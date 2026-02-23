@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quantum PRA v22.2 - Final Authority</title>
+    <style>
+        body { font-family: 'JetBrains Mono', monospace; background: #010409; color: #c9d1d9; padding: 20px; }
+        .container { max-width: 950px; margin: auto; background: #0d1117; padding: 35px; border-radius: 20px; border: 1px solid #30363d; box-shadow: 0 0 60px rgba(57, 211, 83, 0.3); }
+        h1 { text-align: center; color: #39d353; letter-spacing: 5px; text-transform: uppercase; font-size: 1.8rem; }
+        .stats { display: flex; justify-content: space-around; margin: 25px 0; background: #161b22; padding: 20px; border-radius: 12px; border: 1px solid #30363d; }
+        .stat-v { color: #39d353; font-size: 1.8rem; font-weight: bold; display: block; text-align: center; }
+        textarea { width: 100%; height: 280px; background: #010409; color: #79c0ff; border: 1px solid #30363d; padding: 20px; border-radius: 10px; font-size: 14px; outline: none; box-sizing: border-box; }
+        button { width: 100%; padding: 20px; margin-top: 25px; background: #238636; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
+        .root-card { background: #161b22; padding: 15px; margin-top: 10px; border-radius: 8px; border-left: 5px solid #39d353; }
+        .root-val { font-size: 1.3rem; letter-spacing: 5px; color: #f0f6fc; }
+        .watermark { text-align: center; color: #30363d; font-size: 0.7rem; margin-top: 25px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>FINAL AUTHORITY SCAN</h1>
+    <div style="text-align:center; color:#8b949e; font-size:0.8rem; margin-bottom:20px;">v22.2 - FUZZY PATTERN EXTRACTION</div>
+    <textarea id="dataInput" placeholder="PASTE THE 7-LINE DATA HERE..."></textarea>
+    <button onclick="runV22_2()">Execute Universal Extraction</button>
+    <div id="results" style="display:none;">
+        <div class="stats">
+            <div><span id="lCount" class="stat-v">0</span><small>LINES</small></div>
+            <div><span id="sCount" class="stat-v">0ms</span><small>SPEED</small></div>
+            <div><span id="rCount" class="stat-v">0</span><small>ROOTS</small></div>
+            <div><span id="mode" class="stat-v">ULTRA</span><small>MODE</small></div>
+        </div>
+        <div id="display"></div>
+    </div>
+</div>
+<div class="watermark">Designed by udayana ananth kumar</div>
+
+<script>
+function runV22_2() {
+    const t0 = performance.now();
+    const input = document.getElementById('dataInput').value.trim();
+    if (!input) return;
+    
+    // v22.2: Ultra-cleaning logic
+    const lines = input.split('\n')
+                       .filter(l => l.trim())
+                       .map(l => l.toUpperCase().trim().split(/\s+/).filter(t => t.length > 0));
+
+    // v22.2: Force threshold to 1 for deep discovery in small sets
+    let threshold = lines.length <= 10 ? 1 : 2;
+
+    let pool = {};
+    lines.forEach(line => {
+        line.forEach((t, i) => {
+            if (!pool[t]) {
+                let dom = t.match(/[A-Z]/) ? 'A' : (t.match(/[0-9]/) ? 'N' : 'S');
+                pool[t] = { nexts: {}, total: 0, domain: dom };
+            }
+            pool[t].total++;
+            
+            // Circular Symmetry + Deep Linking
+            let nextIndex = (i + 1) % line.length;
+            let n = line[nextIndex];
+            if (n && n !== t) {
+                pool[t].nexts[n] = (pool[t].nexts[n] || 0) + 1;
+            }
+        });
+    });
+
+    let roots = [];
+    let visited = new Set();
+    let tokens = Object.keys(pool).sort((a,b) => pool[b].total - pool[a].total);
+
+    tokens.forEach(token => {
+        if (visited.has(token)) return;
+        let chain = [token];
+        let curr = token;
+        visited.add(token);
+
+        while (true) {
+            let nexts = pool[curr].nexts;
+            let validNexts = Object.keys(nexts).filter(n => 
+                pool[n].domain === pool[token].domain && 
+                !visited.has(n) &&
+                nexts[n] >= threshold
+            );
+            
+            if (validNexts.length > 0) {
+                let bestNext = validNexts.sort((a,b) => nexts[b] - nexts[a])[0];
+                chain.push(bestNext);
+                visited.add(bestNext);
+                curr = bestNext;
+            } else break;
+        }
+        // v22.2: Capture any meaningful sequence (2+ tokens)
+        if (chain.length >= 2) roots.push(chain);
+    });
+
+    let final = roots.filter((c, i) => !roots.some((r, j) => i !== j && c.every(v => r.includes(v))));
+    const t1 = performance.now();
+
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('lCount').innerText = lines.length;
+    document.getElementById('sCount').innerText = (t1 - t0).toFixed(1) + "ms";
+    document.getElementById('rCount').innerText = final.length;
+    document.getElementById('display').innerHTML = final.map(sys => 
+        `<div class="root-card"><div class="root-val">${sys.join(' ')}</div></div>`
+    ).join('');
+}
+</script>
+</body>
+</html>
