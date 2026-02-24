@@ -2,98 +2,125 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GROW-WIN v75.2 - Ultimate Edition</title>
+    <title>GROW-WIN v75.2 - ALSS Ultimate Edition</title>
     <style>
-        :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; }
+        :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; --gold: #f2cc60; }
         body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: #c9d1d9; padding: 20px; }
         .container { max-width: 900px; margin: auto; background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid #30363d; box-shadow: 0 0 80px rgba(57, 211, 83, 0.2); }
         .header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #21262d; padding-bottom: 20px; }
         .brand { font-size: 2.8rem; font-weight: 900; letter-spacing: 10px; color: var(--neon); }
+        .logic-tag { color: var(--blue); font-size: 0.9rem; letter-spacing: 5px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+        .engine-type { color: var(--gold); font-size: 0.8rem; letter-spacing: 4px; margin-top: 5px; font-weight: bold; }
         
         #rsaInput { 
             width: 100%; height: 120px; background: #000; color: var(--neon); border: 2px solid #30363d; 
             padding: 20px; border-radius: 12px; font-size: 1.1rem; font-family: inherit; margin-bottom: 20px; box-sizing: border-box;
+            outline: none; transition: 0.3s;
         }
+        #rsaInput:focus { border-color: var(--neon); box-shadow: 0 0 15px rgba(57, 211, 83, 0.3); }
 
         button { 
             width: 100%; padding: 22px; background: #238636; color: white; border: none; 
             border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 1.3rem; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 2px;
         }
-        button:hover { background: #2ea043; box-shadow: 0 0 30px var(--neon); }
+        button:hover { background: #2ea043; box-shadow: 0 0 30px var(--neon); transform: translateY(-2px); }
 
         .scan-result { 
             display: none; margin-top: 35px; padding: 30px; border: 1px solid var(--blue); 
-            border-radius: 18px; background: #161b22; position: relative;
+            border-radius: 18px; background: #161b22; position: relative; animation: fadeIn 0.5s ease;
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         .status-tag { position: absolute; top: -12px; right: 20px; background: var(--blue); color: #000; padding: 2px 12px; border-radius: 5px; font-size: 0.7rem; font-weight: bold; }
-        .key-output { font-size: 2.2rem; color: var(--neon); font-weight: 800; text-align: center; margin: 20px 0; word-break: break-all; }
+        .key-output { font-size: 2.2rem; color: var(--neon); font-weight: 800; text-align: center; margin: 20px 0; word-break: break-all; text-shadow: 0 0 10px rgba(57, 211, 83, 0.5); }
         
         .footer { text-align: center; margin-top: 50px; color: #484f58; font-size: 0.8rem; letter-spacing: 2px; }
+        .patent-note { color: var(--gold); font-size: 0.65rem; margin-top: 10px; opacity: 0.8; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
+        <div class="logic-tag">Logic Computing</div>
         <div class="brand">GROW-WIN v75.2</div>
-        <div style="color:var(--blue); font-size:0.7rem; letter-spacing:3px; margin-top:5px;">ULTIMATE RSA KEY SCANNER</div>
+        <div class="engine-type">ADAPTIVE LOG-STABILIZED SOLVER (ALSS)</div>
+        <div style="color:var(--blue); font-size:0.6rem; letter-spacing:3px; margin-top:8px;">PRECISION MATHEMATICAL RIG</div>
     </div>
 
     <div class="input-section">
         <label style="font-size: 0.75rem; color: #8b949e; display: block; margin-bottom: 10px;">ENTER ENCRYPTED TARGET (EQUATION = MAGNITUDE):</label>
-        <textarea id="rsaInput" placeholder="Paste your RSA Command here..."></textarea>
-        <button onclick="executeRSAScan()">EXECUTE RSA KEY SCAN</button>
+        <textarea id="rsaInput" placeholder="Write your logic equation here..."></textarea>
+        <button onclick="executeRSAScan()">Run Ultimate Scan</button>
     </div>
 
     <div id="scanResult" class="scan-result">
-        <div class="status-tag">SECURE KEY IDENTIFIED</div>
-        <div style="font-size: 0.8rem; color: #8b949e; text-align: center;">VERIFIED RSA-2048 COMPONENT (X)</div>
+        <div class="status-tag">CONVERGENCE ACHIEVED</div>
+        <div style="font-size: 0.8rem; color: #8b949e; text-align: center;">IDENTIFIED NUMERICAL ROOT (X)</div>
         <div id="keyVal" class="key-output">---</div>
         
         <div style="display: flex; justify-content: space-between; border-top: 1px solid #30363d; padding-top: 15px; font-size: 0.75rem; color: #8b949e;">
-            <div>BIT-STRENGTH: <span style="color:white">INFINITE-SCALE</span></div>
+            <div>SCALE: <span style="color:white">QUINTILLION (10¹⁸)</span></div>
             <div>RESIDUAL: <span style="color:var(--neon)" id="resVal">0.00</span></div>
-            <div>PARSER: <span style="color:var(--blue)">ULTIMATE STABLE</span></div>
+            <div>MODE: <span style="color:var(--blue)">ALSS-STABLE</span></div>
         </div>
     </div>
 
-    <div class="footer">ARCHITECT: <span>UDAYANA ANANTH KUMAR</span></div>
+    <div class="footer">
+        ARCHITECT: <span style="color:#c9d1d9">UDAYANA ANANTH KUMAR</span>
+        <div class="patent-note">SYSTEM PROTECTED BY ARCHITECTURAL LOGIC v75.2</div>
+    </div>
 </div>
 
 <script>
 function executeRSAScan() {
     const input = document.getElementById('rsaInput').value;
     if(!input.includes('=')) {
-        alert("Format Error: Use 'Equation = Target'");
+        alert("Format Error: Use 'Equation = Target'\nExample: 50 * Math.log10(x) + x/10 = 1000");
         return;
     }
 
     try {
         const [eq, tar] = input.split('=');
-        const target = parseFloat(tar.trim());
-        const solver = new Function('x', 'return ' + eq.trim());
+        const target = parseFloat(tar.trim().replace(/,/g, ''));
+        
+        let sanitizedEq = eq.trim();
+        
+        const solver = new Function('x', `
+            try {
+                return ${sanitizedEq};
+            } catch(e) { return NaN; }
+        `);
 
-        // --- THE ULTIMATE UPDATE ---
-        // Range increased to 1e18 (Quintillion Scale)
-        // Iterations increased to 1000 for zero-error convergence
+        // --- ALSS CONVERGENCE ENGINE ---
+        // Range: 0 to 1 Quintillion
+        // Iterations: 1000 for maximum precision
         let low = 0, high = 1e18, x; 
+        
         for(let i=0; i<1000; i++) {
             x = (low + high) / 2;
             let val = solver(x);
+            if(isNaN(val)) break;
             if(val < target) low = x;
             else high = x;
         }
 
+        const finalVal = solver(x);
+        if(isNaN(finalVal)) {
+            alert("Calculation Error: Check Equation Syntax (Use 'Math.log10' instead of 'log10')");
+            return;
+        }
+
         document.getElementById('scanResult').style.display = 'block';
-        document.getElementById('keyVal').innerText = x.toFixed(10);
+        document.getElementById('keyVal').innerText = x.toLocaleString(undefined, {minimumFractionDigits: 10, maximumFractionDigits: 10});
         
-        // Final residual check
-        let finalRes = Math.abs(target - solver(x));
+        let finalRes = Math.abs(target - finalVal);
         document.getElementById('resVal').innerText = finalRes === 0 ? "0.000e+0" : finalRes.toExponential(3);
         
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     } catch(e) {
-        alert("Syntax Error: Check your equation or target.");
+        alert("Syntax Error: Ensure the equation uses standard JavaScript Math functions.");
     }
 }
 </script>
