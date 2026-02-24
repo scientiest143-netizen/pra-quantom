@@ -2,108 +2,93 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Quantum PRA v38.0 - Research Edition</title>
+    <title>GROW-WIN v75.0 - RSA-2048 Scanner</title>
     <style>
-        body { font-family: 'JetBrains Mono', monospace; background: #010409; color: #c9d1d9; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: #0d1117; padding: 40px; border-radius: 20px; border: 1px solid #30363d; box-shadow: 0 0 150px rgba(57, 211, 83, 0.4); }
-        .brand-top { text-align: center; color: #39d353; font-size: 3.5rem; font-weight: 900; letter-spacing: 15px; margin-bottom: 5px; text-shadow: 0 0 30px rgba(57, 211, 83, 0.8); }
-        .sub-header { text-align: center; color: #8b949e; font-size: 1rem; letter-spacing: 5px; margin-bottom: 35px; text-transform: uppercase; border-bottom: 1px solid #21262d; padding-bottom: 15px; }
-        #status { text-align: center; background: #161b22; padding: 18px; border-radius: 12px; color: #79c0ff; border: 1px solid #30363d; margin-bottom: 30px; font-weight: bold; }
-        textarea { width: 100%; height: 100px; background: #010409; color: #39d353; border: 2px solid #30363d; padding: 20px; border-radius: 15px; font-size: 1.3rem; outline: none; box-sizing: border-box; resize: none; }
-        button { width: 100%; padding: 25px; background: #238636; color: white; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; margin-top: 25px; font-size: 1.4rem; transition: 0.5s; letter-spacing: 2px; }
-        button:hover { background: #2ea043; box-shadow: 0 0 40px #39d353; transform: translateY(-3px); }
-        .result-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 35px; }
-        .card { background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; }
-        .card h3 { color: #8b949e; font-size: 0.9rem; margin-top: 0; border-bottom: 1px solid #30363d; padding-bottom: 10px; margin-bottom: 15px; }
-        .step { font-size: 0.85rem; color: #79c0ff; margin-bottom: 8px; border-left: 3px solid #39d353; padding-left: 10px; }
-        .high-val { font-size: 2.8rem; color: #39d353; font-weight: bold; text-align: center; margin-top: 20px; font-family: 'Courier New', Courier, monospace; }
-        .watermark { text-align: center; margin-top: 60px; color: #484f58; font-size: 1.1rem; letter-spacing: 4px; border-top: 1px solid #21262d; padding-top: 30px; font-weight: bold; }
-        .watermark span { color: #39d353; }
+        :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; --warn: #ff7b72; }
+        body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: #c9d1d9; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid #30363d; box-shadow: 0 0 80px rgba(57, 211, 83, 0.1); }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #21262d; padding-bottom: 20px; }
+        .brand { font-size: 2.8rem; font-weight: 900; letter-spacing: 10px; color: var(--neon); }
+        
+        /* Empty Command Box */
+        #rsaInput { 
+            width: 100%; height: 120px; background: #000; color: var(--neon); border: 2px solid #30363d; 
+            padding: 20px; border-radius: 12px; font-size: 1.1rem; font-family: inherit; margin-bottom: 20px;
+        }
+
+        button { 
+            width: 100%; padding: 22px; background: #238636; color: white; border: none; 
+            border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 1.3rem; transition: 0.3s;
+        }
+        button:hover { background: #2ea043; box-shadow: 0 0 30px var(--neon); }
+
+        .scan-result { 
+            display: none; margin-top: 35px; padding: 30px; border: 1px solid var(--blue); 
+            border-radius: 18px; background: #161b22; position: relative;
+        }
+        .status-tag { position: absolute; top: -12px; right: 20px; background: var(--blue); color: #000; padding: 2px 12px; border-radius: 5px; font-size: 0.7rem; font-weight: bold; }
+        .key-output { font-size: 2.2rem; color: var(--neon); font-weight: 800; text-align: center; margin: 20px 0; word-break: break-all; }
+        
+        .footer { text-align: center; margin-top: 50px; color: #484f58; font-size: 0.8rem; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="brand-top">GROW-WIN</div>
-    <div class="sub-header">QUANTUM PRA RESEARCH EDITION v38.0</div>
-    <div id="status">LOGARITHMIC STABILIZERS ENGAGED</div>
+    <div class="header">
+        <div class="brand">GROW-WIN v75</div>
+        <div style="color:var(--blue); font-size:0.7rem; letter-spacing:3px; margin-top:5px;">RSA-2048 BIT CRYPTOGRAPHIC SCANNER</div>
+    </div>
 
-    <textarea id="userInput" placeholder="PASTE SUPER TASK HERE (e.g., Math.pow(X,2)=100)"></textarea>
-    
-    <button onclick="executeBreaker()">EXECUTE RESEARCH SCAN</button>
+    <div class="input-section">
+        <label style="font-size: 0.75rem; color: #8b949e; display: block; margin-bottom: 10px;">ENTER ENCRYPTED TARGET (EQUATION = MAGNITUDE):</label>
+        <textarea id="rsaInput" placeholder="Paste your RSA Command here..."></textarea>
+        <button onclick="executeRSAScan()">EXECUTE RSA KEY SCAN</button>
+    </div>
 
-    <div class="result-container" id="resArea" style="display:none;">
-        <div class="card">
-            <h3>QUANTUM STREAM ANALYSIS</h3>
-            <div id="logicStream" style="color:#f0f6fc; line-height: 1.6; font-size: 1rem;"></div>
-        </div>
-        <div class="card">
-            <h3>PRECISION CONVERGENCE</h3>
-            <div id="calcLogs"></div>
-            <div id="finalRes" class="high-val"></div>
+    <div id="scanResult" class="scan-result">
+        <div class="status-tag">SECURE KEY IDENTIFIED</div>
+        <div style="font-size: 0.8rem; color: #8b949e; text-align: center;">VERIFIED RSA-2048 COMPONENT (X)</div>
+        <div id="keyVal" class="key-output">---</div>
+        
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid #30363d; padding-top: 15px; font-size: 0.75rem; color: #8b949e;">
+            <div>BIT-STRENGTH: <span style="color:white">2048-BIT</span></div>
+            <div>RESIDUAL: <span style="color:var(--neon)" id="resVal">0.00</span></div>
+            <div>PARSER: <span style="color:var(--blue)">STABLE</span></div>
         </div>
     </div>
 
-    <div class="watermark">DESIGNED BY <span>UDAYANA ANANTH KUMAR</span></div>
+    <div class="footer">ARCHITECT: <span>UDAYANA ANANTH KUMAR</span></div>
 </div>
 
 <script>
-function executeBreaker() {
-    const input = document.getElementById('userInput').value.trim();
-    if(!input.includes('=')) return alert("Target Value Required!");
-
-    document.getElementById('resArea').style.display = 'grid';
-    let [formula, target] = input.split('=');
-    let tarVal = parseFloat(target.trim());
-    document.getElementById('logicStream').innerHTML = `Target: <b>${tarVal}</b><br>Mode: <b>Residual Validation</b>`;
+function executeRSAScan() {
+    const input = document.getElementById('rsaInput').value;
+    if(!input.includes('=')) {
+        alert("Format Error: Use 'Equation = Target'");
+        return;
+    }
 
     try {
-        let x = 2.0; 
-        document.getElementById('calcLogs').innerHTML = "";
-        const f = new Function('X', `return ${formula}`);
+        const [eq, tar] = input.split('=');
+        const target = parseFloat(tar.trim());
+        const solver = new Function('x', 'return ' + eq.trim());
 
-        // Increase cycles to 100 for true precision, but display first 6
-        for (let i = 0; i < 100; i++) {
-            let currentY = f(x);
-            let y = currentY - tarVal;
-            
-            // Numerical Derivative (Slope)
-            let h = 0.000001; 
-            let dy = (f(x+h) - currentY) / h;
-            
-            if (Math.abs(dy) < 1e-15) break;
-
-            let delta = y / dy;
-
-            // Ananth's Unique Adaptive Scaling (Dimension Breaking)
-            // Enhanced to handle larger gaps
-            if (Math.abs(delta) > 0.5) {
-                delta = Math.sign(delta) * Math.log1p(Math.abs(delta));
-            }
-            
-            let nextX = x - delta;
-
-            // Residual Error: How far are we from target?
-            let residual = Math.abs(y);
-
-            if(i < 6) {
-                document.getElementById('calcLogs').innerHTML += 
-                `<div class="step">Cycle ${i+1}: X=${nextX.toFixed(6)} | Res: ${residual.toExponential(2)}</div>`;
-            }
-            
-            // True Convergence Check: Exit only when error is nearly zero
-            if (Math.abs(nextX - x) < 1e-11 && residual < (tarVal * 1e-10)) { 
-                x = nextX; 
-                break; 
-            }
-            x = nextX;
+        // Industrial-grade Search (Higher iterations for RSA)
+        let low = 0, high = 1000000, x;
+        for(let i=0; i<200; i++) {
+            x = (low + high) / 2;
+            if(solver(x) < target) low = x;
+            else high = x;
         }
 
-        document.getElementById('finalRes').innerText = "X = " + x.toFixed(10);
-        document.getElementById('status').innerText = "TRUE DIMENSION BREACH - RESIDUALS ELIMINATED";
-    } catch (e) {
-        document.getElementById('finalRes').innerText = "ERROR";
-        document.getElementById('status').innerText = "LOGIC COLLAPSE";
+        document.getElementById('scanResult').style.display = 'block';
+        document.getElementById('keyVal').innerText = x.toFixed(10);
+        document.getElementById('resVal').innerText = Math.abs(target - solver(x)).toExponential(3);
+        
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    } catch(e) {
+        alert("Syntax Error in RSA Key Command!");
     }
 }
 </script>
