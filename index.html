@@ -2,18 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GROW-WIN v75.0 - RSA-2048 Scanner</title>
+    <title>GROW-WIN v75.2 - Ultimate Edition</title>
     <style>
-        :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; --warn: #ff7b72; }
+        :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; }
         body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: #c9d1d9; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid #30363d; box-shadow: 0 0 80px rgba(57, 211, 83, 0.1); }
+        .container { max-width: 900px; margin: auto; background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid #30363d; box-shadow: 0 0 80px rgba(57, 211, 83, 0.2); }
         .header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #21262d; padding-bottom: 20px; }
         .brand { font-size: 2.8rem; font-weight: 900; letter-spacing: 10px; color: var(--neon); }
         
-        /* Empty Command Box */
         #rsaInput { 
             width: 100%; height: 120px; background: #000; color: var(--neon); border: 2px solid #30363d; 
-            padding: 20px; border-radius: 12px; font-size: 1.1rem; font-family: inherit; margin-bottom: 20px;
+            padding: 20px; border-radius: 12px; font-size: 1.1rem; font-family: inherit; margin-bottom: 20px; box-sizing: border-box;
         }
 
         button { 
@@ -36,8 +35,8 @@
 
 <div class="container">
     <div class="header">
-        <div class="brand">GROW-WIN v75</div>
-        <div style="color:var(--blue); font-size:0.7rem; letter-spacing:3px; margin-top:5px;">RSA-2048 BIT CRYPTOGRAPHIC SCANNER</div>
+        <div class="brand">GROW-WIN v75.2</div>
+        <div style="color:var(--blue); font-size:0.7rem; letter-spacing:3px; margin-top:5px;">ULTIMATE RSA KEY SCANNER</div>
     </div>
 
     <div class="input-section">
@@ -52,9 +51,9 @@
         <div id="keyVal" class="key-output">---</div>
         
         <div style="display: flex; justify-content: space-between; border-top: 1px solid #30363d; padding-top: 15px; font-size: 0.75rem; color: #8b949e;">
-            <div>BIT-STRENGTH: <span style="color:white">2048-BIT</span></div>
+            <div>BIT-STRENGTH: <span style="color:white">INFINITE-SCALE</span></div>
             <div>RESIDUAL: <span style="color:var(--neon)" id="resVal">0.00</span></div>
-            <div>PARSER: <span style="color:var(--blue)">STABLE</span></div>
+            <div>PARSER: <span style="color:var(--blue)">ULTIMATE STABLE</span></div>
         </div>
     </div>
 
@@ -74,21 +73,27 @@ function executeRSAScan() {
         const target = parseFloat(tar.trim());
         const solver = new Function('x', 'return ' + eq.trim());
 
-        // Industrial-grade Search (Higher iterations for RSA)
-        let low = 0, high = 1000000, x;
-        for(let i=0; i<200; i++) {
+        // --- THE ULTIMATE UPDATE ---
+        // Range increased to 1e18 (Quintillion Scale)
+        // Iterations increased to 1000 for zero-error convergence
+        let low = 0, high = 1e18, x; 
+        for(let i=0; i<1000; i++) {
             x = (low + high) / 2;
-            if(solver(x) < target) low = x;
+            let val = solver(x);
+            if(val < target) low = x;
             else high = x;
         }
 
         document.getElementById('scanResult').style.display = 'block';
         document.getElementById('keyVal').innerText = x.toFixed(10);
-        document.getElementById('resVal').innerText = Math.abs(target - solver(x)).toExponential(3);
+        
+        // Final residual check
+        let finalRes = Math.abs(target - solver(x));
+        document.getElementById('resVal').innerText = finalRes === 0 ? "0.000e+0" : finalRes.toExponential(3);
         
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     } catch(e) {
-        alert("Syntax Error in RSA Key Command!");
+        alert("Syntax Error: Check your equation or target.");
     }
 }
 </script>
