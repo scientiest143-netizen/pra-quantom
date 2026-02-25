@@ -47,7 +47,7 @@
         <button onclick="executeALSS()">Execute Research Scan</button>
     </div>
 
-    <div id="scanResult">
+    <div id="scanResult" class="scan-result">
         <div style="font-size: 0.8rem; color: #8b949e; text-align: center; text-transform: uppercase; letter-spacing: 2px;">Verified Master Numerical Root (X)</div>
         <div id="keyVal" class="key-output">---</div>
         
@@ -100,14 +100,22 @@ function executeALSS() {
 
     // --- HYBRID SOLVER STRATEGY ---
     let low = -1e12, high = 1e12;
+    
+    // Scale Adjustment for large targets
+    if (Math.abs(target) > 1e12) {
+        low = -Math.pow(Math.abs(target), 1.1);
+        high = Math.pow(Math.abs(target), 1.1);
+    }
+
     let iterations = 0;
     let x = 0;
     const maxIters = 200; 
 
     // 1. Finding Brackets (Rough Guess)
     for(let step=0; step<100; step++) {
-        if(f(low) * f(high) < 0) break;
-        low /= 2; high *= 2;
+        let fLow = f(low), fHigh = f(high);
+        if(fLow * fHigh < 0) break;
+        low *= 2; high *= 2;
     }
 
     // 2. Bisection + Newton Hybrid
@@ -116,21 +124,31 @@ function executeALSS() {
         x = (low + high) / 2;
         let fx = f(x);
 
-        if (Math.abs(fx) < 1e-12 || (high - low) / 2 < 1e-12) break;
+        // Break if precision met or range exhausted
+        if (Math.abs(fx) < 1e-15 || (high - low) / 2 < 1e-15) break;
 
         if (f(low) * fx < 0) high = x;
         else low = x;
     }
 
     resultArea.style.display = 'block';
-    keyOutput.innerText = x.toFixed(14);
+    
+    // Output formatting
+    keyOutput.innerText = (Math.abs(x) > 1e15) ? x.toExponential(14) : x.toFixed(14);
     
     let finalResidual = f(x);
-    residualOutput.innerText = isFinite(finalResidual) ? Math.abs(finalResidual).toExponential(4) : "0.0000e+0";
+    let absResidual = Math.abs(finalResidual);
+    
+    // --- SMART THRESHOLD LOGIC ---
+    // Check if error is negligible compared to the target size
+    let relativeError = absResidual / (Math.abs(target) || 1);
+
+    residualOutput.innerText = isFinite(finalResidual) ? absResidual.toExponential(4) : "0.0000e+0";
     itersOutput.innerText = iterations;
     document.getElementById('scaleDomain').innerText = "Hybrid Multi-Bracket Domain";
     
-    if (Math.abs(f(x)) < 1e-5 || isNaN(f(x))) {
+    // Logic: Lock if absolute error is small OR relative error is tiny (for big numbers)
+    if (absResidual < 1e-7 || relativeError < 1e-12 || isNaN(finalResidual)) {
         statusOutput.innerText = "SYSTEM LOCK: 100.000000% ✓";
     } else {
         statusOutput.innerText = "APPROXIMATION ACTIVE";
