@@ -42,7 +42,7 @@
     </div>
 
     <div class="input-section">
-        <label style="font-size: 0.7rem; color: #8b949e; display: block; margin-bottom: 10px;">UNIVERSAL EQUATION INPUT:</label>
+        <label style="font-size: 0.7rem; color: #8b949e; display: block; margin-bottom: 10px;">UNIVERSAL EQUATION INPUT (Ex: log(x) + x^2 = 100):</label>
         <textarea id="rsaInput" placeholder="Equation = Target"></textarea>
         <button onclick="executeALSS()">Execute Research Scan</button>
     </div>
@@ -65,7 +65,7 @@
             </div>
             <div class="diag-item">
                 <span class="diag-label">Engine Mode:</span>
-                <span class="diag-val">Stabilized Universal Hybrid (Active)</span>
+                <span class="diag-val">Universal Infinite-Stability Logic (Active)</span>
             </div>
         </div>
     </div>
@@ -90,6 +90,7 @@ function executeALSS() {
     const parts = rawInput.split('=');
     const target = parseFloat(parts[1].trim());
     
+    // --- UNIVERSAL PARSER: Handles math functions automatically ---
     let formulaStr = parts[0].trim()
         .replace(/\^/g, '**')
         .replace(/sin/g, 'Math.sin')
@@ -101,60 +102,61 @@ function executeALSS() {
         .replace(/abs/g, 'Math.abs')
         .replace(/pi/g, 'Math.PI');
 
-    // --- STABILIZED EVALUATION FUNCTION ---
     function f(val_x) {
         try {
+            // High-precision x replacement logic
             let evalStr = formulaStr.replace(/(?<![a-zA-Z0-9.])x(?![a-zA-Z0-9.])/g, `(${val_x})`);
             let res = eval(evalStr);
-            if (!isFinite(res)) return res > 0 ? 1e308 : -1e308; // Prevent NaN
+            if (!isFinite(res)) return res > 0 ? 1e308 : -1e308;
             return res - target;
         } catch(e) { return 1e308; }
     }
 
-    // --- SMART SEARCH STRATEGY ---
-    let low = -1e6, high = 1e6;
+    // --- INFINITE STABILITY SOLVER ---
+    let low = -1e10, high = 1e10; 
     let iterations = 0;
     let x = 0;
     const maxIters = 1000;
 
-    // Advanced Domain Expansion
-    for(let step=0; step<100; step++) {
+    // Dynamic Multi-Scale Bracketing
+    for(let step=0; step<200; step++) {
         let fL = f(low), fH = f(high);
-        if((fL * fH < 0) || !isFinite(fL) || !isFinite(fH)) break;
-        low *= 5; high *= 5;
+        if((fL * fH < 0)) break;
+        low *= 10; high *= 10;
+        if(step > 150) { low = -1e100; high = 1e100; } // Extreme scale
     }
 
     for (let i = 0; i < maxIters; i++) {
         iterations++;
         x = (low + high) / 2;
         let fx = f(x);
-
-        if (Math.abs(fx) < 1e-15 || (high - low) / 2 < 1e-15) break;
-
+        
+        // Break on extreme precision
+        if (Math.abs(fx) < 1e-18 || (high - low) / 2 < 1e-18) break;
+        
         if (f(low) * fx < 0) high = x;
         else low = x;
     }
 
     resultArea.style.display = 'block';
     
-    // Safety check for Output
     let finalRes = f(x);
-    let displayX = isFinite(x) ? x : 0;
-    keyOutput.innerText = (Math.abs(displayX) > 1e15 || (Math.abs(displayX) < 1e-4 && displayX !== 0)) ? displayX.toExponential(14) : displayX.toFixed(14);
-    
     let absRes = Math.abs(finalRes);
-    residualOutput.innerText = isFinite(absRes) ? absRes.toExponential(4) : "ERROR";
+    
+    // Auto-Format Output (Scientific or Decimal)
+    keyOutput.innerText = (Math.abs(x) > 1e15 || (Math.abs(x) < 1e-4 && x !== 0)) ? x.toExponential(14) : x.toFixed(14);
+    residualOutput.innerText = absRes.toExponential(4);
     itersOutput.innerText = iterations;
     document.getElementById('scaleDomain').innerText = "Universal Multi-Scale";
 
-    // --- REFINED VERIFICATION LOGIC ---
-    // If it's NaN or Infinity, it's definitely NOT a System Lock
-    if (isFinite(finalRes) && (absRes < 1e-2 || (absRes / (Math.abs(target) || 1)) < 1e-10)) {
+    // --- ARCHITECTURAL VERIFICATION ---
+    let relError = absRes / (Math.abs(target) || 1);
+    if (isFinite(finalRes) && (absRes < 1e-5 || relError < 1e-12)) {
         statusOutput.innerText = "SYSTEM LOCK: 100.000000% ✓";
         statusOutput.style.color = "var(--neon)";
     } else {
-        statusOutput.innerText = "DIVERGENCE DETECTED / APPROXIMATION";
-        statusOutput.style.color = "var(--danger)";
+        statusOutput.innerText = "APPROXIMATION ACTIVE / DIVERGING";
+        statusOutput.style.color = "var(--gold)";
     }
 
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
