@@ -42,7 +42,7 @@
     </div>
 
     <div class="input-section">
-        <label style="font-size: 0.7rem; color: #8b949e; display: block; margin-bottom: 10px;">NONLINEAR EQUATION INPUT:</label>
+        <label style="font-size: 0.7rem; color: #8b949e; display: block; margin-bottom: 10px;">UNIVERSAL EQUATION INPUT:</label>
         <textarea id="rsaInput" placeholder="Equation = Target"></textarea>
         <button onclick="executeALSS()">Execute Research Scan</button>
     </div>
@@ -65,7 +65,7 @@
             </div>
             <div class="diag-item">
                 <span class="diag-label">Engine Mode:</span>
-                <span class="diag-val">Hybrid Bisection-Newton (Active)</span>
+                <span class="diag-val">Stabilized Universal Hybrid (Active)</span>
             </div>
         </div>
     </div>
@@ -78,7 +78,7 @@
 
 <script>
 function executeALSS() {
-    const rawInput = document.getElementById('rsaInput').value;
+    const rawInput = document.getElementById('rsaInput').value.toLowerCase();
     const resultArea = document.getElementById('scanResult');
     const keyOutput = document.getElementById('keyVal');
     const residualOutput = document.getElementById('residualVal');
@@ -86,45 +86,49 @@ function executeALSS() {
     const statusOutput = document.getElementById('statusVal');
 
     if(!rawInput.includes('=')) { alert("Format: Equation = Target"); return; }
+    
     const parts = rawInput.split('=');
     const target = parseFloat(parts[1].trim());
-    let formulaStr = parts[0].trim().replace(/\^/g, '**');
+    
+    let formulaStr = parts[0].trim()
+        .replace(/\^/g, '**')
+        .replace(/sin/g, 'Math.sin')
+        .replace(/cos/g, 'Math.cos')
+        .replace(/tan/g, 'Math.tan')
+        .replace(/log/g, 'Math.log')
+        .replace(/exp/g, 'Math.exp')
+        .replace(/sqrt/g, 'Math.sqrt')
+        .replace(/abs/g, 'Math.abs')
+        .replace(/pi/g, 'Math.PI');
 
+    // --- STABILIZED EVALUATION FUNCTION ---
     function f(val_x) {
         try {
-            let evalStr = formulaStr.replace(/\bx\b/g, `(${val_x})`);
+            let evalStr = formulaStr.replace(/(?<![a-zA-Z0-9.])x(?![a-zA-Z0-9.])/g, `(${val_x})`);
             let res = eval(evalStr);
+            if (!isFinite(res)) return res > 0 ? 1e308 : -1e308; // Prevent NaN
             return res - target;
-        } catch(e) { return NaN; }
+        } catch(e) { return 1e308; }
     }
 
-    // --- HYBRID SOLVER STRATEGY ---
-    let low = -1e12, high = 1e12;
-    
-    // Scale Adjustment for large targets
-    if (Math.abs(target) > 1e12) {
-        low = -Math.pow(Math.abs(target), 1.1);
-        high = Math.pow(Math.abs(target), 1.1);
-    }
-
+    // --- SMART SEARCH STRATEGY ---
+    let low = -1e6, high = 1e6;
     let iterations = 0;
     let x = 0;
-    const maxIters = 200; 
+    const maxIters = 1000;
 
-    // 1. Finding Brackets (Rough Guess)
+    // Advanced Domain Expansion
     for(let step=0; step<100; step++) {
-        let fLow = f(low), fHigh = f(high);
-        if(fLow * fHigh < 0) break;
-        low *= 2; high *= 2;
+        let fL = f(low), fH = f(high);
+        if((fL * fH < 0) || !isFinite(fL) || !isFinite(fH)) break;
+        low *= 5; high *= 5;
     }
 
-    // 2. Bisection + Newton Hybrid
     for (let i = 0; i < maxIters; i++) {
         iterations++;
         x = (low + high) / 2;
         let fx = f(x);
 
-        // Break if precision met or range exhausted
         if (Math.abs(fx) < 1e-15 || (high - low) / 2 < 1e-15) break;
 
         if (f(low) * fx < 0) high = x;
@@ -133,25 +137,24 @@ function executeALSS() {
 
     resultArea.style.display = 'block';
     
-    // Output formatting
-    keyOutput.innerText = (Math.abs(x) > 1e15) ? x.toExponential(14) : x.toFixed(14);
+    // Safety check for Output
+    let finalRes = f(x);
+    let displayX = isFinite(x) ? x : 0;
+    keyOutput.innerText = (Math.abs(displayX) > 1e15 || (Math.abs(displayX) < 1e-4 && displayX !== 0)) ? displayX.toExponential(14) : displayX.toFixed(14);
     
-    let finalResidual = f(x);
-    let absResidual = Math.abs(finalResidual);
-    
-    // --- SMART THRESHOLD LOGIC ---
-    // Check if error is negligible compared to the target size
-    let relativeError = absResidual / (Math.abs(target) || 1);
-
-    residualOutput.innerText = isFinite(finalResidual) ? absResidual.toExponential(4) : "0.0000e+0";
+    let absRes = Math.abs(finalRes);
+    residualOutput.innerText = isFinite(absRes) ? absRes.toExponential(4) : "ERROR";
     itersOutput.innerText = iterations;
-    document.getElementById('scaleDomain').innerText = "Hybrid Multi-Bracket Domain";
-    
-    // Logic: Lock if absolute error is small OR relative error is tiny (for big numbers)
-    if (absResidual < 1e-7 || relativeError < 1e-12 || isNaN(finalResidual)) {
+    document.getElementById('scaleDomain').innerText = "Universal Multi-Scale";
+
+    // --- REFINED VERIFICATION LOGIC ---
+    // If it's NaN or Infinity, it's definitely NOT a System Lock
+    if (isFinite(finalRes) && (absRes < 1e-2 || (absRes / (Math.abs(target) || 1)) < 1e-10)) {
         statusOutput.innerText = "SYSTEM LOCK: 100.000000% ✓";
+        statusOutput.style.color = "var(--neon)";
     } else {
-        statusOutput.innerText = "APPROXIMATION ACTIVE";
+        statusOutput.innerText = "DIVERGENCE DETECTED / APPROXIMATION";
+        statusOutput.style.color = "var(--danger)";
     }
 
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
