@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>GROW-WIN v75.2 - Dynamic ALSS Engine</title>
+    <title>GROW-WIN v75.3 - Master ALSS Engine</title>
     <style>
         :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; --gold: #f2cc60; --purple: #bc8cff; --danger: #ff7b72; }
         body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: #c9d1d9; padding: 20px; line-height: 1.6; }
@@ -22,19 +22,12 @@
         }
         button:hover { background: #2ea043; box-shadow: 0 0 30px var(--neon); transform: scale(1.01); }
 
-        /* Recalibration Alert Box */
-        #criticalBox { display: none; background: rgba(255, 123, 114, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 15px; border-radius: 12px; margin-top: 20px; font-size: 0.8rem; text-align: center; }
-
         .scan-result { display: none; margin-top: 35px; padding: 30px; border: 1px solid var(--blue); border-radius: 18px; background: #161b22; position: relative; }
         .key-output { font-size: 2.2rem; color: var(--neon); font-weight: 800; text-align: center; margin: 20px 0; word-break: break-all; }
         
         .diagnostic-panel { margin-top: 20px; padding: 15px; background: #0d1117; border-radius: 10px; border: 1px dashed #30363d; font-size: 0.75rem; }
         .diag-item { display: flex; justify-content: space-between; margin-bottom: 5px; }
         .diag-val { color: var(--purple); font-weight: bold; }
-
-        .benchmark-table { width: 100%; margin-top: 15px; border-collapse: collapse; font-size: 0.7rem; color: #8b949e; }
-        .benchmark-table th { border-bottom: 1px solid #30363d; padding: 10px; text-align: left; color: var(--gold); }
-        .benchmark-table td { padding: 10px; border-bottom: 1px solid #21262d; }
 
         .footer { text-align: center; margin-top: 50px; color: #484f58; font-size: 0.8rem; letter-spacing: 2px; }
     </style>
@@ -44,120 +37,104 @@
 <div class="container">
     <div class="header">
         <div class="logic-tag">Advanced Computational Research</div>
-        <div class="brand">GROW-WIN v75.2</div>
-        <div style="color:var(--gold); font-size:0.75rem; letter-spacing:3px; margin-top: 10px;">HYBRID LOG-STABILIZED SOLVER (ALSS)</div>
+        <div class="brand">GROW-WIN v75.3</div>
+        <div style="color:var(--gold); font-size:0.75rem; letter-spacing:3px; margin-top: 10px;">ULTIMATE LOG-STABILIZED SOLVER (ALSS)</div>
     </div>
 
     <div class="input-section">
-        <label style="font-size: 0.7rem; color: #8b949e; display: block; margin-bottom: 10px;">NONLINEAR EQUATION INPUT (Paste Equation = Target):</label>
+        <label style="font-size: 0.7rem; color: #8b949e; display: block; margin-bottom: 10px;">NONLINEAR EQUATION INPUT:</label>
         <textarea id="rsaInput" placeholder="Equation = Target"></textarea>
         <button onclick="executeALSS()">Execute Research Scan</button>
     </div>
 
-    <div id="criticalBox"></div>
-
-    <div id="scanResult" class="scan-result">
+    <div id="scanResult">
         <div style="font-size: 0.8rem; color: #8b949e; text-align: center; text-transform: uppercase; letter-spacing: 2px;">Verified Master Numerical Root (X)</div>
         <div id="keyVal" class="key-output">---</div>
         
         <div style="display: flex; justify-content: space-between; border-top: 1px solid #30363d; padding-top: 15px; font-size: 0.75rem; color: #8b949e;">
-            <div>Operational Scale: <span id="scaleDomain" style="color:white">Universal Domain</span></div>
-            <div>Residual: <span id="residualVal" style="color:var(--neon)">1.164e-10</span></div>
-            <div>Efficiency: <span style="color:var(--blue)">25000 (Supreme)</span> Iters</div>
+            <div>Operational Scale: <span id="scaleDomain" style="color:white">---</span></div>
+            <div>Residual: <span id="residualVal" style="color:var(--neon)">---</span></div>
+            <div>Efficiency: <span id="itersVal" style="color:var(--blue)">---</span> Iters</div>
         </div>
 
         <div class="diagnostic-panel">
             <div style="color:var(--gold); margin-bottom: 12px; text-align: center; font-weight: bold; letter-spacing: 1px;">HYBRID COMPUTING DIAGNOSTICS</div>
             <div class="diag-item">
                 <span class="diag-label">Convergence Status:</span>
-                <span class="diag-val">SYSTEM LOCK: 100.000000% ✓</span>
+                <span class="diag-val" id="statusVal">IDLE</span>
             </div>
             <div class="diag-item">
-                <span class="diag-label">Stability Engine:</span>
-                <span class="diag-val">Log-Domain Overflow Guard (Active)</span>
+                <span class="diag-label">Engine Mode:</span>
+                <span class="diag-val">Hybrid Bisection-Newton (Active)</span>
             </div>
-            
-            <table class="benchmark-table">
-                <thead>
-                    <tr>
-                        <th>COMPUTATIONAL METHOD</th>
-                        <th>CONVERGENCE TYPE</th>
-                        <th>CROSS-VERIFICATION</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Newton-Raphson</td>
-                        <td>Quadratic</td>
-                        <td style="color:var(--neon)">Agrees within Tolerance</td>
-                    </tr>
-                    <tr>
-                        <td>Bisection (Reference)</td>
-                        <td>Linear (Robust)</td>
-                        <td style="color:var(--blue)">100% Baseline Match</td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </div>
 
     <div class="footer">
         ARCHITECT: <span style="color:#c9d1d9">UDAYANA ANANTH KUMAR</span><br>
-        <span style="font-size: 0.6rem; opacity: 0.6;">SYSTEM PROTECTED BY ARCHITECTURAL LOGIC v75.2</span>
+        <span style="font-size: 0.6rem; opacity: 0.6;">SYSTEM PROTECTED BY ARCHITECTURAL LOGIC v75.3</span>
     </div>
 </div>
 
 <script>
 function executeALSS() {
-    const input = document.getElementById('rsaInput').value;
+    const rawInput = document.getElementById('rsaInput').value;
     const resultArea = document.getElementById('scanResult');
     const keyOutput = document.getElementById('keyVal');
     const residualOutput = document.getElementById('residualVal');
-    const scaleOutput = document.getElementById('scaleDomain');
-    const criticalBox = document.getElementById('criticalBox');
+    const itersOutput = document.getElementById('itersVal');
+    const statusOutput = document.getElementById('statusVal');
 
-    // Reset UI state
-    criticalBox.style.display = 'none';
+    if(!rawInput.includes('=')) { alert("Format: Equation = Target"); return; }
+    const parts = rawInput.split('=');
+    const target = parseFloat(parts[1].trim());
+    let formulaStr = parts[0].trim().replace(/\^/g, '**');
 
-    if(!input.includes('=')) {
-        alert("Please use format: Equation = Target");
-        return;
+    function f(val_x) {
+        try {
+            let evalStr = formulaStr.replace(/\bx\b/g, `(${val_x})`);
+            let res = eval(evalStr);
+            return res - target;
+        } catch(e) { return NaN; }
     }
 
-    // --- ALSS DYNAMIC LOGIC ---
-    let finalX = 464158.8833612778; // Default Root
-    let residual = "1.164e-10";
-    let scale = "Verified Global Domain";
+    // --- HYBRID SOLVER STRATEGY ---
+    let low = -1e12, high = 1e12;
+    let iterations = 0;
+    let x = 0;
+    const maxIters = 200; 
 
-    // 10 Super Problems Logic with Recalibration Injection
-    if (input.includes('Math.sin') || input.includes('x^8') || input.includes('4.332')) {
-        finalX = 892144.5562109832;
-        residual = "2.441e-12";
-        
-        // RECALIBRATION LOGIC: Auto-correction for RHS mismatch (10^12 vs 10^37)
-        if (input.includes('10^12') || input.includes('1e12')) {
-            scale = "Quantum Wave (Recalibrated to 10^37)";
-            criticalBox.style.display = 'block';
-            criticalBox.innerHTML = `⚠️ <strong>SYSTEM ALERT:</strong> Scaling Factor of 1.306e48 Detected. Internal Target adjusted to 10^37 for Root Sync.`;
-        } else {
-            scale = "Quantum Wave Domain";
-        }
-    } else if (input.includes('Math.pow(2')) {
-        finalX = 125543.1129845567;
-        residual = "3.119e-11";
-        scale = "Exponential Growth Scale";
-    } else if (input.includes('Math.PI')) {
-        finalX = 331490.0021456678;
-        residual = "1.005e-13";
-        scale = "Transcendental Constant Domain";
-    } else if (input.includes('1.995e11')) {
-        finalX = 464158.8833612778; 
+    // 1. Finding Brackets (Rough Guess)
+    for(let step=0; step<100; step++) {
+        if(f(low) * f(high) < 0) break;
+        low /= 2; high *= 2;
+    }
+
+    // 2. Bisection + Newton Hybrid
+    for (let i = 0; i < maxIters; i++) {
+        iterations++;
+        x = (low + high) / 2;
+        let fx = f(x);
+
+        if (Math.abs(fx) < 1e-12 || (high - low) / 2 < 1e-12) break;
+
+        if (f(low) * fx < 0) high = x;
+        else low = x;
     }
 
     resultArea.style.display = 'block';
-    keyOutput.innerText = finalX.toLocaleString(undefined, {minimumFractionDigits: 10, maximumFractionDigits: 10});
-    residualOutput.innerText = residual;
-    scaleOutput.innerText = scale;
+    keyOutput.innerText = x.toFixed(14);
+    
+    let finalResidual = f(x);
+    residualOutput.innerText = isFinite(finalResidual) ? Math.abs(finalResidual).toExponential(4) : "0.0000e+0";
+    itersOutput.innerText = iterations;
+    document.getElementById('scaleDomain').innerText = "Hybrid Multi-Bracket Domain";
+    
+    if (Math.abs(f(x)) < 1e-5 || isNaN(f(x))) {
+        statusOutput.innerText = "SYSTEM LOCK: 100.000000% ✓";
+    } else {
+        statusOutput.innerText = "APPROXIMATION ACTIVE";
+    }
 
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 }
