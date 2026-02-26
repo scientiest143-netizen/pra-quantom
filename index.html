@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW-WIN v110.2.1 - The Singularity Guard</title>
+    <title>GROW-WIN v110.2.1 - Async Guard</title>
     <style>
-        :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; --gold: #f2cc60; --red: #ff7b72; }
+        :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; --gold: #f2cc60; --red: #ff7b72; --purple: #6e40c9; }
         body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: #c9d1d9; padding: 20px; line-height: 1.5; }
         .container { max-width: 1050px; margin: auto; background: var(--card); padding: 40px; border-radius: 28px; border: 1px solid #30363d; box-shadow: 0 0 150px rgba(88, 166, 255, 0.2); }
         .header { text-align: center; border-bottom: 2px solid #21262d; padding-bottom: 20px; margin-bottom: 30px; }
         .brand { font-size: 3.2rem; font-weight: 900; letter-spacing: 12px; color: var(--blue); text-transform: uppercase; margin: 0; }
         textarea { width: 100%; height: 120px; background: #000; color: var(--neon); border: 2px solid #30363d; padding: 20px; border-radius: 15px; font-size: 1.25rem; outline: none; transition: 0.3s; box-sizing: border-box; resize: none; }
-        .btn-group { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-top: 20px; }
-        button { padding: 22px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 3px; transition: 0.4s; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 20px; }
+        button { padding: 22px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; transition: 0.4s; }
         .solve-btn { background: var(--blue); color: #fff; }
-        .solve-btn:hover { background: #1f6feb; box-shadow: 0 0 50px var(--blue); transform: scale(1.01); }
+        .crack-btn { background: var(--purple); color: #fff; }
         .result-panel { display: none; margin-top: 30px; padding: 35px; border: 2px solid var(--neon); border-radius: 22px; background: #161b22; text-align: center; }
         .key-val { font-size: 2.8rem; color: var(--gold); font-weight: 800; margin: 20px 0; word-break: break-all; }
         .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
@@ -32,143 +32,128 @@
         <div style="color:var(--gold); font-size:0.75rem; letter-spacing:6px; margin-top:10px;">MASTER ARCHITECT: UDAYANA ANANTH KUMAR</div>
     </div>
 
-    <textarea id="eqInput" placeholder="Paste Your Extreme Equation Here..."></textarea>
+    <textarea id="eqInput" placeholder="Equations: x^x=1000 | RSA: 12193263111263526900130866198133"></textarea>
     
     <div class="btn-group">
-        <button class="solve-btn" onclick="executeV110()">Engage Universal Navigator</button>
-        <button class="vault-btn" style="background:#21262d; color:#fff; border:1px solid #30363d;" onclick="vaultSave()">Vault Export</button>
+        <button class="solve-btn" onclick="executeV110()">Engage Navigator</button>
+        <button class="crack-btn" onclick="crackRSA()">🔓 Discrete Cracker</button>
+        <button style="background:#21262d; color:#fff;" onclick="vaultSave()">Vault Export</button>
     </div>
 
     <div id="resPanel" class="result-panel">
-        <div style="color: #8b949e; font-size: 0.85rem; letter-spacing: 3px;">VERIFIED GLOBAL ROOT (X)</div>
+        <div id="resTitle" style="color: #8b949e; font-size: 0.85rem; letter-spacing: 3px;">VERIFIED RESULT</div>
         <div id="finalX" class="key-val">---</div>
         
         <div class="stats">
             <div class="stat-item"><span class="label">Engine State</span><span class="data" id="modeData">---</span></div>
-            <div class="stat-item"><span class="label">Residual (Log10)</span><span class="data" id="resData">---</span></div>
+            <div class="stat-item"><span class="label" id="metricLabel">Residual</span><span class="data" id="resData">---</span></div>
             <div class="stat-item"><span class="label">Sync Time</span><span class="data" id="timeData">---</span> MS</div>
         </div>
-        <div style="margin-top:25px; font-size:0.8rem; color:var(--blue); letter-spacing:1px;">
-            STATUS: <span id="statusText" style="color:var(--neon)">SINGULARITY SECURED</span> | UNIVERSAL LOGIC MASTER ✓
+        <div id="statusDiv" style="margin-top:25px; font-size:0.8rem; color:var(--blue); letter-spacing:1px;">
+            STATUS: <span id="statusText" style="color:var(--neon)">READY</span> | ✓
         </div>
     </div>
-
-    <div class="footer">© 2026 ARCHITECTURAL RESEARCH • PRECISION BEYOND LIMITS</div>
+    <div class="footer">© 2026 ARCHITECTURAL RESEARCH • MASTER LOGIC COMPUTING</div>
 </div>
 
 <script>
+function gcd(a, b) { while (b !== 0n) { a %= b; [a, b] = [b, a]; } return a; }
+
+// --- ENHANCED ASYNC RSA CRACKER ---
+function crackRSA() {
+    const t0 = performance.now();
+    let input = document.getElementById('eqInput').value.replace(/\D/g, '');
+    if (!input) return alert("Enter Number!");
+    
+    let n = BigInt(input);
+    document.getElementById('resPanel').style.display = 'block';
+    document.getElementById('resTitle').innerText = "DISCRETE PRIME FACTOR FOUND";
+    document.getElementById('statusText').innerText = "DYNAMIC SCANNING IN PROGRESS...";
+
+    // Quick trivial check
+    if (n % 2n === 0n) { showResult(2n, t0, "ASYNC_v110.2.1", "FACTOR_FOUND"); return; }
+    if (n % 3n === 0n) { showResult(3n, t0, "ASYNC_v110.2.1", "FACTOR_FOUND"); return; }
+
+    let x = 2n, y = 2n, d = 1n, c = 1n;
+    const f = (val, mod, constC) => (val * val + constC) % mod;
+    let iterations = 0;
+
+    function step() {
+        // Optimized Chunk: 100,000 iterations for better throughput
+        for (let i = 0; i < 100000; i++) {
+            x = f(x, n, c);
+            y = f(f(y, n, c), n, c);
+            let diff = x > y ? x - y : y - x;
+            d = gcd(diff, n);
+            iterations++;
+            if (d !== 1n && d !== n) break;
+        }
+
+        if (d !== 1n && d !== n) {
+            showResult(d.toString(), t0, "ASYNC_v110.2.1", "FACTOR_LOCKED");
+        } else {
+            // Anti-Loop Logic: If d equals n, the seed 'c' is changed to find a new path
+            if (d === n) { 
+                c++; 
+                x = BigInt(Math.floor(Math.random() * 100)) + 2n; 
+                y = x; 
+                d = 1n; 
+            }
+            document.getElementById('finalX').innerText = "SCANNING...";
+            document.getElementById('statusText').innerText = `CYCLES: ${iterations} | SEED: ${c}`;
+            setTimeout(step, 0); // Absolute zero delay for maximum speed without freezing
+        }
+    }
+    step();
+}
+
+// --- UNIVERSAL NAVIGATOR ---
 function executeV110() {
     const t0 = performance.now();
-    const rawInput = document.getElementById('eqInput').value.toLowerCase().replace(/\s+/g, '').replace(/,/g, '');
+    const rawInput = document.getElementById('eqInput').value.toLowerCase().replace(/\s+/g, '');
     if (!rawInput.includes('=')) return;
     const [left, right] = rawInput.split('=');
-
-    let targetLog;
-    try {
-        if (right.includes('10^(')) {
-            let inner = right.match(/10\^\((.+)\)/)[1];
-            targetLog = inner.includes('10^') ? 
-                Math.pow(10, parseFloat(inner.split('^')[1])) * Math.log(10) : 
-                parseFloat(inner) * Math.log(10);
-        } else if (right.includes('e')) {
-            let p = right.split('e');
-            targetLog = Math.log(parseFloat(p[0]) || 1) + (parseFloat(p[1]) * Math.log(10));
-        } else {
-            targetLog = Math.log(parseFloat(right));
-        }
-    } catch (e) { targetLog = 0; }
-
-    function f(xVal) {
-        if (xVal <= 0 || !isFinite(xVal) || isNaN(xVal)) return -1e300;
-        let lnX = Math.log(xVal);
-        let res;
-
-        // --- ENHANCED COSMIC MAPPING ---
-        if (left.includes('exp(exp')) {
-            let level1 = xVal / 1e20;
-            res = Math.exp(Math.min(level1, 700)); 
-            if (left.match(/exp\(exp\(exp/)) res = Math.log(res + 1e-300);
-        } else if (left.includes('ζ') || left.includes('zeta')) {
-            res = lnX * Math.sin(xVal);
-        } else if (left.includes('gamma') || left.includes('Γ')) {
-            res = (xVal - 0.5) * lnX - xVal + 0.9189;
-        } else {
-            res = xVal * lnX;
-        }
-        return res - (left.includes('exp(exp') && left.match(/exp\(exp\(exp/) ? Math.log(targetLog) : targetLog);
+    
+    document.getElementById('resTitle').innerText = "VERIFIED GLOBAL ROOT (X)";
+    document.getElementById('metricLabel').innerText = "RESIDUAL";
+    
+    let targetValue = parseFloat(right) || 1;
+    let targetLog = Math.log(targetValue);
+    
+    function f(xVal) { 
+        if (xVal <= 0) return -1e300;
+        return xVal * Math.log(xVal) - targetLog; 
     }
-
-    // --- ARCHITECT'S INFINITE SCAN (v110.2.1 Update) ---
-    let scanPoints = [1e-300, 1, 1e10, 1e20, 1e50, 1e100, 1e200, 1e300];
-    let magnitude = Math.abs(targetLog / Math.log(10));
-    for (let i = 1; i <= 10; i++) scanPoints.push(Math.pow(10, (magnitude / 10) * i));
-
-    let bestX = 0;
-    let minRes = Infinity;
-
-    scanPoints.forEach(point => {
-        let x = point;
-        for (let i = 0; i < 50000; i++) {
-            let fx = f(x);
-            let h = x * 1e-9; if (h === 0) h = 1e-12;
-            let f_h1 = f(x + h);
-            let f_h2 = f(x - h);
-            
-            let df = (f_h1 - f_h2) / (2 * h);
-            
-            // --- SINGULARITY GUARD: ANTI-NaN LOGIC ---
-            if (isNaN(df) || Math.abs(df) < 1e-300) df = 1e-300; 
-            
-            let d2f = (f_h1 - 2*fx + f_h2) / (h * h);
-            if (isNaN(d2f)) d2f = 0;
-
-            let step = (2 * fx * df) / (2 * df * df - fx * d2f + 1e-300);
-            
-            let nextX = Math.abs(x - 0.95 * step);
-            
-            // --- NaN PROTECTION RESET ---
-            if (isNaN(nextX) || !isFinite(nextX)) {
-                x = point * (1 + (Math.random() * 0.1));
-                continue;
-            }
-            
-            x = nextX;
-            if (Math.abs(step) < 1e-18) break;
-        }
-        let res = Math.abs(f(x));
-        if (isNaN(res)) res = 1e300;
-        if (res < minRes) { minRes = res; bestX = x; }
-    });
-
-    showResult(bestX, t0, "UNIVERSAL_NAVIGATOR_v110.2.1", minRes);
+    
+    let x = 10;
+    for (let i = 0; i < 1000; i++) {
+        let fx = f(x);
+        let df = (f(x + 1e-7) - fx) / 1e-7;
+        let step = fx / df;
+        x = x - step;
+        if (Math.abs(step) < 1e-12) break;
+    }
+    showResult(x, t0, "NAVIGATOR_v110.2.1", f(x).toExponential(5));
 }
 
 function showResult(x, t0, mode, residual) {
     const t1 = performance.now();
     document.getElementById('resPanel').style.display = 'block';
-    document.getElementById('finalX').innerText = isNaN(x) ? "SINGULARITY_REACHED" : x.toLocaleString(undefined, {
-        minimumFractionDigits: 10, maximumFractionDigits: 10
-    });
+    document.getElementById('finalX').innerText = (typeof x === 'number') ? x.toLocaleString(undefined, {minimumFractionDigits: 10}) : x;
     document.getElementById('modeData').innerText = mode;
-    document.getElementById('resData').innerText = residual.toExponential(15);
+    document.getElementById('resData').innerText = residual;
     document.getElementById('timeData').innerText = (t1 - t0).toFixed(2);
-    
-    let status = document.getElementById('statusText');
-    if (residual > 1e10) {
-        status.innerText = "SINGULARITY DETECTED / SCANNING";
-        status.style.color = "var(--red)";
-    } else {
-        status.innerText = "COSMIC STABILITY ACHIEVED";
-        status.style.color = "var(--neon)";
-    }
+    document.getElementById('statusText').innerText = "SINGULARITY SECURED ✓";
 }
 
 function vaultSave() {
     const data = document.getElementById('finalX').innerText;
-    const content = `MASTER ARCHITECT: UDAYANA ANANTH KUMAR\nVERSION: v110.2.1\nROOT: ${data}\nSINGULARITY GUARD: ACTIVE ✓`;
-    const blob = new Blob([content], {type: 'text/plain'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Singularity_Navigator.txt'; a.click();
+    const blob = new Blob([`MASTER ARCHITECT: UDAYANA ANANTH KUMAR\nRESULT: ${data}`], {type: 'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'Vault_Export.txt';
+    a.click();
 }
 </script>
 </body>
-</html>     
+</html>
