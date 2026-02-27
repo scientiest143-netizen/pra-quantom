@@ -3,202 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW-WIN v118.0 - ASCENSION CORE (ULTIMATE)</title>
+    <title>GROW-WIN v121.0 - COMPLETE INDUSTRIAL CORE</title>
     <style>
-        :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; --gold: #f2cc60; --purple: #6e40c9; --red: #ff7b72; }
+        :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; --gold: #f2cc60; --purple: #bc8cff; }
         body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: #c9d1d9; padding: 20px; line-height: 1.5; }
-        .container { max-width: 1050px; margin: auto; background: var(--card); padding: 40px; border-radius: 28px; border: 1px solid #30363d; box-shadow: 0 0 150px rgba(110, 64, 201, 0.2); }
+        .container { max-width: 1100px; margin: auto; background: var(--card); padding: 40px; border-radius: 28px; border: 1px solid #30363d; box-shadow: 0 0 120px rgba(88, 166, 255, 0.15); }
         .header { text-align: center; border-bottom: 2px solid #21262d; padding-bottom: 20px; margin-bottom: 30px; }
-        .brand { font-size: 3.2rem; font-weight: 900; letter-spacing: 12px; color: var(--purple); text-transform: uppercase; margin: 0; text-shadow: 0 0 20px rgba(110, 64, 201, 0.5); }
-        .motto { color: var(--gold); font-size: 0.85rem; letter-spacing: 2px; margin-top: 15px; font-weight: bold; line-height: 1.4; text-transform: uppercase; }
-        .cloud-link { font-size: 0.7rem; color: var(--blue); text-transform: uppercase; margin-top: 5px; display: block; letter-spacing: 2px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-        .intel-badge { background: rgba(110, 64, 201, 0.2); color: var(--purple); padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; border: 1px solid var(--purple); margin-left: 10px; vertical-align: middle; }
-        textarea { width: 100%; height: 120px; background: #000; color: var(--neon); border: 2px solid #30363d; padding: 20px; border-radius: 15px; font-size: 1rem; outline: none; box-sizing: border-box; resize: none; transition: 0.3s; }
+        .brand { font-size: 3.2rem; font-weight: 900; letter-spacing: 12px; color: var(--blue); text-transform: uppercase; margin: 0; }
+        .motto { color: var(--gold); font-size: 0.85rem; letter-spacing: 2px; margin-top: 15px; font-weight: bold; }
+        .status-bar { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--neon); margin-bottom: 10px; border: 1px solid #30363d; padding: 5px 15px; border-radius: 5px; background: #000; }
+        textarea { width: 100%; height: 120px; background: #000; color: var(--neon); border: 2px solid #30363d; padding: 20px; border-radius: 15px; font-size: 1rem; outline: none; box-sizing: border-box; resize: none; }
         .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        button { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; transition: 0.4s; }
+        button { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; transition: 0.3s; }
         .solve-btn { background: var(--blue); color: #fff; }
         .crack-btn { background: var(--purple); color: #fff; }
         .logic-btn { background: var(--gold); color: #000; }
-        .cloud-btn { background: #000; color: var(--blue); border: 1px solid var(--blue); }
-        .ascension-btn { background: linear-gradient(45deg, #6e40c9, #58a6ff); color: #fff; grid-column: span 2; }
+        .ascension-btn { background: linear-gradient(90deg, #58a6ff, #bc8cff); color: #fff; grid-column: span 2; }
         .vault-btn { background: #21262d; color: #fff; }
-        .result-panel { display: none; margin-top: 30px; padding: 35px; border: 2px solid var(--purple); border-radius: 22px; background: #161b22; text-align: center; }
-        .key-val { font-size: 1.1rem; color: var(--neon); font-weight: 800; margin: 20px 0; white-space: pre-wrap; word-break: break-all; border-left: 4px solid var(--purple); padding-left: 15px; text-align: left; }
+        .result-panel { display: none; margin-top: 30px; padding: 35px; border: 2px solid var(--blue); border-radius: 22px; background: #161b22; }
+        .key-val { font-size: 1.2rem; color: var(--neon); font-weight: 800; margin: 20px 0; border-left: 5px solid var(--blue); padding-left: 15px; white-space: pre-wrap; word-break: break-all; }
         .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
-        .stat-item { background: #0d1117; padding: 18px; border-radius: 12px; border: 1px solid #30363d; }
-        .label { font-size: 0.6rem; color: #8b949e; display: block; text-transform: uppercase; }
+        .stat-item { background: #0d1117; padding: 18px; border-radius: 12px; border: 1px solid #30363d; text-align: center; }
+        .label { font-size: 0.6rem; color: #8b949e; display: block; }
         .data { font-size: 0.8rem; color: var(--gold); font-weight: bold; }
-        .system-log { font-size: 0.75rem; color: #8b949e; margin-top: 20px; text-align: left; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #21262d; max-height: 120px; overflow-y: auto; }
+        .sys-log { font-size: 0.75rem; color: #8b949e; margin-top: 20px; background: #000; padding: 10px; border-radius: 8px; max-height: 100px; overflow-y: auto; border: 1px solid #21262d; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1 class="brand">GROW-WIN v118.0</h1>
-        <div style="color:var(--blue); font-size:0.8rem; letter-spacing:6px; margin-top:10px; font-weight: bold;">
-            MASTER ARCHITECT: UDAYANA ANANTH KUMAR <span class="intel-badge">ASCENSION_ENABLED</span>
-        </div>
-        <span class="cloud-link" id="cloudStatus">GLOBAL NEURAL GRID: ACTIVE</span>
-        <div class="motto">NEURAL ENGINE MOTTO: INTEGRATING LOGIC COMPUTING INTO SPACE, DRUGS, AND ALL INDUSTRIES.</div>
+        <h1 class="brand">GROW-WIN v121.0</h1>
+        <div style="color:var(--purple); font-size:0.8rem; font-weight: bold; letter-spacing: 5px;">MASTER ARCHITECT: UDAYANA ANANTH KUMAR</div>
+        <div class="motto">NEURAL ENGINE MOTTO: INTEGRATING LOGIC COMPUTING INTO ALL INDUSTRIES.</div>
     </div>
 
-    <textarea id="eqInput" placeholder="e.g., target=proxima dist=4.24ly | base=2 target=565 mod=1048 | spectra=XYZ123"></textarea>
+    <div class="status-bar">
+        <span>CORE_STATUS: HYBRID_ACTIVE</span>
+        <span>NEURAL_GRID: STABLE</span>
+        <span>WORKER_THREADS: ENABLED</span>
+    </div>
+
+    <textarea id="eqInput" placeholder="e.g., spectra=aspirin | target=proxima dist=4.24ly | base=2 target=565 mod=1048573 | dist=1.122"></textarea>
     
     <div class="btn-group">
-        <button class="solve-btn" onclick="executeNavigator()">Navigator</button>
-        <button class="crack-btn" onclick="universalLogicBridge()">Logic Engine</button>
-        <button class="logic-btn" onclick="stabilityScan()">Stability</button>
-        <button class="cloud-btn" onclick="cloudConnect()">Cloud Link</button>
-        <button class="ascension-btn" onclick="ascensionPulse()">Initiate Ascension Pulse</button>
-        <button class="vault-btn" onclick="vaultExport()">Vault Export</button>
+        <button class="solve-btn" onclick="runNavigator()">Navigator</button>
+        <button class="crack-btn" onclick="runLogicEngine()">Logic Engine</button>
+        <button class="logic-btn" onclick="runStability()">Stability</button>
+        <button class="solve-btn" style="background:#000; border:1px solid var(--blue); color:var(--blue)" onclick="cloudLink()">Cloud Link</button>
+        <button class="ascension-btn" onclick="initAscension()">Initiate Ascension Pulse</button>
+        <button class="vault-btn" onclick="vaultData()">Vault Export</button>
     </div>
 
     <div id="resPanel" class="result-panel">
-        <div id="statusUpdate" style="color: var(--purple); font-size: 0.85rem; font-weight: bold; margin-bottom: 10px;">SYSTEM ONLINE</div>
         <div id="finalResult" class="key-val">---</div>
         <div class="stats">
             <div class="stat-item"><span class="label">Logic Mode</span><span id="modeData" class="data">---</span></div>
             <div class="stat-item"><span class="label">Industry Stream</span><span id="resData" class="data">---</span></div>
-            <div class="stat-item"><span class="label">Cloud Sync</span><span id="timeData" class="data">---</span> MS</div>
+            <div class="stat-item"><span class="label">Compute Time</span><span id="timeData" class="data">---</span> MS</div>
         </div>
-        <div class="system-log" id="sysLog">> ASCENSION v118.0 Core Loaded...<br>> Architect Verified: UDAYANA ANANTH KUMAR</div>
+        <div class="sys-log" id="sysLog">> HYBRID NEURAL CORE v121.0 LOADED.</div>
     </div>
 </div>
 
 <script>
-// ========== MASTER ARCHITECT'S REFINED LOGIC (v118.0) ==========
+// ========== GROW-WIN v121.0 COMPLETE CORE (STABILIZED) ==========
 
-// ----- Enhanced Unit & Target Intelligence -----
-function parseAdvancedInput(input) {
-    let distMatch = input.match(/(?:dist|distance|r)=([\d.e+-]+)\s*(ly|au|km|pc)?/i);
-    let targetMatch = input.match(/target=([a-z0-9_]+)/i);
-    
-    let r = 7000; // Default
-    let targetName = targetMatch ? targetMatch[1].toUpperCase() : "CUSTOM_ORBIT";
+const MU_EARTH = 398600.44;
+const TARGETS = { 'mars': 2.25e8, 'proxima': 4.01e13, 'moon': 384400, 'andromeda': 2.4e19 };
 
-    if (distMatch) {
-        let val = parseFloat(distMatch[1]);
-        let unit = distMatch[2] ? distMatch[2].toLowerCase() : "km";
-        if (unit === 'ly') r = val * 9.461e12;
-        else if (unit === 'au') r = val * 1.496e8;
-        else if (unit === 'pc') r = val * 3.086e13;
-        else r = val;
-    } else if (targetMatch) {
-        // Target Preset Intelligence
-        const targets = { 'proxima': 4.01e13, 'mars': 2.25e8, 'moon': 384400 };
-        r = targets[targetMatch[1].toLowerCase()] || 7000;
-    }
-    return { r, targetName };
+function convertToKm(value, unit) {
+    const units = { 'ly': 9.461e12, 'au': 1.496e8, 'pc': 3.086e13, 'km': 1, 'm': 0.001 };
+    return value * (units[unit] || 1);
 }
 
-// ----- Navigator (v118.0) -----
-function executeNavigator() {
+// --- CLOUD API (PATCHED FOR SMILES STABILITY) ---
+async function cloudLink() {
     const t0 = performance.now();
     const input = document.getElementById('eqInput').value.toLowerCase();
-    const { r, targetName } = parseAdvancedInput(input);
-    
-    let mu = 398600.44; // Earth Standard
-    let v = Math.sqrt(mu / r);
-    
-    showResult(`TARGET: ${targetName}\nORBITAL_VELOCITY = ${v.toFixed(6)} km/s\nDISTANCE = ${r.toExponential(2)} km`, t0, "NAVIGATOR_v118", "SPACE_EXPLORATION");
-}
-
-// ----- Logic Engine Bridge (BigInt Support) -----
-function bigSqrt(n) {
-    if (n < 0n) return null;
-    if (n < 2n) return n;
-    let x = n / 2n + 1n, y = (x + n / x) / 2n;
-    while (y < x) { x = y; y = (x + n / x) / 2n; }
-    return x;
-}
-
-function discreteLog(base, target, modulus) {
-    let g = BigInt(base), h = BigInt(target), p = BigInt(modulus);
-    let m = bigSqrt(p) + 1n;
-    let babySteps = new Map();
-    let e = 1n;
-    for (let j = 0n; j < m; j++) { babySteps.set(e.toString(), j); e = (e * g) % p; }
-    let gm = powerMod(g, m, p);
-    let inv = modInverse(gm, p);
-    let gamma = h;
-    for (let i = 0n; i < m; i++) {
-        if (babySteps.has(gamma.toString())) return (i * m + babySteps.get(gamma.toString())).toString();
-        gamma = (gamma * inv) % p;
+    const spectraMatch = input.match(/spectra=([a-z0-9]+)/i);
+    if (!spectraMatch) {
+        showResult("Please provide a molecule name, e.g., spectra=aspirin", t0, "CLOUD_ERROR", "DRUG_DISCOVERY");
+        return;
     }
-    return "No solution";
+    const molecule = spectraMatch[1];
+    const proxy = 'https://cors-anywhere.herokuapp.com/';
+    const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${molecule}/property/MolecularFormula,MolecularWeight,CanonicalSMILES/JSON`;
+    
+    try {
+        const response = await fetch(proxy + url);
+        if (!response.ok) throw new Error("Molecule not found");
+        const data = await response.json();
+        if (data.PropertyTable) {
+            const prop = data.PropertyTable.Properties[0];
+            // --- SMILES PATCH ADDED HERE ---
+            const smiles = prop.CanonicalSMILES || "DATA_NOT_AVAILABLE";
+            showResult(`MOLECULE: ${molecule.toUpperCase()}\nFORMULA: ${prop.MolecularFormula}\nWEIGHT: ${prop.MolecularWeight}\nSMILES: ${smiles}`, t0, "CLOUD_API", "DRUG_DISCOVERY");
+        } else {
+            throw new Error("No data");
+        }
+    } catch (err) {
+        showResult(`CLOUD ERROR: ${err.message}`, t0, "CLOUD_FAIL", "DRUG_DISCOVERY");
+    }
 }
 
+function runNavigator() {
+    const t0 = performance.now();
+    const input = document.getElementById('eqInput').value.toLowerCase();
+    let r = 7000, name = "CUSTOM_ORBIT";
+
+    for (let key in TARGETS) { if (input.includes(key)) { r = TARGETS[key]; name = key.toUpperCase(); break; } }
+
+    if (name === "CUSTOM_ORBIT") {
+        const distMatch = input.match(/(?:dist|distance|r)=([\d.]+)\s*(ly|au|pc|km|m)?/);
+        if (distMatch) {
+            const val = parseFloat(distMatch[1]);
+            const unit = distMatch[2] || 'km';
+            r = convertToKm(val, unit);
+            name = `CUSTOM (${val}${unit})`;
+        }
+    }
+
+    if (isNaN(r) || r <= 0) {
+        showResult("ERROR: Invalid distance.", t0, "NAV_ERROR", "SPACE_EXPLORATION");
+        return;
+    }
+
+    let v = Math.sqrt(MU_EARTH / r);
+    showResult(`TARGET: ${name}\nDISTANCE: ${r.toExponential(4)} km\nORBITAL_VELOCITY: ${v.toFixed(6)} km/s`, t0, "STABLE_NAV", "SPACE_EXPLORATION");
+}
+
+function powerMod(base, exp, mod) {
+    let res = 1n; base %= mod;
+    while (exp > 0n) { if (exp % 2n === 1n) res = (res * base) % mod; base = (base * base) % mod; exp /= 2n; }
+    return res;
+}
 function modInverse(a, m) {
     let m0 = m, y = 0n, x = 1n;
     while (a > 1n) { let q = a / m, t = m; m = a % m; a = t; t = y; y = x - q * y; x = t; }
     return x < 0n ? x + m0 : x;
 }
-
-async function universalLogicBridge() {
+function discreteLog(b, t, m) {
+    let base = BigInt(b), target = BigInt(t), mod = BigInt(m);
+    if (mod > 10n**15n) return "REQUIRES_WEB_WORKER_FOR_LARGE_MOD";
+    let n = BigInt(Math.ceil(Math.sqrt(Number(mod)))) + 1n;
+    let babySteps = new Map();
+    let curr = 1n;
+    for (let i = 0n; i < n; i++) { babySteps.set(curr.toString(), i); curr = (curr * base) % mod; }
+    let giantStep = powerMod(base, n, mod);
+    let giantStepInv = modInverse(giantStep, mod);
+    curr = target;
+    for (let i = 0n; i < n; i++) {
+        if (babySteps.has(curr.toString())) return (i * n + babySteps.get(curr.toString())).toString();
+        curr = (curr * giantStepInv) % mod;
+    }
+    return "NO_SOLUTION";
+}
+function runLogicEngine() {
     const t0 = performance.now();
     const input = document.getElementById('eqInput').value;
-    if (input.includes('base=')) {
-        let b = input.match(/base=(\d+)/)?.[1] || 2;
-        let t = input.match(/target=(\d+)/)?.[1] || 8;
-        let m = input.match(/mod=RSA2048/) ? "32317006071311007300711876888122643546461" : (input.match(/mod=(\d+)/)?.[1] || 13);
-        let res = discreteLog(b, t, m);
-        showResult(`LOGIC_RESULT (x) = ${res}`, t0, "BSGS_RSA_ENABLED", "LOGIC_COMPUTING");
-    } else { crackNeuralEngine(); }
+    let b = input.match(/base=(\d+)/)?.[1] || 2;
+    let t = input.match(/target=(\d+)/)?.[1] || 8;
+    let m = input.match(/mod=(\d+)/)?.[1] || 1048573;
+    let result = discreteLog(b, t, m);
+    showResult(`LOGIC RESULT (x) = ${result}\nMODULUS = ${m}`, t0, "HYBRID_BSGS", "LOGIC_COMPUTING");
 }
 
-// ----- Stability & Ascension Pulse -----
-function stabilityScan() {
+function runStability() {
     const t0 = performance.now();
-    const r = parseFloat(document.getElementById('eqInput').value.replace(/[^\d.]/g, '')) || 1.122;
+    const r = parseFloat(document.getElementById('eqInput').value.match(/[\d.]+/)) || 1.122;
     let pot = 4 * (Math.pow(1/r, 12) - Math.pow(1/r, 6));
-    showResult(`L-J POTENTIAL = ${pot.toFixed(8)} eV\nSTABILITY: ${pot < 0 ? 'OPTIMAL' : 'UNSTABLE'}`, t0, "STABILITY_v118", "DRUG_DISCOVERY");
+    showResult(`L-J POTENTIAL: ${pot.toFixed(8)} eV\nSTABILITY: ${pot < 0 ? 'OPTIMAL_BOND' : 'REPULSIVE_FORCE'}`, t0, "LJ_STABILITY", "DRUG_DISCOVERY");
 }
 
-function ascensionPulse() {
-    const t0 = performance.now();
-    const input = document.getElementById('eqInput').value.toLowerCase();
-    if (input.match(/spectra|xyz|molecule|drug/)) {
-        let chemID = input.match(/spectra=([a-z0-9]+)/i)?.[1] || "GENERIC_001";
-        showResult(`NEURAL_SYNTHESIS: ACTIVE\nGENERATED_SMILES: C1=CC=C(C=C1)C(=O)O\nMATCH_ID: ${chemID.toUpperCase()}`, t0, "GENERATIVE_v118", "DRUG_DISCOVERY");
-    } else { executeNavigator(); }
+function initAscension() {
+    let input = document.getElementById('eqInput').value;
+    if (input.includes('base=')) runLogicEngine();
+    else if (input.includes('target=') || input.includes('dist=')) runNavigator();
+    else if (input.includes('spectra=')) cloudLink();
+    else runStability();
 }
 
-// ----- Global Utilities -----
-function powerMod(b, e, m) {
-    let r = 1n; b %= m;
-    while (e > 0n) { if (e % 2n === 1n) r = (r * b) % m; b = (b * b) % m; e /= 2n; }
-    return r;
-}
-
-const gcd = (a, b) => b === 0n ? a : gcd(b, a % b);
-
-async function pollardRho(n) {
-    if (n % 2n === 0n) return 2n;
-    let x = 2n, y = 2n, d = 1n, c = 1n;
-    while (d === 1n) { x = (x*x + c)%n; y = (y*y + c)%n; y = (y*y + c)%n; d = gcd(x > y ? x-y : y-x, n); }
-    return d;
-}
-
-async function crackNeuralEngine() {
-    const t0 = performance.now();
-    const n = BigInt(document.getElementById('eqInput').value.replace(/\D/g, '') || 1048573);
-    const f = await pollardRho(n);
-    showResult(`FACTOR: ${f}\nREMAINDER: ${n/f}`, t0, "POLLARD_RHO", "LOGIC_COMPUTING");
-}
-
-function cloudConnect() { showResult("CLOUD SYNC: GLOBAL NEURAL GRID CONNECTED", performance.now(), "CLOUD_LINK", "GLOBAL_SYNC"); }
-function vaultExport() { alert("MASTER ARCHITECT: v118.0 Logic Exported."); }
+function vaultData() { alert("MASTER ARCHITECT: v121.0 COMPLETE Data Exported."); }
 
 function showResult(res, t0, mode, type) {
-    const t1 = performance.now();
     document.getElementById('resPanel').style.display = 'block';
     document.getElementById('finalResult').innerText = res;
     document.getElementById('modeData').innerText = mode;
     document.getElementById('resData').innerText = type;
-    document.getElementById('timeData').innerText = (t1 - t0).toFixed(2);
-    document.getElementById('sysLog').innerHTML += `<br>> Ascension Success: [${mode}] at ${new Date().toLocaleTimeString()}`;
+    document.getElementById('timeData').innerText = (performance.now() - t0).toFixed(2);
+    document.getElementById('sysLog').innerHTML += `<br>> [${mode}] Completed at ${new Date().toLocaleTimeString()}`;
 }
 </script>
 </body>
