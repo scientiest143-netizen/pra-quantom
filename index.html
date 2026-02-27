@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW-WIN v124.0 - KANGAROO CORE</title>
+    <title>GROW-WIN v125.0 - KANGAROO CORE</title>
     <style>
         :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; --gold: #f2cc60; --purple: #bc8cff; }
         body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: #c9d1d9; padding: 20px; line-height: 1.5; }
@@ -33,18 +33,18 @@
 
 <div class="container">
     <div class="header">
-        <h1 class="brand">GROW-WIN v124.0</h1>
+        <h1 class="brand">GROW-WIN v125.0</h1>
         <div style="color:var(--purple); font-size:0.8rem; font-weight: bold; letter-spacing: 5px;">MASTER ARCHITECT: UDAYANA ANANTH KUMAR</div>
         <div class="motto">NEURAL ENGINE MOTTO: INTEGRATING LOGIC COMPUTING INTO ALL INDUSTRIES.</div>
     </div>
 
     <div class="status-bar">
-        <span>CORE_STATUS: HYBRID_ACTIVE</span>
-        <span>NEURAL_GRID: STABLE</span>
+        <span>CORE_STATUS: 100Cr_LOGIC_READY</span>
+        <span>NEURAL_GRID: ENHANCED</span>
         <span id="workerStatus">WORKER_THREADS: STANDBY</span>
     </div>
 
-    <textarea id="eqInput" placeholder="Enter logic parameters here... (e.g., base=2 target=1024 mod=123456789)"></textarea>
+    <textarea id="eqInput" placeholder="Enter logic parameters here... (e.g., base=3 target=205891132094649 mod=12345678901234567891)"></textarea>
     
     <div class="btn-group">
         <button class="solve-btn" onclick="runNavigator()">Navigator</button>
@@ -62,7 +62,7 @@
             <div class="stat-item"><span class="label">Industry Stream</span><span id="resData" class="data">---</span></div>
             <div class="stat-item"><span class="label">Compute Time</span><span id="timeData" class="data">---</span> MS</div>
         </div>
-        <div class="sys-log" id="sysLog">> KANGAROO NEURAL CORE v124.0 LOADED.</div>
+        <div class="sys-log" id="sysLog">> KANGAROO NEURAL CORE v125.0 INITIALIZED.</div>
     </div>
 </div>
 
@@ -84,21 +84,25 @@ const workerCode = `
 
         const trapPoints = new Map();
         const jumps = [];
-        for(let i=0; i<32; i++) jumps.push(2n**BigInt(i));
+        for(let i=0; i<64; i++) jumps.push(2n**BigInt(i % 32));
 
-        let tameExp = BigInt(id) * BigInt(limit); 
+        // Tame Kangaroo: Sectoring for 100 Crore range
+        let tameExp = BigInt(id) * BigInt(limit) * 15n; 
         let tamePos = powMod(base, tameExp, mod);
         
         for (let i = 0; i < limit; i++) {
-            let step = jumps[Number(tamePos % 32n)];
+            let step = jumps[Number(tamePos % 64n)];
             tameExp += step;
             tamePos = (tamePos * powMod(base, step, mod)) % mod;
-            if (tamePos % 5000n === 0n) trapPoints.set(tamePos.toString(), tameExp);
+            // Density optimization for 100Cr steps
+            if (tamePos % 800n === 0n) trapPoints.set(tamePos.toString(), tameExp);
         }
 
         let wildExp = 0n, wildPos = target;
-        for (let j = 0; j < limit * 4; j++) {
-            let step = jumps[Number(wildPos % 32n)];
+        // Search limit expanded to hit 1.2 Billion operations total
+        let searchLimit = limit * 10; 
+        for (let j = 0; j < searchLimit; j++) {
+            let step = jumps[Number(wildPos % 64n)];
             wildExp += step;
             wildPos = (wildPos * powMod(base, step, mod)) % mod;
             if (trapPoints.has(wildPos.toString())) {
@@ -117,14 +121,14 @@ let activeWorkers = [];
 function runKangaroo() {
     const t0 = performance.now();
     const input = document.getElementById('eqInput').value;
-    if(!input) return; // Empty input check
+    if(!input) return;
 
-    const b = input.match(/base=(\d+)/)?.[1] || 2;
-    const t = input.match(/target=(\d+)/)?.[1] || 8;
-    const m = input.match(/mod=(\d+)/)?.[1] || 1048573;
+    const b = input.match(/base=(\d+)/)?.[1] || 3;
+    const t = input.match(/target=(\d+)/)?.[1] || 205891132094649;
+    const m = input.match(/mod=(\d+)/)?.[1] || 12345678901234567891;
     
-    document.getElementById('workerStatus').innerText = "WORKER_THREADS: 4_NEURAL_CORES_ACTIVE";
-    showResult("KANGAROOS RELEASED INTO THE NEURAL GRID...", t0, "POLLARD_LAMBDA_PARALLEL", "LOGIC_COMPUTING");
+    document.getElementById('workerStatus').innerText = "WORKER_THREADS: 1.2Bn_DENSITY_ACTIVE";
+    showResult("ASCENDING TO 100 CRORE LOGIC GRID...", t0, "KANGAROO_ULTRA_v125", "MULTI_INDUSTRIAL_NEURAL");
     
     activeWorkers.forEach(w => w.terminate());
     activeWorkers = [];
@@ -137,16 +141,16 @@ function runKangaroo() {
             if (e.data.found && !isFound) {
                 isFound = true;
                 activeWorkers.forEach(wrk => wrk.terminate());
-                showResult(`LOGIC RESULT (x) = ${e.data.result}\\nMODULUS = ${m}\\n(Parallel Hunt Success!)`, t0, "POLLARD_LAMBDA_PARALLEL", "LOGIC_COMPUTING");
+                showResult(`LOGIC RESULT (x) = ${e.data.result}\\nMODULUS = ${m}\\n(Billion Step Success!)`, t0, "KANGAROO_ULTRA_v125", "LOGIC_COMPUTING");
                 document.getElementById('workerStatus').innerText = "WORKER_THREADS: STANDBY";
             } else if (!isFound && i === 3) {
-                // If last worker finishes without find
                 setTimeout(() => {
-                    if(!isFound) showResult("KANGAROO FAILED: RESULT NOT IN SEARCH RANGE. TRY HIGHER LIMIT.", t0, "POLLARD_LAMBDA_PARALLEL", "LOGIC_COMPUTING");
+                    if(!isFound) showResult("1.2Bn SCAN COMPLETE. RESULT BEYOND CURRENT DEPTH.", t0, "KANGAROO_ULTRA_v125", "LOGIC_COMPUTING");
                 }, 1000);
             }
         };
-        w.postMessage({ b, t, m, limit: 15000000, id: i });
+        // 32M * 4 workers * 10x wild jump = 1.28 Billion Step Capacity
+        w.postMessage({ b, t, m, limit: 32000000, id: i });
         activeWorkers.push(w);
     }
 }
