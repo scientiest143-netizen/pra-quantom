@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW-WIN v122.0 - HYPER-THREAD CORE</title>
+    <title>GROW-WIN v124.0 - KANGAROO CORE</title>
     <style>
         :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; --gold: #f2cc60; --purple: #bc8cff; }
         body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: #c9d1d9; padding: 20px; line-height: 1.5; }
@@ -33,7 +33,7 @@
 
 <div class="container">
     <div class="header">
-        <h1 class="brand">GROW-WIN v122.0</h1>
+        <h1 class="brand">GROW-WIN v124.0</h1>
         <div style="color:var(--purple); font-size:0.8rem; font-weight: bold; letter-spacing: 5px;">MASTER ARCHITECT: UDAYANA ANANTH KUMAR</div>
         <div class="motto">NEURAL ENGINE MOTTO: INTEGRATING LOGIC COMPUTING INTO ALL INDUSTRIES.</div>
     </div>
@@ -44,11 +44,11 @@
         <span id="workerStatus">WORKER_THREADS: STANDBY</span>
     </div>
 
-    <textarea id="eqInput" placeholder="base=2 target=8 mod=12345678901234567891"></textarea>
+    <textarea id="eqInput" placeholder="base=2 target=1024 mod=12345678901234567891"></textarea>
     
     <div class="btn-group">
         <button class="solve-btn" onclick="runNavigator()">Navigator</button>
-        <button class="crack-btn" onclick="runLogicEngine()">Logic Engine</button>
+        <button class="crack-btn" onclick="runKangaroo()">Kangaroo Logic</button>
         <button class="logic-btn" onclick="runStability()">Stability</button>
         <button class="solve-btn" style="background:#000; border:1px solid var(--blue); color:var(--blue)" onclick="cloudLink()">Cloud Link</button>
         <button class="ascension-btn" onclick="initAscension()">Initiate Ascension Pulse</button>
@@ -62,126 +62,119 @@
             <div class="stat-item"><span class="label">Industry Stream</span><span id="resData" class="data">---</span></div>
             <div class="stat-item"><span class="label">Compute Time</span><span id="timeData" class="data">---</span> MS</div>
         </div>
-        <div class="sys-log" id="sysLog">> HYBRID NEURAL CORE v122.0 LOADED.</div>
+        <div class="sys-log" id="sysLog">> KANGAROO NEURAL CORE v124.0 LOADED.</div>
     </div>
 </div>
 
 <script>
-// --- WORKER SCRIPT BLOB (The Parallel Brain) ---
+// --- UPDATED v125.0 STRATEGY FOR KANGAROO WORKER ---
 const workerCode = `
     self.onmessage = function(e) {
-        const { b, t, m } = e.data;
+        let { b, t, m, limit } = e.data;
         const base = BigInt(b), target = BigInt(t), mod = BigInt(m);
-        
-        function powerMod(base, exp, mod) {
+
+        function powMod(base, exp, mod) {
             let res = 1n; base %= mod;
-            while (exp > 0n) { if (exp % 2n === 1n) res = (res * base) % mod; base = (base * base) % mod; exp /= 2n; }
+            while (exp > 0n) {
+                if (exp % 2n === 1n) res = (res * base) % mod;
+                base = (base * base) % mod;
+                exp /= 2n;
+            }
             return res;
         }
-        function modInverse(a, m) {
-            let m0 = m, y = 0n, x = 1n;
-            while (a > 1n) { let q = a / m, t = m; m = a % m; a = t; t = y; y = x - q * y; x = t; }
-            return x < 0n ? x + m0 : x;
+
+        const trapPoints = new Map();
+        const jumps = [];
+        for(let i=0; i<32; i++) jumps.push(2n**BigInt(i)); // Increased jump set
+
+        let tameExp = 0n, tamePos = 1n;
+        
+        // Tame Kangaroo
+        for (let i = 0; i < limit; i++) {
+            let step = jumps[Number(tamePos % 32n)];
+            tameExp += step;
+            tamePos = (tamePos * powMod(base, step, mod)) % mod;
+            // Distinguished point trap (every 5000 to save memory)
+            if (tamePos % 5000n === 0n) trapPoints.set(tamePos.toString(), tameExp);
         }
 
-        let n = BigInt(Math.ceil(Math.sqrt(Number(mod)))) + 1n;
-        let babySteps = new Map();
-        let curr = 1n;
-        for (let i = 0n; i < n; i++) { babySteps.set(curr.toString(), i); curr = (curr * base) % mod; }
-        let giantStep = powerMod(base, n, mod);
-        let giantStepInv = modInverse(giantStep, mod);
-        curr = target;
-        let found = "NO_SOLUTION";
-        for (let i = 0n; i < n; i++) {
-            if (babySteps.has(curr.toString())) { found = (i * n + babySteps.get(curr.toString())).toString(); break; }
-            curr = (curr * giantStepInv) % mod;
+        let wildExp = 0n, wildPos = target;
+        // Wild Kangaroo - Searching 4 times the limit for 20-digit security
+        for (let j = 0; j < limit * 4; j++) {
+            let step = jumps[Number(wildPos % 32n)];
+            wildExp += step;
+            wildPos = (wildPos * powMod(base, step, mod)) % mod;
+            
+            if (trapPoints.has(wildPos.toString())) {
+                let dLog = trapPoints.get(wildPos.toString()) - wildExp;
+                if (dLog < 0n) dLog += (mod - 1n);
+                self.postMessage({found: true, result: dLog.toString()});
+                return;
+            }
         }
-        self.postMessage(found);
+        self.postMessage({found: false});
     };
 `;
 
-const blob = new Blob([workerCode], { type: 'application/javascript' });
-const workerUrl = URL.createObjectURL(blob);
-let logicWorker = null;
+let kangarooWorker = null;
 
-const MU_EARTH = 398600.44;
-const TARGETS = { 'mars': 2.25e8, 'proxima': 4.01e13, 'moon': 384400, 'andromeda': 2.4e19 };
-
-function convertToKm(value, unit) {
-    const units = { 'ly': 9.461e12, 'au': 1.496e8, 'pc': 3.086e13, 'km': 1, 'm': 0.001 };
-    return value * (units[unit] || 1);
-}
-
-function runLogicEngine() {
+function runKangaroo() {
     const t0 = performance.now();
     const input = document.getElementById('eqInput').value;
     const b = input.match(/base=(\d+)/)?.[1] || 2;
     const t = input.match(/target=(\d+)/)?.[1] || 8;
     const m = input.match(/mod=(\d+)/)?.[1] || 1048573;
-
-    document.getElementById('workerStatus').innerText = "WORKER_THREADS: ACTIVE";
-    showResult("NEURAL WORKER INITIATED... CALCULATING LARGE MODULUS.", t0, "HYBRID_BSGS", "LOGIC_COMPUTING");
-
-    if (logicWorker) logicWorker.terminate();
-    logicWorker = new Worker(workerUrl);
-
-    logicWorker.onmessage = function(e) {
-        const t1 = performance.now();
-        showResult(`LOGIC RESULT (x) = ${e.data}\nMODULUS = ${m}\n(Background Thread Success)`, t0, "HYBRID_BSGS", "LOGIC_COMPUTING");
+    
+    document.getElementById('workerStatus').innerText = "WORKER_THREADS: KANGAROO_SEARCHING";
+    showResult("KANGAROOS RELEASED INTO THE NEURAL GRID...", t0, "POLLARD_LAMBDA", "LOGIC_COMPUTING");
+    
+    if (kangarooWorker) kangarooWorker.terminate();
+    const blob = new Blob([workerCode], { type: 'application/javascript' });
+    kangarooWorker = new Worker(URL.createObjectURL(blob));
+    
+    kangarooWorker.onmessage = function(e) {
+        if (e.data.found) {
+            showResult(`LOGIC RESULT (x) = ${e.data.result}\nMODULUS = ${m}\n(Kangaroo Hunt Success!)`, t0, "POLLARD_LAMBDA", "LOGIC_COMPUTING");
+        } else {
+            showResult("KANGAROO FAILED: RESULT NOT IN SEARCH RANGE. TRY HIGHER LIMIT.", t0, "POLLARD_LAMBDA", "LOGIC_COMPUTING");
+        }
         document.getElementById('workerStatus').innerText = "WORKER_THREADS: STANDBY";
-        document.getElementById('timeData').innerText = (t1 - t0).toFixed(2);
     };
 
-    logicWorker.postMessage({ b, t, m });
+    // INCREASED LIMIT TO 10 MILLION FOR 20-DIGIT SUPPORT
+    kangarooWorker.postMessage({ b, t, m, limit: 10000000 }); 
 }
 
 function runNavigator() {
     const t0 = performance.now();
-    const input = document.getElementById('eqInput').value.toLowerCase();
-    let r = 7000, name = "CUSTOM_ORBIT";
-    for (let key in TARGETS) { if (input.includes(key)) { r = TARGETS[key]; name = key.toUpperCase(); break; } }
-    if (name === "CUSTOM_ORBIT") {
-        const distMatch = input.match(/(?:dist|distance|r)=([\d.]+)\s*(ly|au|pc|km|m)?/);
-        if (distMatch) {
-            const val = parseFloat(distMatch[1]);
-            const unit = distMatch[2] || 'km';
-            r = convertToKm(val, unit);
-            name = `CUSTOM (${val}${unit})`;
-        }
-    }
-    let v = Math.sqrt(MU_EARTH / r);
-    showResult(`TARGET: ${name}\nDISTANCE: ${r.toExponential(4)} km\nORBITAL_VELOCITY: ${v.toFixed(6)} km/s`, t0, "STABLE_NAV", "SPACE_EXPLORATION");
+    const input = document.getElementById('eqInput').value;
+    const r = parseFloat(input.match(/r=([\d.]+)/)?.[1] || 7000);
+    const MU = 398600.44;
+    const v = Math.sqrt(MU / r);
+    showResult(`ORBITAL ANALYSIS:\nRADIUS: ${r} KM\nVELOCITY: ${v.toFixed(4)} KM/S`, t0, "SPACE_NAV", "SPACE_EXPLORATION");
 }
 
 function runStability() {
     const t0 = performance.now();
-    const r = parseFloat(document.getElementById('eqInput').value.match(/[\d.]+/)) || 1.122;
-    let pot = 4 * (Math.pow(1/r, 12) - Math.pow(1/r, 6));
-    showResult(`L-J POTENTIAL: ${pot.toFixed(8)} eV\nSTABILITY: ${pot < 0 ? 'OPTIMAL_BOND' : 'REPULSIVE_FORCE'}`, t0, "LJ_STABILITY", "DRUG_DISCOVERY");
+    const input = document.getElementById('eqInput').value;
+    const r = parseFloat(input.match(/r=([\d.]+)/)?.[1] || 1.122);
+    const pot = 4 * (Math.pow(1/r, 12) - Math.pow(1/r, 6));
+    showResult(`MOLECULAR STABILITY:\nL-J POTENTIAL: ${pot.toFixed(6)} eV\nSTATUS: ${pot < 0 ? 'STABLE' : 'UNSTABLE'}`, t0, "LJ_POTENTIAL", "DRUG_DISCOVERY");
 }
 
 async function cloudLink() {
     const t0 = performance.now();
-    const input = document.getElementById('eqInput').value.toLowerCase();
-    const molecule = input.match(/spectra=([a-z0-9]+)/i)?.[1];
-    if (!molecule) { showResult("Error: spectra=name missing", t0, "CLOUD_FAIL", "DRUG_DISCOVERY"); return; }
-    const url = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${molecule}/property/MolecularFormula,MolecularWeight,CanonicalSMILES/JSON`;
-    try {
-        const response = await fetch('https://cors-anywhere.herokuapp.com/' + url);
-        const data = await response.json();
-        const prop = data.PropertyTable.Properties[0];
-        showResult(`MOLECULE: ${molecule.toUpperCase()}\nFORMULA: ${prop.MolecularFormula}\nSMILES: ${prop.CanonicalSMILES}`, t0, "CLOUD_API", "DRUG_DISCOVERY");
-    } catch (err) { showResult("CLOUD ERROR: " + err.message, t0, "CLOUD_FAIL", "DRUG_DISCOVERY"); }
-}
-
-function initAscension() {
     const input = document.getElementById('eqInput').value;
-    if (input.includes('base=')) runLogicEngine();
-    else if (input.includes('spectra=')) cloudLink();
-    else if (input.includes('dist=')) runNavigator();
-    else runStability();
+    const name = input.match(/spectra=([a-zA-Z0-9]+)/)?.[1] || "aspirin";
+    showResult(`FETCHING SPECTRA FOR: ${name.toUpperCase()}...`, t0, "CLOUD_FETCH", "DRUG_DISCOVERY");
+    try {
+        const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${name}/JSON`);
+        const data = await res.json();
+        showResult(`PUBCHEM DATA RETRIEVED FOR ${name.toUpperCase()}.\nCID: ${data.PC_Compounds[0].id.id.cid}`, t0, "CLOUD_SUCCESS", "DRUG_DISCOVERY");
+    } catch(e) { showResult("CLOUD LINK FAILED. CHECK SPECTRA NAME.", t0, "CLOUD_ERROR", "DRUG_DISCOVERY"); }
 }
 
+function initAscension() { runKangaroo(); }
 function vaultData() { alert("MASTER ARCHITECT: Data Exported to Neural Vault."); }
 
 function showResult(res, t0, mode, type) {
@@ -190,7 +183,7 @@ function showResult(res, t0, mode, type) {
     document.getElementById('modeData').innerText = mode;
     document.getElementById('resData').innerText = type;
     document.getElementById('timeData').innerText = (performance.now() - t0).toFixed(2);
-    document.getElementById('sysLog').innerHTML += `<br>> [${mode}] Completed at ${new Date().toLocaleTimeString()}`;
+    document.getElementById('sysLog').innerHTML += `<br>> [${mode}] Active at ${new Date().toLocaleTimeString()}`;
 }
 </script>
 </body>
