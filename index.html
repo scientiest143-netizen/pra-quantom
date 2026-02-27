@@ -44,7 +44,7 @@
         <span id="workerStatus">WORKER_THREADS: STANDBY</span>
     </div>
 
-    <textarea id="eqInput" placeholder="base=2 target=1024 mod=12345678901234567891"></textarea>
+    <textarea id="eqInput" placeholder="Enter logic parameters here... (e.g., base=2 target=1024 mod=123456789)"></textarea>
     
     <div class="btn-group">
         <button class="solve-btn" onclick="runNavigator()">Navigator</button>
@@ -67,10 +67,9 @@
 </div>
 
 <script>
-// --- UPDATED v125.0 STRATEGY FOR KANGAROO WORKER ---
 const workerCode = `
     self.onmessage = function(e) {
-        let { b, t, m, limit } = e.data;
+        let { b, t, m, limit, id } = e.data;
         const base = BigInt(b), target = BigInt(t), mod = BigInt(m);
 
         function powMod(base, exp, mod) {
@@ -85,29 +84,26 @@ const workerCode = `
 
         const trapPoints = new Map();
         const jumps = [];
-        for(let i=0; i<32; i++) jumps.push(2n**BigInt(i)); // Increased jump set
+        for(let i=0; i<32; i++) jumps.push(2n**BigInt(i));
 
-        let tameExp = 0n, tamePos = 1n;
+        let tameExp = BigInt(id) * BigInt(limit); 
+        let tamePos = powMod(base, tameExp, mod);
         
-        // Tame Kangaroo
         for (let i = 0; i < limit; i++) {
             let step = jumps[Number(tamePos % 32n)];
             tameExp += step;
             tamePos = (tamePos * powMod(base, step, mod)) % mod;
-            // Distinguished point trap (every 5000 to save memory)
             if (tamePos % 5000n === 0n) trapPoints.set(tamePos.toString(), tameExp);
         }
 
         let wildExp = 0n, wildPos = target;
-        // Wild Kangaroo - Searching 4 times the limit for 20-digit security
         for (let j = 0; j < limit * 4; j++) {
             let step = jumps[Number(wildPos % 32n)];
             wildExp += step;
             wildPos = (wildPos * powMod(base, step, mod)) % mod;
-            
             if (trapPoints.has(wildPos.toString())) {
                 let dLog = trapPoints.get(wildPos.toString()) - wildExp;
-                if (dLog < 0n) dLog += (mod - 1n);
+                while (dLog < 0n) dLog += (mod - 1n);
                 self.postMessage({found: true, result: dLog.toString()});
                 return;
             }
@@ -116,62 +112,74 @@ const workerCode = `
     };
 `;
 
-let kangarooWorker = null;
+let activeWorkers = [];
 
 function runKangaroo() {
     const t0 = performance.now();
     const input = document.getElementById('eqInput').value;
+    if(!input) return; // Empty input check
+
     const b = input.match(/base=(\d+)/)?.[1] || 2;
     const t = input.match(/target=(\d+)/)?.[1] || 8;
     const m = input.match(/mod=(\d+)/)?.[1] || 1048573;
     
-    document.getElementById('workerStatus').innerText = "WORKER_THREADS: KANGAROO_SEARCHING";
-    showResult("KANGAROOS RELEASED INTO THE NEURAL GRID...", t0, "POLLARD_LAMBDA", "LOGIC_COMPUTING");
+    document.getElementById('workerStatus').innerText = "WORKER_THREADS: 4_NEURAL_CORES_ACTIVE";
+    showResult("KANGAROOS RELEASED INTO THE NEURAL GRID...", t0, "POLLARD_LAMBDA_PARALLEL", "LOGIC_COMPUTING");
     
-    if (kangarooWorker) kangarooWorker.terminate();
+    activeWorkers.forEach(w => w.terminate());
+    activeWorkers = [];
+    let isFound = false;
     const blob = new Blob([workerCode], { type: 'application/javascript' });
-    kangarooWorker = new Worker(URL.createObjectURL(blob));
-    
-    kangarooWorker.onmessage = function(e) {
-        if (e.data.found) {
-            showResult(`LOGIC RESULT (x) = ${e.data.result}\nMODULUS = ${m}\n(Kangaroo Hunt Success!)`, t0, "POLLARD_LAMBDA", "LOGIC_COMPUTING");
-        } else {
-            showResult("KANGAROO FAILED: RESULT NOT IN SEARCH RANGE. TRY HIGHER LIMIT.", t0, "POLLARD_LAMBDA", "LOGIC_COMPUTING");
-        }
-        document.getElementById('workerStatus').innerText = "WORKER_THREADS: STANDBY";
-    };
 
-    // INCREASED LIMIT TO 10 MILLION FOR 20-DIGIT SUPPORT
-    kangarooWorker.postMessage({ b, t, m, limit: 10000000 }); 
+    for (let i = 0; i < 4; i++) {
+        const w = new Worker(URL.createObjectURL(blob));
+        w.onmessage = function(e) {
+            if (e.data.found && !isFound) {
+                isFound = true;
+                activeWorkers.forEach(wrk => wrk.terminate());
+                showResult(`LOGIC RESULT (x) = ${e.data.result}\\nMODULUS = ${m}\\n(Parallel Hunt Success!)`, t0, "POLLARD_LAMBDA_PARALLEL", "LOGIC_COMPUTING");
+                document.getElementById('workerStatus').innerText = "WORKER_THREADS: STANDBY";
+            } else if (!isFound && i === 3) {
+                // If last worker finishes without find
+                setTimeout(() => {
+                    if(!isFound) showResult("KANGAROO FAILED: RESULT NOT IN SEARCH RANGE. TRY HIGHER LIMIT.", t0, "POLLARD_LAMBDA_PARALLEL", "LOGIC_COMPUTING");
+                }, 1000);
+            }
+        };
+        w.postMessage({ b, t, m, limit: 15000000, id: i });
+        activeWorkers.push(w);
+    }
 }
 
 function runNavigator() {
     const t0 = performance.now();
     const input = document.getElementById('eqInput').value;
+    if(!input) return;
     const r = parseFloat(input.match(/r=([\d.]+)/)?.[1] || 7000);
-    const MU = 398600.44;
-    const v = Math.sqrt(MU / r);
-    showResult(`ORBITAL ANALYSIS:\nRADIUS: ${r} KM\nVELOCITY: ${v.toFixed(4)} KM/S`, t0, "SPACE_NAV", "SPACE_EXPLORATION");
+    const v = Math.sqrt(398600.44 / r);
+    showResult(`ORBITAL ANALYSIS:\\nRADIUS: ${r} KM\\nVELOCITY: ${v.toFixed(4)} KM/S`, t0, "SPACE_NAV", "SPACE_EXPLORATION");
 }
 
 function runStability() {
     const t0 = performance.now();
     const input = document.getElementById('eqInput').value;
+    if(!input) return;
     const r = parseFloat(input.match(/r=([\d.]+)/)?.[1] || 1.122);
     const pot = 4 * (Math.pow(1/r, 12) - Math.pow(1/r, 6));
-    showResult(`MOLECULAR STABILITY:\nL-J POTENTIAL: ${pot.toFixed(6)} eV\nSTATUS: ${pot < 0 ? 'STABLE' : 'UNSTABLE'}`, t0, "LJ_POTENTIAL", "DRUG_DISCOVERY");
+    showResult(`MOLECULAR STABILITY:\\nL-J POTENTIAL: ${pot.toFixed(6)} eV\\nSTATUS: ${pot < 0 ? 'STABLE' : 'UNSTABLE'}`, t0, "LJ_POTENTIAL", "DRUG_DISCOVERY");
 }
 
 async function cloudLink() {
     const t0 = performance.now();
     const input = document.getElementById('eqInput').value;
+    if(!input) return;
     const name = input.match(/spectra=([a-zA-Z0-9]+)/)?.[1] || "aspirin";
-    showResult(`FETCHING SPECTRA FOR: ${name.toUpperCase()}...`, t0, "CLOUD_FETCH", "DRUG_DISCOVERY");
+    showResult(`FETCHING SPECTRA...`, t0, "CLOUD_FETCH", "DRUG_DISCOVERY");
     try {
         const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${name}/JSON`);
         const data = await res.json();
-        showResult(`PUBCHEM DATA RETRIEVED FOR ${name.toUpperCase()}.\nCID: ${data.PC_Compounds[0].id.id.cid}`, t0, "CLOUD_SUCCESS", "DRUG_DISCOVERY");
-    } catch(e) { showResult("CLOUD LINK FAILED. CHECK SPECTRA NAME.", t0, "CLOUD_ERROR", "DRUG_DISCOVERY"); }
+        showResult(`PUBCHEM DATA RETRIEVED.\\nCID: ${data.PC_Compounds[0].id.id.cid}`, t0, "CLOUD_SUCCESS", "DRUG_DISCOVERY");
+    } catch(e) { showResult("CLOUD LINK FAILED.", t0, "CLOUD_ERROR", "DRUG_DISCOVERY"); }
 }
 
 function initAscension() { runKangaroo(); }
