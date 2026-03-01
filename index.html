@@ -69,7 +69,7 @@
 <script>
 const workerCode = `
     self.onmessage = function(e) {
-        let { b, t, m, limit, id } = e.data;
+        let { b, t, m, limit, id, mode } = e.data;
         const base = BigInt(b), target = BigInt(t), mod = BigInt(m);
 
         function powMod(base, exp, mod) {
@@ -82,11 +82,26 @@ const workerCode = `
             return res;
         }
 
+        // --- MODE 1: LINEAR PARTITION (v131 Integration) ---
+        if (mode === 'partition') {
+            let start = BigInt(id) * BigInt(limit);
+            let currentVal = powMod(base, start, mod);
+            for (let i = 0n; i < BigInt(limit); i++) {
+                if (currentVal === target) {
+                    self.postMessage({found: true, result: (start + i).toString()});
+                    return;
+                }
+                currentVal = (currentVal * base) % mod;
+            }
+            self.postMessage({found: false});
+            return;
+        }
+
+        // --- MODE 2: KANGAROO CORE (v125 Original) ---
         const trapPoints = new Map();
         const jumps = [];
         for(let i=0; i<64; i++) jumps.push(2n**BigInt(i % 32));
 
-        // Tame Kangaroo: Sectoring for 100 Crore range
         let tameExp = BigInt(id) * BigInt(limit) * 15n; 
         let tamePos = powMod(base, tameExp, mod);
         
@@ -94,12 +109,10 @@ const workerCode = `
             let step = jumps[Number(tamePos % 64n)];
             tameExp += step;
             tamePos = (tamePos * powMod(base, step, mod)) % mod;
-            // Density optimization for 100Cr steps
             if (tamePos % 800n === 0n) trapPoints.set(tamePos.toString(), tameExp);
         }
 
         let wildExp = 0n, wildPos = target;
-        // Search limit expanded to hit 1.2 Billion operations total
         let searchLimit = limit * 10; 
         for (let j = 0; j < searchLimit; j++) {
             let step = jumps[Number(wildPos % 64n)];
@@ -130,6 +143,31 @@ function runKangaroo() {
     document.getElementById('workerStatus').innerText = "WORKER_THREADS: 1.2Bn_DENSITY_ACTIVE";
     showResult("ASCENDING TO 100 CRORE LOGIC GRID...", t0, "KANGAROO_ULTRA_v125", "MULTI_INDUSTRIAL_NEURAL");
     
+    launchLogic('kangaroo', b, t, m, 32000000, t0);
+}
+
+function runNavigator() {
+    const t0 = performance.now();
+    const input = document.getElementById('eqInput').value;
+    if(!input) return;
+
+    // v131 Logic Integration: Detecting Discrete Log params or Orbitals
+    const bMatch = input.match(/base=(\d+)/);
+    const tMatch = input.match(/target=(\d+)/);
+    const mMatch = input.match(/mod=(\d+)/);
+
+    if(bMatch && tMatch && mMatch) {
+        document.getElementById('workerStatus').innerText = "WORKER_THREADS: LINEAR_PARTITION_ACTIVE";
+        showResult("EXECUTING v131 LINEAR PARTITION...", t0, "PARTITION_v131", "LOGIC_COMPUTING");
+        launchLogic('partition', bMatch[1], tMatch[1], mMatch[1], 10000000, t0);
+    } else {
+        const r = parseFloat(input.match(/r=([\d.]+)/)?.[1] || 7000);
+        const v = Math.sqrt(398600.44 / r);
+        showResult(`ORBITAL ANALYSIS:\nRADIUS: ${r} KM\nVELOCITY: ${v.toFixed(4)} KM/S`, t0, "SPACE_NAV", "SPACE_EXPLORATION");
+    }
+}
+
+function launchLogic(mode, b, t, m, limit, t0) {
     activeWorkers.forEach(w => w.terminate());
     activeWorkers = [];
     let isFound = false;
@@ -141,27 +179,13 @@ function runKangaroo() {
             if (e.data.found && !isFound) {
                 isFound = true;
                 activeWorkers.forEach(wrk => wrk.terminate());
-                showResult(`LOGIC RESULT (x) = ${e.data.result}\\nMODULUS = ${m}\\n(Billion Step Success!)`, t0, "KANGAROO_ULTRA_v125", "LOGIC_COMPUTING");
+                showResult(`LOGIC MATCH FOUND (x) = ${e.data.result}\nMODULUS = ${m}`, t0, mode.toUpperCase(), "LOGIC_COMPUTING");
                 document.getElementById('workerStatus').innerText = "WORKER_THREADS: STANDBY";
-            } else if (!isFound && i === 3) {
-                setTimeout(() => {
-                    if(!isFound) showResult("1.2Bn SCAN COMPLETE. RESULT BEYOND CURRENT DEPTH.", t0, "KANGAROO_ULTRA_v125", "LOGIC_COMPUTING");
-                }, 1000);
             }
         };
-        // 32M * 4 workers * 10x wild jump = 1.28 Billion Step Capacity
-        w.postMessage({ b, t, m, limit: 32000000, id: i });
+        w.postMessage({ b, t, m, limit, id: i, mode });
         activeWorkers.push(w);
     }
-}
-
-function runNavigator() {
-    const t0 = performance.now();
-    const input = document.getElementById('eqInput').value;
-    if(!input) return;
-    const r = parseFloat(input.match(/r=([\d.]+)/)?.[1] || 7000);
-    const v = Math.sqrt(398600.44 / r);
-    showResult(`ORBITAL ANALYSIS:\\nRADIUS: ${r} KM\\nVELOCITY: ${v.toFixed(4)} KM/S`, t0, "SPACE_NAV", "SPACE_EXPLORATION");
 }
 
 function runStability() {
@@ -170,7 +194,7 @@ function runStability() {
     if(!input) return;
     const r = parseFloat(input.match(/r=([\d.]+)/)?.[1] || 1.122);
     const pot = 4 * (Math.pow(1/r, 12) - Math.pow(1/r, 6));
-    showResult(`MOLECULAR STABILITY:\\nL-J POTENTIAL: ${pot.toFixed(6)} eV\\nSTATUS: ${pot < 0 ? 'STABLE' : 'UNSTABLE'}`, t0, "LJ_POTENTIAL", "DRUG_DISCOVERY");
+    showResult(`MOLECULAR STABILITY:\nL-J POTENTIAL: ${pot.toFixed(6)} eV\nSTATUS: ${pot < 0 ? 'STABLE' : 'UNSTABLE'}`, t0, "LJ_POTENTIAL", "DRUG_DISCOVERY");
 }
 
 async function cloudLink() {
@@ -182,7 +206,7 @@ async function cloudLink() {
     try {
         const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${name}/JSON`);
         const data = await res.json();
-        showResult(`PUBCHEM DATA RETRIEVED.\\nCID: ${data.PC_Compounds[0].id.id.cid}`, t0, "CLOUD_SUCCESS", "DRUG_DISCOVERY");
+        showResult(`PUBCHEM DATA RETRIEVED.\nCID: ${data.PC_Compounds[0].id.id.cid}`, t0, "CLOUD_SUCCESS", "DRUG_DISCOVERY");
     } catch(e) { showResult("CLOUD LINK FAILED.", t0, "CLOUD_ERROR", "DRUG_DISCOVERY"); }
 }
 
