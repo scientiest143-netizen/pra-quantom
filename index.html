@@ -8,214 +8,168 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body { background: #0a0c10; color: #e6edf3; font-family: 'Inter', sans-serif; }
-        .card { background: #161b22; border: 1px solid #30363d; border-radius: 2rem; transition: 0.2s; }
-        .card:hover { border-color: #2ea44f; }
-        .input-field { background: #0d1117; border: 1px solid #3b434b; color: #2ea44f; padding: 0.5rem 1rem; border-radius: 1rem; width: 120px; text-align: center; font-weight: bold; }
-        .btn { background: #2ea44f; color: black; font-weight: 800; padding: 0.75rem 1.5rem; border-radius: 2rem; transition: 0.2s; border: none; cursor: pointer; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 2rem; transition: 0.3s; }
+        .card:hover { border-color: #2ea44f; transform: translateY(-5px); }
+        .input-field { background: #0d1117; border: 1px solid #3b434b; color: #2ea44f; padding: 0.5rem 1rem; border-radius: 1rem; width: 120px; text-align: center; font-weight: bold; outline: none; }
+        .input-field:focus { border-color: #2ea44f; }
+        .btn { background: #2ea44f; color: black; font-weight: 800; padding: 0.75rem 1.5rem; border-radius: 2rem; transition: 0.2s; border: none; cursor: pointer; text-transform: uppercase; }
         .btn:hover { background: #3fb950; box-shadow: 0 0 15px #2ea44f; }
-        .result { background: #0d1117; padding: 0.75rem 1.5rem; border-radius: 1.5rem; border-left: 4px solid #2ea44f; font-weight: 700; }
+        .result { background: #0d1117; padding: 0.75rem 1.5rem; border-radius: 1.5rem; border-left: 4px solid #2ea44f; font-weight: 700; min-height: 50px; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="p-8">
 
 <div class="max-w-6xl mx-auto">
-    <!-- Header -->
     <div class="text-center mb-12">
-        <h1 class="text-5xl font-black tracking-tighter"> GROW-WIN <span class="text-[#2ea44f]">DRUG DISCOVERY</span></h1>
-        <p class="text-sm text-gray-400 mt-2 tracking-widest">LOGIC REPLACES SUPERCOMPUTER · RESULTS IN SECONDS</p>
+        <h1 class="text-5xl font-black tracking-tighter uppercase"> GROW-WIN <span class="text-[#2ea44f]">Pharma Engine</span></h1>
+        <p class="text-sm text-gray-400 mt-2 tracking-widest uppercase">Logic Replaces Supercomputer · Discovery v85.0</p>
     </div>
 
-    <!-- Three core modules -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-        <!-- 1. MOLECULAR DOCKING & SIMULATION -->
         <div class="card p-8 flex flex-col">
-            <h2 class="text-xl font-black text-[#2ea44f] mb-6"> 1. DOCKING & SIMULATION</h2>
+            <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 1. Docking & Simulation</h2>
             <div class="space-y-4 flex-1">
                 <div class="flex justify-between items-center">
-                    <label class="text-sm">Pocket Volume (Å³)</label>
-                    <input id="pocketVol" class="input-field" value="520" placeholder="e.g., 520">
+                    <label class="text-xs font-bold text-gray-400">POCKET VOL (Å³)</label>
+                    <input id="pocketVol" type="number" class="input-field" value="520">
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-sm">Rotatable Bonds</label>
-                    <input id="rotBonds" class="input-field" value="6" placeholder="e.g., 6">
+                    <label class="text-xs font-bold text-gray-400">ROTATABLE BONDS</label>
+                    <input id="rotBonds" type="number" class="input-field" value="6">
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-sm">LogP (hydrophobicity)</label>
-                    <input id="logP_dock" class="input-field" value="2.8" placeholder="e.g., 2.8">
+                    <label class="text-xs font-bold text-gray-400">LOGP (HYDRO)</label>
+                    <input id="logP_dock" type="number" step="0.1" class="input-field" value="2.8">
                 </div>
-                <button class="btn w-full mt-6" onclick="computeDocking()">COMPUTE AFFINITY</button>
+                <button class="btn w-full mt-6" onclick="computeDocking()">Compute Affinity</button>
             </div>
-            <div class="result mt-6 text-center" id="dockingResult">⏎ enter values</div>
-            <div class="text-[10px] text-gray-500 mt-2 text-center">LOGIC: volume × bonds / LogP</div>
+            <div class="result mt-6 text-center" id="dockingResult">-3.78 kcal/mol</div>
         </div>
 
-        <!-- 2. ADMET PREDICTION -->
         <div class="card p-8 flex flex-col">
-            <h2 class="text-xl font-black text-[#2ea44f] mb-6"> 2. ADMET PREDICTION</h2>
+            <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 2. ADMET Prediction</h2>
             <div class="space-y-4 flex-1">
                 <div class="flex justify-between items-center">
-                    <label class="text-sm">LogP</label>
-                    <input id="logP_admet" class="input-field" value="2.8" placeholder="e.g., 2.8">
+                    <label class="text-xs font-bold text-gray-400">MOL WEIGHT (G/MOL)</label>
+                    <input id="molWeight" type="number" class="input-field" value="420">
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-sm">Mol Weight (g/mol)</label>
-                    <input id="molWeight" class="input-field" value="420" placeholder="e.g., 420">
+                    <label class="text-xs font-bold text-gray-400">H-BOND DONORS</label>
+                    <input id="hbd" type="number" class="input-field" value="2">
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-sm">H-Bond Donors</label>
-                    <input id="hbd" class="input-field" value="2" placeholder="e.g., 2">
+                    <label class="text-xs font-bold text-gray-400">PSA (Å²)</label>
+                    <input id="psa" type="number" class="input-field" value="68">
                 </div>
-                <div class="flex justify-between items-center">
-                    <label class="text-sm">H-Bond Acceptors</label>
-                    <input id="hba" class="input-field" value="5" placeholder="e.g., 5">
-                </div>
-                <div class="flex justify-between items-center">
-                    <label class="text-sm">PSA (Å²)</label>
-                    <input id="psa" class="input-field" value="68" placeholder="e.g., 68">
-                </div>
-                <button class="btn w-full mt-6" onclick="computeADMET()">PREDICT ADMET</button>
+                <button class="btn w-full mt-6" onclick="computeADMET()">Predict ADMET</button>
             </div>
-            <div class="result mt-6 text-center" id="admetResult">⏎ enter values</div>
-            <div class="text-[10px] text-gray-500 mt-2 text-center">Lipinski + BBB rules</div>
+            <div class="result mt-6 text-sm text-center" id="admetResult">Violations: 0 | BBB: Yes</div>
         </div>
 
-        <!-- 3. SCORING & RANKING -->
         <div class="card p-8 flex flex-col">
-            <h2 class="text-xl font-black text-[#2ea44f] mb-6"> 3. SCORING & RANKING</h2>
+            <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 3. Scoring & Ranking</h2>
             <div class="space-y-4 flex-1">
                 <div class="flex justify-between items-center">
-                    <label class="text-sm">Docking Score (kcal/mol)</label>
-                    <input id="dockScore_input" class="input-field" value="-8.5" placeholder="e.g., -8.5">
+                    <label class="text-xs font-bold text-gray-400">DOCKING SCORE</label>
+                    <input id="dockScore_input" type="number" step="0.1" class="input-field" value="-3.78">
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-sm">Lipinski Violations</label>
-                    <input id="lipinskiViol" class="input-field" value="0" placeholder="0–4">
+                    <label class="text-xs font-bold text-gray-400">VIOLATIONS</label>
+                    <input id="lipinskiViol" type="number" class="input-field" value="0">
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-sm">BBB Penetration?</label>
-                    <select id="bbb" class="input-field bg-black">
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
+                    <label class="text-xs font-bold text-gray-400">BBB PASS?</label>
+                    <select id="bbb" class="input-field bg-[#0d1117] cursor-pointer">
+                        <option value="1">YES</option>
+                        <option value="0">NO</option>
                     </select>
                 </div>
-                <button class="btn w-full mt-6" onclick="computeScore()">CALCULATE DRUG SCORE</button>
+                <button class="btn w-full mt-6" onclick="computeScore()">Calculate Score</button>
             </div>
-            <div class="result mt-6 text-center" id="scoreResult">⏎ enter values</div>
-            <div class="text-[10px] text-gray-500 mt-2 text-center">Combined rank: A / B / C</div>
+            <div class="result mt-6 text-center" id="scoreResult">Score: 50.0 | Rank: C</div>
         </div>
     </div>
 
-    <!-- Global ranking / quick summary -->
-    <div class="mt-12 card p-8 text-center">
-        <h3 class="text-sm font-black text-[#2ea44f] tracking-widest"> OVERALL VERDICT (USING CURRENT INPUTS)</h3>
-        <div class="flex justify-center items-center gap-12 mt-6">
+    <div class="mt-12 card p-8 text-center border-t-4 border-t-[#2ea44f]">
+        <h3 class="text-xs font-black text-[#2ea44f] tracking-[0.5em] uppercase mb-4">Grow-Win Industrial Verdict</h3>
+        <div class="flex flex-col md:flex-row justify-center items-center gap-12 mt-4">
             <div>
-                <span class="text-xs text-gray-400">DRUG SCORE</span>
-                <div id="globalScore" class="text-6xl font-black text-white">0.0</div>
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Logic Drug Score</span>
+                <div id="globalScore" class="text-7xl font-black text-white">50.0</div>
             </div>
+            <div class="hidden md:block h-20 w-px bg-gray-800"></div>
             <div>
-                <span class="text-xs text-gray-400">RANK</span>
-                <div id="globalRank" class="text-6xl font-black text-[#2ea44f]">C</div>
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Final Rank</span>
+                <div id="globalRank" class="text-7xl font-black text-[#2ea44f]">C</div>
             </div>
         </div>
-        <button class="btn px-12 py-4 mt-8 text-lg" onclick="runAll()">RUN FULL EVALUATION</button>
-        <p class="text-[10px] text-gray-600 mt-6">DESINED BY UDAYANA ANANATH KUMAR </p>
+        <button class="btn px-16 py-5 mt-10 text-xl tracking-widest shadow-xl" onclick="runAll()">Execute Full Discovery</button>
+        <p class="text-[10px] text-gray-600 mt-8 font-bold tracking-widest uppercase italic">Design & Logic by Udayana Ananth Kumar</p>
     </div>
 </div>
 
 <script>
-    // ==================== LOGIC FUNCTIONS ====================
-    // Each uses simple formulas to mimic complex simulations.
-
-    // 1. Docking & simulation
     function computeDocking() {
         const vol = parseFloat(document.getElementById('pocketVol').value) || 0;
-        const bonds = parseFloat(document.getElementById('rotBonds').value) || 1; // avoid division by zero
-        const logp = parseFloat(document.getElementById('logP_dock').value) || 0;
-        // Fake affinity: more volume & bonds -> stronger? Actually we want a negative score (kcal/mol). 
-        // Let's do: affinity = - (vol / 100) - (bonds * 0.2) + (logp * 0.3) + some base.
-        // But to keep it simple: affinity = - (vol/50 + bonds*0.5 - logp*0.2)
-        const affinity = -(vol / 80 + bonds * 0.3 - logp * 0.2).toFixed(2);
-        const result = affinity.toFixed(2) + ' kcal/mol';
-        document.getElementById('dockingResult').innerText = result;
-        document.getElementById('dockScore_input').value = affinity.toFixed(2); // sync with scoring tab
+        const bonds = parseFloat(document.getElementById('rotBonds').value) || 1;
+        const logp = parseFloat(document.getElementById('logP_dock').value) || 1;
+        let affinity = -((vol / 150) + (bonds * 0.4) - (logp * 0.1)).toFixed(2);
+        document.getElementById('dockingResult').innerText = affinity + ' kcal/mol';
+        document.getElementById('dockScore_input').value = affinity;
         return affinity;
     }
 
-    // 2. ADMET prediction
     function computeADMET() {
-        const logp = parseFloat(document.getElementById('logP_admet').value) || 0;
         const mw = parseFloat(document.getElementById('molWeight').value) || 0;
         const hbd = parseFloat(document.getElementById('hbd').value) || 0;
-        const hba = parseFloat(document.getElementById('hba').value) || 0;
         const psa = parseFloat(document.getElementById('psa').value) || 0;
-
-        // Lipinski rules
-        let lipinskiViolations = 0;
-        if (mw > 500) lipinskiViolations++;
-        if (logp > 5) lipinskiViolations++;
-        if (hbd > 5) lipinskiViolations++;
-        if (hba > 10) lipinskiViolations++;
-
-        // BBB penetration (simplified)
-        const bbb = (psa < 90 && logp < 5 && mw < 450) ? 'Yes' : 'No';
-
-        // CYP inhibition risk (crude)
-        const cypRisk = (logp > 4 || mw > 400) ? 'High' : 'Low';
-
-        const result = `Lipinski violations: ${lipinskiViolations} | BBB: ${bbb} | CYP risk: ${cypRisk}`;
-        document.getElementById('admetResult').innerText = result;
-
-        // Update scoring tab fields
-        document.getElementById('lipinskiViol').value = lipinskiViolations;
-        document.getElementById('bbb').value = bbb === 'Yes' ? '1' : '0';
-
-        return { lipinskiViolations, bbb, cypRisk };
+        const logp = parseFloat(document.getElementById('logP_dock').value) || 0;
+        let violations = 0;
+        if (mw > 500) violations++;
+        if (logp > 5) violations++;
+        if (hbd > 5) violations++;
+        const bbb = (psa < 90 && mw < 450) ? 'Yes' : 'No';
+        document.getElementById('admetResult').innerText = `Violations: ${violations} | BBB: ${bbb}`;
+        document.getElementById('lipinskiViol').value = violations;
+        document.getElementById('bbb').value = (bbb === 'Yes' ? '1' : '0');
+        return { violations, bbb };
     }
 
-    // 3. Scoring & ranking
+    // UPDATED LOGIC FOR TASK 3 ACCURACY
     function computeScore() {
-        const dockScore = parseFloat(document.getElementById('dockScore_input').value) || 0;
-        const lipinskiViol = parseFloat(document.getElementById('lipinskiViol').value) || 0;
+        const dock = parseFloat(document.getElementById('dockScore_input').value) || 0;
+        const viol = parseInt(document.getElementById('lipinskiViol').value) || 0;
         const bbb = parseInt(document.getElementById('bbb').value) || 0;
 
-        // Normalize docking: more negative = better. Let's map to 0-100 scale.
-        // Assume dockScore ranges from -12 to -4 (typical). Map: 100 - ((dockScore + 12) * 12.5) roughly.
-        let dockNorm = 0;
-        if (dockScore <= -12) dockNorm = 100;
-        else if (dockScore >= -4) dockNorm = 0;
-        else dockNorm = 100 - ((dockScore + 12) * 12.5);
+        let dockPart = Math.abs(dock) * 8; 
+        let admetPart = (viol === 0 ? 30 : (viol === 1 ? 15 : 0)) + (bbb === 1 ? 10 : 0);
+        
+        let finalScore = (dockPart + admetPart);
 
-        // Lipinski: 0 violations = 100, 1 = 75, 2 = 50, 3 = 25, 4 = 0
-        const lipScore = Math.max(0, 100 - lipinskiViol * 25);
+        // SAFETY PENALTY: If more than 1 violation, force a lower rank regardless of affinity
+        if (viol > 1) {
+            finalScore = Math.min(finalScore, 60.0); // Caps score at 60 (Rank C/B Border)
+        }
 
-        // BBB: 100 if yes, 0 if no
-        const bbbScore = bbb ? 100 : 0;
-
-        // Composite (weighted)
-        const totalScore = (dockNorm * 0.5 + lipScore * 0.3 + bbbScore * 0.2).toFixed(1);
+        finalScore = Math.min(100, finalScore).toFixed(1);
         let rank = 'C';
-        if (totalScore >= 80) rank = 'A';
-        else if (totalScore >= 60) rank = 'B';
+        if (finalScore >= 85) rank = 'A';
+        else if (finalScore >= 65) rank = 'B';
 
-        document.getElementById('scoreResult').innerText = `Score: ${totalScore} | Rank: ${rank}`;
-        document.getElementById('globalScore').innerText = totalScore;
+        document.getElementById('scoreResult').innerText = `Score: ${finalScore} | Rank: ${rank}`;
+        document.getElementById('globalScore').innerText = finalScore;
         document.getElementById('globalRank').innerText = rank;
+        
+        const rankColor = rank === 'A' ? '#2ea44f' : (rank === 'B' ? '#e3b341' : '#f85149');
+        document.getElementById('globalRank').style.color = rankColor;
     }
 
-    // Run all three modules and update global
     function runAll() {
         computeDocking();
         computeADMET();
         computeScore();
     }
-
-    // Initialize with defaults on page load
-    window.onload = function() {
-        // Optionally pre-fill some fields
-        runAll(); // show initial results
-    };
+    window.onload = runAll;
 </script>
 </body>
 </html>
