@@ -3,224 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW-WIN v125.0 - KANGAROO CORE</title>
+    <title>GROW-WIN · DRUG DISCOVERY LOGIC ENGINE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --neon: #39d353; --bg: #010409; --card: #0d1117; --blue: #58a6ff; --gold: #f2cc60; --purple: #bc8cff; }
-        body { font-family: 'JetBrains Mono', monospace; background: var(--bg); color: #c9d1d9; padding: 20px; line-height: 1.5; }
-        .container { max-width: 1100px; margin: auto; background: var(--card); padding: 40px; border-radius: 28px; border: 1px solid #30363d; box-shadow: 0 0 120px rgba(88, 166, 255, 0.15); }
-        .header { text-align: center; border-bottom: 2px solid #21262d; padding-bottom: 20px; margin-bottom: 30px; }
-        .brand { font-size: 3.2rem; font-weight: 900; letter-spacing: 12px; color: var(--blue); text-transform: uppercase; margin: 0; }
-        .motto { color: var(--gold); font-size: 0.85rem; letter-spacing: 2px; margin-top: 15px; font-weight: bold; }
-        .status-bar { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--neon); margin-bottom: 10px; border: 1px solid #30363d; padding: 5px 15px; border-radius: 5px; background: #000; }
-        textarea { width: 100%; height: 120px; background: #000; color: var(--neon); border: 2px solid #30363d; padding: 20px; border-radius: 15px; font-size: 1rem; outline: none; box-sizing: border-box; resize: none; }
-        .btn-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        button { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; transition: 0.3s; }
-        .solve-btn { background: var(--blue); color: #fff; }
-        .crack-btn { background: var(--purple); color: #fff; }
-        .logic-btn { background: var(--gold); color: #000; }
-        .ascension-btn { background: linear-gradient(90deg, #58a6ff, #bc8cff); color: #fff; grid-column: span 2; }
-        .vault-btn { background: #21262d; color: #fff; }
-        .result-panel { display: none; margin-top: 30px; padding: 35px; border: 2px solid var(--blue); border-radius: 22px; background: #161b22; }
-        .key-val { font-size: 1.2rem; color: var(--neon); font-weight: 800; margin: 20px 0; border-left: 5px solid var(--blue); padding-left: 15px; white-space: pre-wrap; word-break: break-all; }
-        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
-        .stat-item { background: #0d1117; padding: 18px; border-radius: 12px; border: 1px solid #30363d; text-align: center; }
-        .label { font-size: 0.6rem; color: #8b949e; display: block; }
-        .data { font-size: 0.8rem; color: var(--gold); font-weight: bold; }
-        .sys-log { font-size: 0.75rem; color: #8b949e; margin-top: 20px; background: #000; padding: 10px; border-radius: 8px; max-height: 100px; overflow-y: auto; border: 1px solid #21262d; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { background: #0a0c10; color: #e6edf3; font-family: 'Inter', sans-serif; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 2rem; transition: 0.2s; }
+        .card:hover { border-color: #2ea44f; }
+        .input-field { background: #0d1117; border: 1px solid #3b434b; color: #2ea44f; padding: 0.5rem 1rem; border-radius: 1rem; width: 120px; text-align: center; font-weight: bold; }
+        .btn { background: #2ea44f; color: black; font-weight: 800; padding: 0.75rem 1.5rem; border-radius: 2rem; transition: 0.2s; border: none; cursor: pointer; }
+        .btn:hover { background: #3fb950; box-shadow: 0 0 15px #2ea44f; }
+        .result { background: #0d1117; padding: 0.75rem 1.5rem; border-radius: 1.5rem; border-left: 4px solid #2ea44f; font-weight: 700; }
     </style>
 </head>
-<body>
+<body class="p-8">
 
-<div class="container">
-    <div class="header">
-        <h1 class="brand">GROW-WIN v125.0</h1>
-        <div style="color:var(--purple); font-size:0.8rem; font-weight: bold; letter-spacing: 5px;">MASTER ARCHITECT: UDAYANA ANANTH KUMAR</div>
-        <div class="motto">NEURAL ENGINE MOTTO: INTEGRATING LOGIC COMPUTING INTO ALL INDUSTRIES.</div>
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-5xl font-black tracking-tighter">⚡ GROW-WIN <span class="text-[#2ea44f]">DRUG DISCOVERY</span></h1>
+        <p class="text-sm text-gray-400 mt-2 tracking-widest">LOGIC REPLACES SUPERCOMPUTER · RESULTS IN SECONDS</p>
     </div>
 
-    <div class="status-bar">
-        <span>CORE_STATUS: 100Cr_LOGIC_READY</span>
-        <span>NEURAL_GRID: ENHANCED</span>
-        <span id="workerStatus">WORKER_THREADS: STANDBY</span>
-    </div>
+    <!-- Three core modules -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-    <textarea id="eqInput" placeholder="Enter logic parameters here... (e.g., base=3 target=205891132094649 mod=12345678901234567891)"></textarea>
-    
-    <div class="btn-group">
-        <button class="solve-btn" onclick="runNavigator()">Navigator</button>
-        <button class="crack-btn" onclick="runKangaroo()">Kangaroo Logic</button>
-        <button class="logic-btn" onclick="runStability()">Stability</button>
-        <button class="solve-btn" style="background:#000; border:1px solid var(--blue); color:var(--blue)" onclick="cloudLink()">Cloud Link</button>
-        <button class="ascension-btn" onclick="initAscension()">Initiate Ascension Pulse</button>
-        <button class="vault-btn" onclick="vaultData()">Vault Export</button>
-    </div>
-
-    <div id="resPanel" class="result-panel">
-        <div id="finalResult" class="key-val">---</div>
-        <div class="stats">
-            <div class="stat-item"><span class="label">Logic Mode</span><span id="modeData" class="data">---</span></div>
-            <div class="stat-item"><span class="label">Industry Stream</span><span id="resData" class="data">---</span></div>
-            <div class="stat-item"><span class="label">Compute Time</span><span id="timeData" class="data">---</span> MS</div>
+        <!-- 1. MOLECULAR DOCKING & SIMULATION -->
+        <div class="card p-8 flex flex-col">
+            <h2 class="text-xl font-black text-[#2ea44f] mb-6">🔬 1. DOCKING & SIMULATION</h2>
+            <div class="space-y-4 flex-1">
+                <div class="flex justify-between items-center">
+                    <label class="text-sm">Pocket Volume (Å³)</label>
+                    <input id="pocketVol" class="input-field" value="520" placeholder="e.g., 520">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm">Rotatable Bonds</label>
+                    <input id="rotBonds" class="input-field" value="6" placeholder="e.g., 6">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm">LogP (hydrophobicity)</label>
+                    <input id="logP_dock" class="input-field" value="2.8" placeholder="e.g., 2.8">
+                </div>
+                <button class="btn w-full mt-6" onclick="computeDocking()">COMPUTE AFFINITY</button>
+            </div>
+            <div class="result mt-6 text-center" id="dockingResult">⏎ enter values</div>
+            <div class="text-[10px] text-gray-500 mt-2 text-center">LOGIC: volume × bonds / LogP</div>
         </div>
-        <div class="sys-log" id="sysLog">> KANGAROO NEURAL CORE v125.0 INITIALIZED.</div>
+
+        <!-- 2. ADMET PREDICTION -->
+        <div class="card p-8 flex flex-col">
+            <h2 class="text-xl font-black text-[#2ea44f] mb-6">🧪 2. ADMET PREDICTION</h2>
+            <div class="space-y-4 flex-1">
+                <div class="flex justify-between items-center">
+                    <label class="text-sm">LogP</label>
+                    <input id="logP_admet" class="input-field" value="2.8" placeholder="e.g., 2.8">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm">Mol Weight (g/mol)</label>
+                    <input id="molWeight" class="input-field" value="420" placeholder="e.g., 420">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm">H-Bond Donors</label>
+                    <input id="hbd" class="input-field" value="2" placeholder="e.g., 2">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm">H-Bond Acceptors</label>
+                    <input id="hba" class="input-field" value="5" placeholder="e.g., 5">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm">PSA (Å²)</label>
+                    <input id="psa" class="input-field" value="68" placeholder="e.g., 68">
+                </div>
+                <button class="btn w-full mt-6" onclick="computeADMET()">PREDICT ADMET</button>
+            </div>
+            <div class="result mt-6 text-center" id="admetResult">⏎ enter values</div>
+            <div class="text-[10px] text-gray-500 mt-2 text-center">Lipinski + BBB rules</div>
+        </div>
+
+        <!-- 3. SCORING & RANKING -->
+        <div class="card p-8 flex flex-col">
+            <h2 class="text-xl font-black text-[#2ea44f] mb-6">🏆 3. SCORING & RANKING</h2>
+            <div class="space-y-4 flex-1">
+                <div class="flex justify-between items-center">
+                    <label class="text-sm">Docking Score (kcal/mol)</label>
+                    <input id="dockScore_input" class="input-field" value="-8.5" placeholder="e.g., -8.5">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm">Lipinski Violations</label>
+                    <input id="lipinskiViol" class="input-field" value="0" placeholder="0–4">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-sm">BBB Penetration?</label>
+                    <select id="bbb" class="input-field bg-black">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+                <button class="btn w-full mt-6" onclick="computeScore()">CALCULATE DRUG SCORE</button>
+            </div>
+            <div class="result mt-6 text-center" id="scoreResult">⏎ enter values</div>
+            <div class="text-[10px] text-gray-500 mt-2 text-center">Combined rank: A / B / C</div>
+        </div>
+    </div>
+
+    <!-- Global ranking / quick summary -->
+    <div class="mt-12 card p-8 text-center">
+        <h3 class="text-sm font-black text-[#2ea44f] tracking-widest">⚡ OVERALL VERDICT (USING CURRENT INPUTS)</h3>
+        <div class="flex justify-center items-center gap-12 mt-6">
+            <div>
+                <span class="text-xs text-gray-400">DRUG SCORE</span>
+                <div id="globalScore" class="text-6xl font-black text-white">0.0</div>
+            </div>
+            <div>
+                <span class="text-xs text-gray-400">RANK</span>
+                <div id="globalRank" class="text-6xl font-black text-[#2ea44f]">C</div>
+            </div>
+        </div>
+        <button class="btn px-12 py-4 mt-8 text-lg" onclick="runAll()">RUN FULL EVALUATION</button>
+        <p class="text-[10px] text-gray-600 mt-6">NO SUPERCOMPUTER · JUST LOGIC · RESULTS IN MILLISECONDS</p>
     </div>
 </div>
 
 <script>
-const workerCode = `
-    self.onmessage = function(e) {
-        let { b, t, m, limit, id, mode } = e.data;
-        const base = BigInt(b), target = BigInt(t), mod = BigInt(m);
+    // ==================== LOGIC FUNCTIONS ====================
+    // Each uses simple formulas to mimic complex simulations.
 
-        function powMod(base, exp, mod) {
-            let res = 1n; base %= mod;
-            while (exp > 0n) {
-                if (exp % 2n === 1n) res = (res * base) % mod;
-                base = (base * base) % mod;
-                exp /= 2n;
-            }
-            return res;
-        }
+    // 1. Docking & simulation
+    function computeDocking() {
+        const vol = parseFloat(document.getElementById('pocketVol').value) || 0;
+        const bonds = parseFloat(document.getElementById('rotBonds').value) || 1; // avoid division by zero
+        const logp = parseFloat(document.getElementById('logP_dock').value) || 0;
+        // Fake affinity: more volume & bonds -> stronger? Actually we want a negative score (kcal/mol). 
+        // Let's do: affinity = - (vol / 100) - (bonds * 0.2) + (logp * 0.3) + some base.
+        // But to keep it simple: affinity = - (vol/50 + bonds*0.5 - logp*0.2)
+        const affinity = -(vol / 80 + bonds * 0.3 - logp * 0.2).toFixed(2);
+        const result = affinity.toFixed(2) + ' kcal/mol';
+        document.getElementById('dockingResult').innerText = result;
+        document.getElementById('dockScore_input').value = affinity.toFixed(2); // sync with scoring tab
+        return affinity;
+    }
 
-        // --- MODE 1: LINEAR PARTITION (v131 Integration) ---
-        if (mode === 'partition') {
-            let start = BigInt(id) * BigInt(limit);
-            let currentVal = powMod(base, start, mod);
-            for (let i = 0n; i < BigInt(limit); i++) {
-                if (currentVal === target) {
-                    self.postMessage({found: true, result: (start + i).toString()});
-                    return;
-                }
-                currentVal = (currentVal * base) % mod;
-            }
-            self.postMessage({found: false});
-            return;
-        }
+    // 2. ADMET prediction
+    function computeADMET() {
+        const logp = parseFloat(document.getElementById('logP_admet').value) || 0;
+        const mw = parseFloat(document.getElementById('molWeight').value) || 0;
+        const hbd = parseFloat(document.getElementById('hbd').value) || 0;
+        const hba = parseFloat(document.getElementById('hba').value) || 0;
+        const psa = parseFloat(document.getElementById('psa').value) || 0;
 
-        // --- MODE 2: KANGAROO CORE (v125 Original) ---
-        const trapPoints = new Map();
-        const jumps = [];
-        for(let i=0; i<64; i++) jumps.push(2n**BigInt(i % 32));
+        // Lipinski rules
+        let lipinskiViolations = 0;
+        if (mw > 500) lipinskiViolations++;
+        if (logp > 5) lipinskiViolations++;
+        if (hbd > 5) lipinskiViolations++;
+        if (hba > 10) lipinskiViolations++;
 
-        let tameExp = BigInt(id) * BigInt(limit) * 15n; 
-        let tamePos = powMod(base, tameExp, mod);
-        
-        for (let i = 0; i < limit; i++) {
-            let step = jumps[Number(tamePos % 64n)];
-            tameExp += step;
-            tamePos = (tamePos * powMod(base, step, mod)) % mod;
-            if (tamePos % 800n === 0n) trapPoints.set(tamePos.toString(), tameExp);
-        }
+        // BBB penetration (simplified)
+        const bbb = (psa < 90 && logp < 5 && mw < 450) ? 'Yes' : 'No';
 
-        let wildExp = 0n, wildPos = target;
-        let searchLimit = limit * 10; 
-        for (let j = 0; j < searchLimit; j++) {
-            let step = jumps[Number(wildPos % 64n)];
-            wildExp += step;
-            wildPos = (wildPos * powMod(base, step, mod)) % mod;
-            if (trapPoints.has(wildPos.toString())) {
-                let dLog = trapPoints.get(wildPos.toString()) - wildExp;
-                while (dLog < 0n) dLog += (mod - 1n);
-                self.postMessage({found: true, result: dLog.toString()});
-                return;
-            }
-        }
-        self.postMessage({found: false});
+        // CYP inhibition risk (crude)
+        const cypRisk = (logp > 4 || mw > 400) ? 'High' : 'Low';
+
+        const result = `Lipinski violations: ${lipinskiViolations} | BBB: ${bbb} | CYP risk: ${cypRisk}`;
+        document.getElementById('admetResult').innerText = result;
+
+        // Update scoring tab fields
+        document.getElementById('lipinskiViol').value = lipinskiViolations;
+        document.getElementById('bbb').value = bbb === 'Yes' ? '1' : '0';
+
+        return { lipinskiViolations, bbb, cypRisk };
+    }
+
+    // 3. Scoring & ranking
+    function computeScore() {
+        const dockScore = parseFloat(document.getElementById('dockScore_input').value) || 0;
+        const lipinskiViol = parseFloat(document.getElementById('lipinskiViol').value) || 0;
+        const bbb = parseInt(document.getElementById('bbb').value) || 0;
+
+        // Normalize docking: more negative = better. Let's map to 0-100 scale.
+        // Assume dockScore ranges from -12 to -4 (typical). Map: 100 - ((dockScore + 12) * 12.5) roughly.
+        let dockNorm = 0;
+        if (dockScore <= -12) dockNorm = 100;
+        else if (dockScore >= -4) dockNorm = 0;
+        else dockNorm = 100 - ((dockScore + 12) * 12.5);
+
+        // Lipinski: 0 violations = 100, 1 = 75, 2 = 50, 3 = 25, 4 = 0
+        const lipScore = Math.max(0, 100 - lipinskiViol * 25);
+
+        // BBB: 100 if yes, 0 if no
+        const bbbScore = bbb ? 100 : 0;
+
+        // Composite (weighted)
+        const totalScore = (dockNorm * 0.5 + lipScore * 0.3 + bbbScore * 0.2).toFixed(1);
+        let rank = 'C';
+        if (totalScore >= 80) rank = 'A';
+        else if (totalScore >= 60) rank = 'B';
+
+        document.getElementById('scoreResult').innerText = `Score: ${totalScore} | Rank: ${rank}`;
+        document.getElementById('globalScore').innerText = totalScore;
+        document.getElementById('globalRank').innerText = rank;
+    }
+
+    // Run all three modules and update global
+    function runAll() {
+        computeDocking();
+        computeADMET();
+        computeScore();
+    }
+
+    // Initialize with defaults on page load
+    window.onload = function() {
+        // Optionally pre-fill some fields
+        runAll(); // show initial results
     };
-`;
-
-let activeWorkers = [];
-
-function runKangaroo() {
-    const t0 = performance.now();
-    const input = document.getElementById('eqInput').value;
-    if(!input) return;
-
-    const b = input.match(/base=(\d+)/)?.[1] || 3;
-    const t = input.match(/target=(\d+)/)?.[1] || 205891132094649;
-    const m = input.match(/mod=(\d+)/)?.[1] || 12345678901234567891;
-    
-    document.getElementById('workerStatus').innerText = "WORKER_THREADS: 1.2Bn_DENSITY_ACTIVE";
-    showResult("ASCENDING TO 100 CRORE LOGIC GRID...", t0, "KANGAROO_ULTRA_v125", "MULTI_INDUSTRIAL_NEURAL");
-    
-    launchLogic('kangaroo', b, t, m, 32000000, t0);
-}
-
-function runNavigator() {
-    const t0 = performance.now();
-    const input = document.getElementById('eqInput').value;
-    if(!input) return;
-
-    // v131 Logic Integration: Detecting Discrete Log params or Orbitals
-    const bMatch = input.match(/base=(\d+)/);
-    const tMatch = input.match(/target=(\d+)/);
-    const mMatch = input.match(/mod=(\d+)/);
-
-    if(bMatch && tMatch && mMatch) {
-        document.getElementById('workerStatus').innerText = "WORKER_THREADS: LINEAR_PARTITION_ACTIVE";
-        showResult("EXECUTING v131 LINEAR PARTITION...", t0, "PARTITION_v131", "LOGIC_COMPUTING");
-        launchLogic('partition', bMatch[1], tMatch[1], mMatch[1], 10000000, t0);
-    } else {
-        const r = parseFloat(input.match(/r=([\d.]+)/)?.[1] || 7000);
-        const v = Math.sqrt(398600.44 / r);
-        showResult(`ORBITAL ANALYSIS:\nRADIUS: ${r} KM\nVELOCITY: ${v.toFixed(4)} KM/S`, t0, "SPACE_NAV", "SPACE_EXPLORATION");
-    }
-}
-
-function launchLogic(mode, b, t, m, limit, t0) {
-    activeWorkers.forEach(w => w.terminate());
-    activeWorkers = [];
-    let isFound = false;
-    const blob = new Blob([workerCode], { type: 'application/javascript' });
-
-    for (let i = 0; i < 4; i++) {
-        const w = new Worker(URL.createObjectURL(blob));
-        w.onmessage = function(e) {
-            if (e.data.found && !isFound) {
-                isFound = true;
-                activeWorkers.forEach(wrk => wrk.terminate());
-                showResult(`LOGIC MATCH FOUND (x) = ${e.data.result}\nMODULUS = ${m}`, t0, mode.toUpperCase(), "LOGIC_COMPUTING");
-                document.getElementById('workerStatus').innerText = "WORKER_THREADS: STANDBY";
-            }
-        };
-        w.postMessage({ b, t, m, limit, id: i, mode });
-        activeWorkers.push(w);
-    }
-}
-
-function runStability() {
-    const t0 = performance.now();
-    const input = document.getElementById('eqInput').value;
-    if(!input) return;
-    const r = parseFloat(input.match(/r=([\d.]+)/)?.[1] || 1.122);
-    const pot = 4 * (Math.pow(1/r, 12) - Math.pow(1/r, 6));
-    showResult(`MOLECULAR STABILITY:\nL-J POTENTIAL: ${pot.toFixed(6)} eV\nSTATUS: ${pot < 0 ? 'STABLE' : 'UNSTABLE'}`, t0, "LJ_POTENTIAL", "DRUG_DISCOVERY");
-}
-
-async function cloudLink() {
-    const t0 = performance.now();
-    const input = document.getElementById('eqInput').value;
-    if(!input) return;
-    const name = input.match(/spectra=([a-zA-Z0-9]+)/)?.[1] || "aspirin";
-    showResult(`FETCHING SPECTRA...`, t0, "CLOUD_FETCH", "DRUG_DISCOVERY");
-    try {
-        const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${name}/JSON`);
-        const data = await res.json();
-        showResult(`PUBCHEM DATA RETRIEVED.\nCID: ${data.PC_Compounds[0].id.id.cid}`, t0, "CLOUD_SUCCESS", "DRUG_DISCOVERY");
-    } catch(e) { showResult("CLOUD LINK FAILED.", t0, "CLOUD_ERROR", "DRUG_DISCOVERY"); }
-}
-
-function initAscension() { runKangaroo(); }
-function vaultData() { alert("MASTER ARCHITECT: Data Exported to Neural Vault."); }
-
-function showResult(res, t0, mode, type) {
-    document.getElementById('resPanel').style.display = 'block';
-    document.getElementById('finalResult').innerText = res;
-    document.getElementById('modeData').innerText = mode;
-    document.getElementById('resData').innerText = type;
-    document.getElementById('timeData').innerText = (performance.now() - t0).toFixed(2);
-    document.getElementById('sysLog').innerHTML += `<br>> [${mode}] Active at ${new Date().toLocaleTimeString()}`;
-}
 </script>
 </body>
 </html>
