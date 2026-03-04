@@ -3,43 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW-WIN · DRUG DISCOVERY LOGIC ENGINE</title>
+    <title>GROW-WIN · DRUG DISCOVERY LOGIC ENGINE v92</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { background: #0a0c10; color: #e6edf3; font-family: 'Inter', sans-serif; }
+        body { background: #0a0c10; color: #e6edf3; font-family: 'Inter', sans-serif; font-size: 14px; }
         .card { background: #161b22; border: 1px solid #30363d; border-radius: 2rem; transition: 0.3s; }
         .card:hover { border-color: #2ea44f; transform: translateY(-5px); }
-        .input-field { background: #0d1117; border: 1px solid #3b434b; color: #2ea44f; padding: 0.5rem 1rem; border-radius: 1rem; width: 120px; text-align: center; font-weight: bold; outline: none; }
+        .input-field { background: #0d1117; border: 1px solid #3b434b; color: #2ea44f; padding: 0.5rem 1rem; border-radius: 1rem; width: 120px; text-align: center; font-weight: bold; outline: none; font-size: 14px; }
         .input-field:focus { border-color: #2ea44f; }
-        .btn { background: #2ea44f; color: black; font-weight: 800; padding: 0.75rem 1.5rem; border-radius: 2rem; transition: 0.2s; border: none; cursor: pointer; text-transform: uppercase; }
+        .btn { background: #2ea44f; color: black; font-weight: 800; padding: 0.75rem 1.5rem; border-radius: 2rem; transition: 0.2s; border: none; cursor: pointer; text-transform: uppercase; font-size: 14px; }
         .btn:hover { background: #3fb950; box-shadow: 0 0 15px #2ea44f; }
-        .result { background: #0d1117; padding: 0.75rem 1.5rem; border-radius: 1.5rem; border-left: 4px solid #2ea44f; font-weight: 700; min-height: 50px; display: flex; align-items: center; justify-content: center; }
+        .result { background: #0d1117; padding: 0.75rem 1.5rem; border-radius: 1.5rem; border-left: 4px solid #2ea44f; font-weight: 700; min-height: 50px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .opt-card { background: #0d1117; border-left: 4px solid #2ea44f; padding: 1rem; border-radius: 1rem; margin-bottom: 1rem; }
+        .weak-text { color: #f85149; font-weight: 900; text-transform: uppercase; font-size: 12px; }
+        .fix-text { color: #2ea44f; font-weight: 700; }
     </style>
 </head>
 <body class="p-8">
 
-<div class="max-w-6xl mx-auto">
+<div class="max-w-7xl mx-auto">
     <div class="text-center mb-12">
         <h1 class="text-5xl font-black tracking-tighter uppercase"> GROW-WIN <span class="text-[#2ea44f]">Pharma Engine</span></h1>
-        <p class="text-sm text-gray-400 mt-2 tracking-widest uppercase">Logic Replaces Supercomputer · Discovery v85.1</p>
+        <p class="text-sm text-gray-400 mt-2 tracking-widest uppercase">Logic Replaces Supercomputer · Discovery v92</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
         <div class="card p-8 flex flex-col">
             <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 1. Docking & Simulation</h2>
             <div class="space-y-4 flex-1">
                 <div class="flex justify-between items-center">
-                    <label class="text-xs font-bold text-gray-400">POCKET VOL (Å³)</label>
-                    <input id="pocketVol" type="number" class="input-field" placeholder="0">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Pocket Vol (Å³)</label>
+                    <input id="pocketVol" type="number" class="input-field" placeholder="">
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-xs font-bold text-gray-400">ROTATABLE BONDS</label>
-                    <input id="rotBonds" type="number" class="input-field" placeholder="0">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Rotatable Bonds</label>
+                    <input id="rotBonds" type="number" class="input-field" placeholder="">
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-xs font-bold text-gray-400">LOGP (HYDRO)</label>
-                    <input id="logP_dock" type="number" step="0.1" class="input-field" placeholder="0.0">
+                    <label class="text-xs font-bold text-gray-400 uppercase">LogP (Hydro)</label>
+                    <input id="logP_dock" type="number" step="0.1" class="input-field" placeholder="">
                 </div>
                 <button class="btn w-full mt-6" onclick="computeDocking()">Compute Affinity</button>
             </div>
@@ -47,23 +51,19 @@
         </div>
 
         <div class="card p-8 flex flex-col">
-            <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 2. ADMET Prediction</h2>
+            <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 2. ADMET & PK</h2>
             <div class="space-y-4 flex-1">
                 <div class="flex justify-between items-center">
-                    <label class="text-xs font-bold text-gray-400">MOL WEIGHT (G/MOL)</label>
-                    <input id="molWeight" type="number" class="input-field" placeholder="0">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Mol Weight (g/mol)</label>
+                    <input id="molWeight" type="number" class="input-field" placeholder="">
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-xs font-bold text-gray-400">H-BOND DONORS</label>
-                    <input id="hbd" type="number" class="input-field" placeholder="0">
+                    <label class="text-xs font-bold text-gray-400 uppercase">PSA (Å²)</label>
+                    <input id="psa" type="number" class="input-field" placeholder="">
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-xs font-bold text-gray-400">H-BOND ACCEPTORS</label>
-                    <input id="hba" type="number" class="input-field" placeholder="0">
-                </div>
-                <div class="flex justify-between items-center">
-                    <label class="text-xs font-bold text-gray-400">PSA (Å²)</label>
-                    <input id="psa" type="number" class="input-field" placeholder="0">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Bioavailability %</label>
+                    <input id="bioavail" type="number" class="input-field" placeholder="">
                 </div>
                 <button class="btn w-full mt-6" onclick="computeADMET()">Predict ADMET</button>
             </div>
@@ -71,22 +71,22 @@
         </div>
 
         <div class="card p-8 flex flex-col">
-            <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 3. Scoring & Ranking</h2>
+            <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 3. Scoring & Kill Switch</h2>
             <div class="space-y-4 flex-1">
                 <div class="flex justify-between items-center">
-                    <label class="text-xs font-bold text-gray-400">DOCKING SCORE</label>
-                    <input id="dockScore_input" type="number" step="0.1" class="input-field" placeholder="0.0">
+                    <label class="text-xs font-bold text-gray-400 uppercase">hERG Block (%)</label>
+                    <input id="herg" type="number" class="input-field" placeholder="">
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-xs font-bold text-gray-400">VIOLATIONS</label>
-                    <input id="lipinskiViol" type="number" class="input-field" placeholder="0">
-                </div>
-                <div class="flex justify-between items-center">
-                    <label class="text-xs font-bold text-gray-400">BBB PASS?</label>
-                    <select id="bbb" class="input-field bg-[#0d1117] cursor-pointer">
-                        <option value="1">YES</option>
+                    <label class="text-xs font-bold text-gray-400 uppercase">Genotoxicity</label>
+                    <select id="genotox" class="input-field">
                         <option value="0">NO</option>
+                        <option value="1">YES</option>
                     </select>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Docking Score</label>
+                    <input id="dockScore_input" type="number" step="0.1" class="input-field" placeholder="">
                 </div>
                 <button class="btn w-full mt-6" onclick="computeScore()">Calculate Score</button>
             </div>
@@ -94,21 +94,40 @@
         </div>
     </div>
 
-    <div class="mt-12 card p-8 text-center border-t-4 border-t-[#2ea44f]">
-        <h3 class="text-xs font-black text-[#2ea44f] tracking-[0.5em] uppercase mb-4">Grow-Win Industrial Verdict</h3>
-        <div class="flex flex-col md:flex-row justify-center items-center gap-12 mt-4">
-            <div>
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Logic Drug Score</span>
-                <div id="globalScore" class="text-7xl font-black text-white">0.0</div>
+    <input type="hidden" id="lipinskiViol" value="0">
+    <input type="hidden" id="bbb" value="0">
+
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <div class="card p-8 text-center border-t-4 border-t-[#2ea44f]">
+            <h3 class="text-xs font-black text-[#2ea44f] tracking-[0.5em] uppercase mb-4">Grow-Win Industrial Verdict</h3>
+            <div class="flex flex-col justify-center items-center gap-6 mt-4">
+                <div>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Logic Drug Score</span>
+                    <div id="globalScore" class="text-7xl font-black text-white">0.0</div>
+                </div>
+                <div class="h-px w-20 bg-gray-800"></div>
+                <div>
+                    <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Final Rank</span>
+                    <div id="globalRank" class="text-7xl font-black text-gray-600">-</div>
+                </div>
             </div>
-            <div class="hidden md:block h-20 w-px bg-gray-800"></div>
-            <div>
-                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Final Rank</span>
-                <div id="globalRank" class="text-7xl font-black text-gray-600">-</div>
-            </div>
+            <div id="finalDecisionText" class="mt-6 font-bold uppercase tracking-tighter text-xl"></div>
+            <button class="btn w-full py-5 mt-10 text-xl tracking-widest shadow-xl" onclick="runAll()">Execute Full Discovery</button>
         </div>
-        <button class="btn px-16 py-5 mt-10 text-xl tracking-widest shadow-xl" onclick="runAll()">Execute Full Discovery</button>
-        <p class="text-[10px] text-gray-600 mt-8 font-bold tracking-widest uppercase italic">Design & Logic by Udayana Ananth Kumar</p>
+
+        <div class="card p-8 border-t-4 border-t-cyan-500">
+            <h3 class="text-xs font-black text-cyan-500 tracking-[0.5em] uppercase mb-6">11. Smart Optimization Engine</h3>
+            <div id="opt-container" class="space-y-4 overflow-y-auto" style="max-height: 400px;">
+                <p class="text-gray-500 italic text-center py-20">Execute engine to see optimization path...</p>
+            </div>
+            <button class="btn w-full mt-6 !background-none border border-[#2ea44f] !text-[#2ea44f] bg-transparent hover:!bg-[#2ea44f] hover:!text-black" onclick="autoOptimize()">Recalculate with Optimizations</button>
+        </div>
+
+    </div>
+
+    <div class="mt-12 text-center">
+        <p class="text-[10px] text-gray-600 font-bold tracking-widest uppercase italic">Design & Logic by Udayana Ananth Kumar</p>
     </div>
 </div>
 
@@ -128,20 +147,17 @@
 
     function computeADMET() {
         const mw = parseFloat(document.getElementById('molWeight').value) || 0;
-        const hbd = parseFloat(document.getElementById('hbd').value) || 0;
-        const hba = parseFloat(document.getElementById('hba').value) || 0;
         const psa = parseFloat(document.getElementById('psa').value) || 0;
         const logp = parseFloat(document.getElementById('logP_dock').value) || 0;
+        const bio = parseFloat(document.getElementById('bioavail').value) || 0;
 
         let violations = 0;
         if (mw > 500) violations++;
         if (logp > 5) violations++;
-        if (hbd > 5) violations++;
-        if (hba > 10) violations++;
         
         const bbb = (psa < 90 && mw < 450) ? 'Yes' : 'No';
         
-        document.getElementById('admetResult').innerText = `Violations: ${violations} | BBB: ${bbb}`;
+        document.getElementById('admetResult').innerText = `Violations: ${violations} | BBB: ${bbb} | PK: ${bio}%`;
         document.getElementById('lipinskiViol').value = violations;
         document.getElementById('bbb').value = (bbb === 'Yes' ? '1' : '0');
         
@@ -152,6 +168,8 @@
         const dock = parseFloat(document.getElementById('dockScore_input').value) || 0;
         const viol = parseInt(document.getElementById('lipinskiViol').value) || 0;
         const bbb = parseInt(document.getElementById('bbb').value) || 0;
+        const herg = parseFloat(document.getElementById('herg').value) || 0;
+        const genotox = document.getElementById('genotox').value;
 
         if (dock === 0 && viol === 0) return;
 
@@ -160,21 +178,116 @@
         
         let finalScore = (dockPart + admetPart);
 
+        // KILL SWITCH
+        if (genotox === "1" || herg > 20) {
+            finalScore = Math.min(finalScore, 40.0);
+        }
         if (viol > 1) {
             finalScore = Math.min(finalScore, 60.0);
         }
 
         finalScore = Math.min(100, finalScore).toFixed(1);
         let rank = 'C';
-        if (finalScore >= 85) rank = 'A';
-        else if (finalScore >= 65) rank = 'B';
+        let decisionText = "⚠️ Optimize First";
+        let decisionColor = "#f85149";
+
+        if (finalScore >= 85 && genotox === "0") {
+            rank = 'A';
+            decisionText = "✅ Proceed to Lab";
+            decisionColor = "#2ea44f";
+        } else if (finalScore >= 65) {
+            rank = 'B';
+            decisionText = "⚠️ Optimize First";
+            decisionColor = "#e3b341";
+        } else if (finalScore < 50 || genotox === "1") {
+            decisionText = "❌ Reject Molecule";
+            decisionColor = "#f85149";
+        }
 
         document.getElementById('scoreResult').innerText = `Score: ${finalScore} | Rank: ${rank}`;
         document.getElementById('globalScore').innerText = finalScore;
         document.getElementById('globalRank').innerText = rank;
+        document.getElementById('finalDecisionText').innerText = decisionText;
+        document.getElementById('finalDecisionText').style.color = decisionColor;
         
         const rankColor = rank === 'A' ? '#2ea44f' : (rank === 'B' ? '#e3b341' : '#f85149');
         document.getElementById('globalRank').style.color = rankColor;
+
+        generateOptimizations(finalScore, dock, viol, herg, bbb);
+    }
+
+    function generateOptimizations(score, dock, viol, herg, bbb) {
+        const optContainer = document.getElementById('opt-container');
+        optContainer.innerHTML = "";
+        let suggestions = [];
+
+        // Logic 1: Docking
+        if (Math.abs(dock) < 6) {
+            suggestions.push({
+                area: "Docking Strength",
+                fix: "Reduce rotatable bonds and adjust LogP to 2-3.",
+                gain: "+15 Score",
+                priority: "HIGH"
+            });
+        }
+
+        // Logic 2: ADMET/Size
+        if (parseFloat(document.getElementById('molWeight').value) > 500) {
+            suggestions.push({
+                area: "Molecular Weight",
+                fix: "Reduce molecular size / remove bulky groups.",
+                gain: "+10 Score & Absorption",
+                priority: "MEDIUM"
+            });
+        }
+
+        // Logic 3: Safety
+        if (herg > 10) {
+            suggestions.push({
+                area: "hERG Risk (Cardiac)",
+                fix: "Reduce aromatic rings and lipophilicity.",
+                gain: "+30 Safety Score",
+                priority: "CRITICAL"
+            });
+        }
+
+        // Logic 4: PK
+        if (parseFloat(document.getElementById('bioavail').value) < 50) {
+            suggestions.push({
+                area: "Bioavailability",
+                fix: "Improve solubility / reduce PSA.",
+                gain: "+12 PK Score",
+                priority: "HIGH"
+            });
+        }
+
+        if (suggestions.length === 0 && score >= 85) {
+            optContainer.innerHTML = "<p class='text-green-400 font-bold text-center py-20 uppercase'>Molecule Profile Optimized for Lab Entry.</p>";
+        } else {
+            suggestions.forEach(s => {
+                optContainer.innerHTML += `
+                    <div class="opt-card">
+                        <div class="weak-text">WEAK AREA: ${s.area}</div>
+                        <div class="mt-2 text-sm"><span class="text-gray-500 uppercase font-bold text-[10px]">Fix:</span> <span class="fix-text">${s.fix}</span></div>
+                        <div class="mt-1 text-sm"><span class="text-gray-500 uppercase font-bold text-[10px]">Gain:</span> <span class="text-cyan-400 font-bold">${s.gain}</span></div>
+                        <div class="mt-1 text-[10px] font-black uppercase text-right" style="color: ${s.priority === 'CRITICAL' ? '#f85149' : '#e3b341'}">Priority: ${s.priority}</div>
+                    </div>
+                `;
+            });
+        }
+    }
+
+    function autoOptimize() {
+        // Simulated optimization logic
+        const herg = document.getElementById('herg');
+        const rot = document.getElementById('rotBonds');
+        const bio = document.getElementById('bioavail');
+        
+        if (parseFloat(herg.value) > 10) herg.value = 5;
+        if (parseFloat(rot.value) > 5) rot.value = 3;
+        if (parseFloat(bio.value) < 50) bio.value = 75;
+
+        runAll();
     }
 
     function runAll() {
@@ -182,22 +295,9 @@
         computeADMET();
         computeScore();
     }
-    
-    function runLaserStress() {
-        let count = 1000;
-        let start = performance.now();
-        for(let i=0; i<count; i++) {
-            let v = Math.random() * 500;
-            let b = Math.random() * 10;
-            let lp = Math.random() * 5;
-            let res = -((v / 150) + (b * 0.4) - (lp * 0.1));
-        }
-        let end = performance.now();
-        console.log(`Laser Stress Test: Processed 1000 molecules in ${(end-start).toFixed(4)}ms`);
-    }
 
     window.onload = function() {
-        runLaserStress(); 
+        console.log("GROW-WIN Engine v92 Loaded.");
     };
 </script>
 </body>
