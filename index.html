@@ -118,14 +118,12 @@
         const steps = parseInt(document.getElementById('sSteps').value) || 0;
         const yields = parseFloat(document.getElementById('sYield').value) || 0;
 
-        // Optimized Ranking Logic (Rank A Sensitivity)
         let score = (Math.abs(affinity) * 12) + (admet.mw < 450 ? 25 : 10);
         if (steps > 0) score += (steps <= 5 ? 20 : 5);
         if (yields >= 75) score += 10;
         
-        // Safety Barrier
         if (genotox === "1" || herg > 10) {
-            score = Math.min(score, 49); // Lock at Rank C if unsafe
+            score = Math.min(score, 49); 
         }
 
         score = Math.max(0, Math.min(100, score)).toFixed(1);
@@ -138,13 +136,13 @@
 
         let approval = "REJECTED";
         let appColor = "#f85149";
-        if (score >= 85 && genotox === "0" && herg <= 5) { approval = "FDA READY / APPROVED"; appColor = "#2ea44f"; }
+        // Correction applied here: Label updated to R&D Ready / Lab Validation Recommended
+        if (score >= 85 && genotox === "0" && herg <= 5) { approval = "R&D Ready / Lab Validation Recommended"; appColor = "#2ea44f"; }
         else if (score >= 65 && genotox === "0") { approval = "IND PHASE I/II READY"; appColor = "#e3b341"; }
         
         const appEl = document.getElementById('approvalStatus');
         appEl.innerText = approval; appEl.style.color = appColor;
 
-        // Logic Improvement Engine - Updated
         let suggest = "Molecule is optimal.";
         if (herg > 10) suggest = "High cardiac risk! Lower hERG % to widen Therapeutic Window.";
         else if (steps > 5) suggest = "Manufacturing cost high. Reduce synthesis steps to <5.";
