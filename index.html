@@ -19,7 +19,11 @@
         .suggestion-box { background: rgba(46, 164, 79, 0.1); border: 1px dashed #2ea44f; border-radius: 1rem; padding: 0.75rem; margin-top: 1rem; font-size: 11px; color: #8b949e; }
         .insight-item { border-bottom: 1px solid #30363d; padding: 5px 0; }
         .insight-item:last-child { border: none; }
-        .remedy-box { background: rgba(227, 179, 65, 0.1); border: 1px solid #e3b341; border-radius: 1rem; padding: 0.75rem; margin-top: 1rem; font-size: 11px; color: #e3b341; }
+        .auto-status { font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; }
+        /* Tooltip style */
+        .tooltip { position: relative; display: inline-block; cursor: help; }
+        .tooltip .tooltiptext { visibility: hidden; width: 160px; background-color: #30363d; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -80px; opacity: 0; transition: opacity 0.3s; font-size: 10px; font-weight: normal; }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
     </style>
 </head>
 <body class="p-8">
@@ -47,9 +51,11 @@
                         <option value="gi">GASTRO (GI)</option>
                     </select>
                 </div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Pocket Vol (Å³)</label><input id="pocketVol" type="text" placeholder="0" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Rotatable Bonds</label><input id="rotBonds" type="text" placeholder="0" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">LogP (Hydro)</label><input id="logP_dock" type="text" placeholder="0" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">Pocket Vol (Å³)<span class="tooltiptext">Active site cavity volume.</span></label><input id="pocketVol" type="number" placeholder="0" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">Rotatable Bonds<span class="tooltiptext">Number of single bonds which can rotate freely.</span></label><input id="rotBonds" type="number" placeholder="0" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">LogP (Hydro)<span class="tooltiptext">Lipophilicity; partition coefficient between octanol and water.</span></label><input id="logP_dock" type="number" step="0.1" placeholder="0" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">H-Bond Count<span class="tooltiptext">Sum of H-bond donors and acceptors.</span></label><input id="hBonds" type="number" placeholder="0" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">RMSD (Å)<span class="tooltiptext">Root-mean-square deviation of atomic positions.</span></label><input id="rmsd" type="number" step="0.1" placeholder="0" class="input-field"></div>
                 <button class="btn w-full mt-6" onclick="computeDocking()">Compute Affinity</button>
             </div>
             <div class="result mt-6 text-center" id="dockingResult">-</div>
@@ -58,9 +64,10 @@
         <div class="card p-8 flex flex-col">
             <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 2. ADMET & PK</h2>
             <div class="space-y-4 flex-1">
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Mol Weight</label><input id="molWeight" type="text" placeholder="0" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">PSA (Å²)</label><input id="psa" type="text" placeholder="0" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Bioavail %</label><input id="bioavail" type="text" placeholder="0" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Mol Weight</label><input id="molWeight" type="number" placeholder="0" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">PSA (Å²)<span class="tooltiptext">Polar Surface Area; determines cell permeability.</span></label><input id="psa" type="number" placeholder="0" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Bioavail %</label><input id="bioavail" type="number" placeholder="0" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-blue-300 uppercase">PPB % (Protein Binding)</label><input id="ppb" type="number" placeholder="0" class="input-field"></div>
                 <button class="btn w-full mt-6" onclick="computeADMET()">Predict ADMET</button>
             </div>
             <div class="result mt-6 text-sm text-center" id="admetResult">-</div>
@@ -68,12 +75,18 @@
 
         <div class="card p-8 flex flex-col">
             <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 3. Final Controls</h2>
-            <div class="space-y-3 flex-1 overflow-y-auto" style="max-height: 300px;">
-                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-red-400 uppercase">hERG Block %</label><input id="herg" type="text" placeholder="0" class="input-field !w-20"></div>
+            <div class="space-y-3 flex-1 overflow-y-auto" style="max-height: 400px; scrollbar-width: thin; scrollbar-color: #30363d transparent;">
+                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-red-400 uppercase tooltip">hERG Block %<span class="tooltiptext">Potential for heart rhythm interference (cardiotoxicity).</span></label><input id="herg" type="number" placeholder="0" class="input-field !w-20"></div>
+                
+                <div class="flex justify-between items-center p-2 bg-black/30 rounded-lg">
+                    <label class="text-[10px] font-bold text-red-500 uppercase">DILI Risk (Liver)</label>
+                    <span id="diliAutoStatus" class="auto-status bg-gray-800 text-gray-400">Wait...</span>
+                </div>
+
                 <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-gray-400 uppercase">Genotoxicity</label><select id="genotox" class="input-field !w-20"><option value="0">NO</option><option value="1">YES</option></select></div>
                 <hr class="border-gray-800">
-                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-yellow-500 uppercase">Synth Steps</label><input id="sSteps" type="text" placeholder="0" class="input-field !w-20"></div>
-                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-yellow-500 uppercase">Avg Yield %</label><input id="sYield" type="text" placeholder="0" class="input-field !w-20"></div>
+                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-yellow-500 uppercase">Synth Steps</label><input id="sSteps" type="number" placeholder="0" class="input-field !w-20"></div>
+                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-yellow-500 uppercase">Avg Yield %</label><input id="sYield" type="number" placeholder="0" class="input-field !w-20"></div>
                 <button class="btn w-full mt-4" onclick="runAll()">Calculate All</button>
             </div>
             <div class="result mt-6 text-center" id="scoreResult">-</div>
@@ -83,7 +96,7 @@
     <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="card p-8 border-t-4 border-t-yellow-500">
             <h3 class="text-xs font-black text-yellow-500 tracking-[0.5em] uppercase mb-4">Industrial Intelligence Report</h3>
-            <div id="synth-report-box" class="space-y-2 min-h-[220px]">
+            <div id="synth-report-box" class="space-y-2 min-h-[220px] overflow-y-auto pr-2" style="max-height: 250px;">
                 <p class="text-gray-500 italic text-center py-10 uppercase">Awaiting manufacturing data...</p>
             </div>
         </div>
@@ -111,12 +124,12 @@
     function updateTargetAdvice() {
         const type = document.getElementById('targetType').value;
         const advice = {
-            'cns': "🧠 <b>CNS:</b> BBB దాటడానికి MW < 450 మరియు PSA < 90 ఉండటం కీలకం.",
+            'cns': "🧠 <b>CNS:</b> BBB దాటడానికి MW < 450 మరియు PSA < 90 ఉండటం కీలకం. H-Bond Donor count తక్కువగా ఉండాలి.",
             'cancer': "🎗️ <b>ONCOLOGY:</b> Binding Affinity బలంగా ఉండాలి (-8.0 కంటే ఎక్కువ ఐడియల్).",
-            'virus': "🦠 <b>ANTI-INFECTIVE:</b> Mutations తట్టుకోవడానికి Flexibilty ఉండాలి.",
-            'heart': "❤️ <b>CARDIO:</b> hERG Block < 5% ఉండాలి. Heart safety అత్యంత ముఖ్యం.",
-            'metabolic': "🧬 <b>METABOLIC:</b> Bioavailability > 60% ఉండాలి (Long term oral use).",
-            'immune': "🛡️ <b>IMMUNOLOGY:</b> Molecular Specificity ముఖ్యం. Side-effects తగ్గించాలి.",
+            'virus': "🦠 <b>ANTI-INFECTIVE:</b> Mutations తట్టుకోవడానికి Rotatable Bonds (Flexibility) ఎక్కువగా ఉండాలి.",
+            'heart': "❤️ <b>CARDIO:</b> hERG Block < 5% ఉండాలి.",
+            'metabolic': "🧬 <b>METABOLIC:</b> Bioavailability > 60% ఉండాలి.",
+            'immune': "🛡️ <b>IMMUNOLOGY:</b> Molecular Specificity ముఖ్యం.",
             'rare': "💎 <b>RARE DISEASE:</b> Orphan drug logic: Synthesis Yield ఎక్కువగా ఉండాలి.",
             'gi': "🧪 <b>GASTRO:</b> Solubility కీలకం. LogP నియంత్రణలో ఉండాలి.",
             'none': ""
@@ -126,136 +139,141 @@
     }
 
     function computeDocking() {
+        const type = document.getElementById('targetType').value;
         const vol = parseFloat(document.getElementById('pocketVol').value) || 0;
         const bonds = parseFloat(document.getElementById('rotBonds').value) || 0;
         const logp = parseFloat(document.getElementById('logP_dock').value) || 0;
-        let affinity = -((vol / 150) + (bonds * 0.4) - (logp * 0.1)).toFixed(2);
-        document.getElementById('dockingResult').innerText = affinity + ' kcal/mol';
-        return parseFloat(affinity);
+        const rmsd = parseFloat(document.getElementById('rmsd').value) || 0;
+        const mw = parseFloat(document.getElementById('molWeight').value) || 1; // Used for efficiency calculation
+
+        // Industrial Affinity Logic: Combining binding energy with Ligand Efficiency (LE)
+        // Base affinity driven by pocket fit and lipophilicity
+        let affinityVal = -((vol / 85) + (logp * 0.15));
+        
+        // Target specific flexibility adjustments
+        if(type === 'virus') {
+            affinityVal -= (bonds * 0.25); // Bonus for flexibility in viral docking
+        } else {
+            affinityVal += (bonds * 0.08); // Penalty for entropy loss in rigid targets
+        }
+
+        // Penalty for high RMSD (Docking uncertainty)
+        if(rmsd > 2.0) {
+            affinityVal += (Math.pow(rmsd, 1.2) * 0.5);
+        } else {
+            affinityVal -= (0.4 - rmsd * 0.1); // Small bonus for high precision poses
+        }
+
+        // Internal Efficiency Check: Affinity normalized by size (Simplified LE)
+        // High affinity with low MW is much better than high affinity with high MW
+        const ligandEfficiency = Math.abs(affinityVal) / (mw / 100);
+        if(ligandEfficiency < 1.0) affinityVal += 0.5; // Slight penalty for poor size-to-binding ratio
+
+        affinityVal = parseFloat(affinityVal.toFixed(2));
+        
+        const resEl = document.getElementById('dockingResult');
+        resEl.innerText = affinityVal + ' kcal/mol';
+        resEl.style.color = affinityVal < -7.8 ? '#2ea44f' : (affinityVal < -5.2 ? '#e3b341' : '#f85149');
+        
+        return affinityVal;
     }
 
     function computeADMET() {
         const mw = parseFloat(document.getElementById('molWeight').value) || 0;
         const psa = parseFloat(document.getElementById('psa').value) || 0;
+        const hbonds = parseFloat(document.getElementById('hBonds').value) || 0;
         const bio = parseFloat(document.getElementById('bioavail').value) || 0;
-        const bbb = (psa < 90 && mw < 450) ? 'Yes' : 'No';
-        document.getElementById('admetResult').innerText = `BBB: ${bbb} | PK: ${bio}% | MW: ${mw}`;
-        return { bbb, mw, psa, bio };
+        const ppb = parseFloat(document.getElementById('ppb').value) || 0;
+        
+        const bbb = (psa < 85 && mw < 430 && hbonds < 6) ? 'Yes' : 'No';
+        
+        document.getElementById('admetResult').innerText = `BBB: ${bbb} | PK: ${bio}% | PPB: ${ppb}%`;
+        return { bbb, mw, psa, bio, ppb };
     }
 
     function runAll() {
+        const type = document.getElementById('targetType').value;
         const affinity = computeDocking();
         const admet = computeADMET();
         const herg = parseFloat(document.getElementById('herg').value) || 0;
         const genotox = document.getElementById('genotox').value;
         const steps = parseInt(document.getElementById('sSteps').value) || 0;
         const yields = parseFloat(document.getElementById('sYield').value) || 0;
-        const type = document.getElementById('targetType').value;
         const logP = parseFloat(document.getElementById('logP_dock').value) || 0;
+        const hbonds = parseFloat(document.getElementById('hBonds').value) || 0;
+        const rotBonds = parseFloat(document.getElementById('rotBonds').value) || 0;
 
-        let score = (Math.abs(affinity) * 10); 
-        if (admet.mw >= 200 && admet.mw <= 450) score += 30;
-        if (Math.abs(affinity) < 4) score -= 20;
-        if (steps > 0 && steps <= 4) score += 15;
-        if (yields > 70) score += 10;
-
-        let safetyFailure = false;
+        let score = (Math.abs(affinity) * 6.8); 
         let insights = [];
-        let remedies = [];
+        let safetyFailure = false;
 
-        // LogP Solubility Logic
-        if (logP >= 1 && logP <= 3.5) {
-            score += 15;
-            insights.push("<div class='insight-item text-green-400'>✅ OPTIMAL LogP: Good balance of solubility and permeability.</div>");
-        } else if (logP > 5) {
-            score -= 25;
-            insights.push("<div class='insight-item text-orange-400'>⚠️ HIGH LogP: Risk of poor water solubility.</div>");
-            remedies.push("• <b>LogP ని తగ్గించండి:</b> మాలిక్యూల్‌కు Hydrophilic గ్రూప్స్ (OH, NH2) యాడ్ చేయండి.");
-        } else if (logP < 0) {
-            score -= 20;
-            insights.push("<div class='insight-item text-blue-300'>⚠️ LOW LogP: Poor membrane permeability.</div>");
-            remedies.push("• <b>LogP ని పెంచండి:</b> Carbon chains లేదా Aromatic rings పెంచి Permeability మెరుగుపరచండి.");
+        if (type === 'cns') {
+            if (admet.psa < 70) score += 12;
+            if (admet.mw > 450) score -= 18;
+        }
+        if (type === 'heart' && herg > 5) score -= (herg * 2.5);
+
+        if (admet.bio >= 85) score += 22;
+        else if (admet.bio >= 60) score += 12;
+
+        if (logP >= 1 && logP <= 3.2) score += 18;
+        if (admet.mw <= 400) score += 18;
+        if (hbonds >= 2 && hbonds <= 6) score += 10;
+
+        let diliScore = (logP * 0.6) + (admet.mw * 0.006) + (rotBonds * 0.25);
+        let diliStatus = (diliScore > 5.8 && admet.psa < 75) ? "HIGH" : "LOW";
+        
+        const diliEl = document.getElementById('diliAutoStatus');
+        diliEl.innerText = diliStatus;
+        diliEl.className = `auto-status ${diliStatus === 'HIGH' ? 'bg-red-900 text-red-200' : 'bg-green-900 text-green-200'}`;
+
+        if (diliStatus === "HIGH") {
+            score -= 38;
+            insights.push("<div class='insight-item text-red-500'>🚨 DILI ALERT: Complex metabolic profile suggests liver risk.</div>");
         }
 
-        // Safety Logic
-        if (herg >= 71) {
-            score = Math.min(score, 20);
-            insights.push("<div class='insight-item text-red-600 font-black'>💀 FATAL: hERG Block is Critical.</div>");
-            remedies.push("• <b>hERG Block తగ్గించండి:</b> Basic amines తగ్గించండి లేదా మాలిక్యూల్ Rigid గా ఉండేలా చూడండి.");
-            safetyFailure = true;
-        } else if (herg >= 31) {
-            score = Math.min(score, 40);
-            insights.push("<div class='insight-item text-red-400'>🚨 WARNING: High Cardiac Risk.</div>");
-            remedies.push("• <b>Safety Alert:</b> మాలిక్యూల్ ఫ్లెక్సిబిలిటీ తగ్గించడం ద్వారా hERG బైండింగ్ ఆపవచ్చు.");
-            safetyFailure = true;
-        }
+        if (herg >= 50) { score = 5; safetyFailure = true; insights.push("<div class='insight-item text-red-600 font-black'>💀 CRITICAL: hERG inhibition is cardiotoxic.</div>"); }
+        if (genotox == "1") { score = 3; safetyFailure = true; insights.push("<div class='insight-item text-red-600 font-black'>🚨 GENOTOXIC: Positive mutagenicity detected.</div>"); }
 
-        // Genotoxicity Logic
-        if (genotox === "1") {
-            if (type === "cancer") {
-                insights.push("<div class='insight-item text-yellow-500 font-bold'>🎗️ ONCOLOGY SPECIAL: Genotoxicity accepted.</div>");
-            } else {
-                score = Math.min(score, 30);
-                insights.push("<div class='insight-item text-red-500'>🚨 CRITICAL: Genotoxicity Detected.</div>");
-                remedies.push("• <b>Genotox Error:</b> మాలిక్యూల్ నుండి Reactive functional groups (Nitro, Aliphatic halides) తొలగించండి.");
-                safetyFailure = true;
-            }
-        }
+        score = Math.max(0, Math.min(115, score)).toFixed(1);
 
-        // Strict CNS Logic
-        if (type === "cns" && admet.bbb === "No") {
-            score = score * 0.4; 
-            insights.push("<div class='insight-item text-red-500 font-bold'>🚨 CNS FAILURE: Cannot cross BBB.</div>");
-            remedies.push("• <b>BBB Pass అవ్వాలంటే:</b> MW < 450 మరియు PSA < 90 ఉండేలా మాలిక్యూల్ చిన్నది చేయండి.");
-            safetyFailure = true;
-        }
-
-        // Final Score Calculation
-        score = Math.max(0, Math.min(100, score)).toFixed(1);
-        let rank = score >= 85 ? 'A' : (score >= 65 ? 'B' : 'C');
-
-        // Clinical Timeline Logic
-        let clinicalYears = 12; 
-        if (score >= 90) clinicalYears -= 3;
-        if (type === "rare") clinicalYears -= 4;
-        if (type === "virus") clinicalYears -= 2; 
-        if (steps > 6) clinicalYears += 2;
-        if (safetyFailure) clinicalYears = "N/A (Project Halted)";
+        let rank = "C";
+        if (score >= 100) rank = "A++";
+        else if (score >= 90) rank = "A+";
+        else if (score >= 80) rank = "A";
+        else if (score >= 70) rank = "B+";
+        else if (score >= 60) rank = "B";
 
         document.getElementById('globalScore').innerText = score;
         document.getElementById('globalRank').innerText = rank;
-        document.getElementById('globalRank').style.color = rank === 'A' ? '#2ea44f' : (rank === 'B' ? '#e3b341' : '#f85149');
-        document.getElementById('scoreResult').innerText = `Score: ${score} | Rank: ${rank}`;
+        document.getElementById('globalRank').style.color = rank.includes('A') ? '#2ea44f' : (rank.includes('B') ? '#e3b341' : '#f85149');
         
         let approval = (score >= 85 && !safetyFailure) ? "R&D READY" : (score >= 65 && !safetyFailure ? "IND PHASE I" : "REJECTED");
         const appEl = document.getElementById('approvalStatus');
         appEl.innerText = approval;
         appEl.style.color = (approval === "REJECTED") ? "#f85149" : (approval === "R&D READY" ? "#2ea44f" : "#e3b341");
 
-        const cost = (steps * 4500 / (yields/100 || 0.1)).toFixed(0);
+        const yieldFactor = yields > 0 ? yields/100 : 0.1;
+        const cost = (steps * 5200 / yieldFactor).toFixed(0);
+        let marketYears = safetyFailure ? "N/A" : (score > 95 ? "5-7" : "10-13");
+
+        if (steps > 9) insights.push("<div class='insight-item text-yellow-500'>🛠️ SYNTH: Complex route. High production overhead.</div>");
+        if (yields < 35) insights.push("<div class='insight-item text-yellow-500'>🛠️ YIELD: Sub-optimal. Manufacturing cost will be high.</div>");
+
         if (targetAdvice) insights.unshift(targetAdvice);
         
-        insights.push("<div class='insight-item text-gray-500 font-bold'>ℹ️ LOGIC SOURCE: Verify parameters via SwissADME & pkCSM.</div>");
-
-        let remedyHTML = remedies.length > 0 ? `
-            <div class="remedy-box">
-                <span class="font-black uppercase tracking-tighter">🛠️ Auto-Correction Advice:</span><br>
-                <div class="mt-1 leading-tight">${remedies.join("<br>")}</div>
-            </div>` : "";
-
         document.getElementById('synth-report-box').innerHTML = `
             <div class="opt-card">
-                <div class="weak-text">Synthesis & Clinical Audit</div>
-                <div class="text-xs mt-2 text-gray-300">
-                    • Est. Cost/Gram: <span class="text-yellow-500">₹${cost}</span><br>
-                    • Success Rate: <span class="text-yellow-500">${yields}%</span><br>
-                    • Est. Time to Market: <span class="text-[#2ea44f] font-bold">${clinicalYears} Years</span>
-                </div>
+                <div class="weak-text">Industrial Clinical Audit</div>
+                <div class="text-xs mt-2 text-gray-300">• Est. Cost: <span class="text-yellow-500">₹${cost}</span> | Time-to-Market: ${marketYears} Years</div>
             </div>
-            ${remedyHTML}
+            <div class="opt-card" style="border-left-color: #2ea44f;">
+                <div class="weak-text" style="color: #2ea44f;">Molecular Summary</div>
+                <div class="text-xs mt-2 text-gray-300">• Sub-Rank: ${rank} | Metabolic DILI: ${diliStatus} | BBB Perm: ${admet.bbb}</div>
+            </div>
             <div class="suggestion-box">
-                <span class="text-[#2ea44f] font-bold uppercase">GROW-WIN Improvement Logic:</span><br>
-                <div class="mt-2 text-[10px] leading-relaxed">${insights.join("")}</div>
+                <span class="text-[#2ea44f] font-bold uppercase">GROW-WIN Improvement Logic:</span>
+                <div class="mt-2 text-[10px] sm:text-[11px] leading-relaxed">${insights.join("")}</div>
             </div>
         `;
     }
