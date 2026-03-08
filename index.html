@@ -121,7 +121,7 @@
             'none': ""
         };
         targetAdvice = advice[type] ? `<div class='insight-item text-blue-400'>${advice[type]}</div>` : "";
-        runAll(); // Auto-update report on target change
+        runAll();
     }
 
     function computeDocking() {
@@ -139,7 +139,7 @@
         const bio = parseFloat(document.getElementById('bioavail').value) || 0;
         const bbb = (psa < 90 && mw < 450) ? 'Yes' : 'No';
         document.getElementById('admetResult').innerText = `BBB: ${bbb} | PK: ${bio}% | MW: ${mw}`;
-        return { bbb, mw, bio };
+        return { bbb, mw, psa, bio };
     }
 
     function runAll() {
@@ -149,6 +149,8 @@
         const genotox = document.getElementById('genotox').value;
         const steps = parseInt(document.getElementById('sSteps').value) || 0;
         const yields = parseFloat(document.getElementById('sYield').value) || 0;
+        const type = document.getElementById('targetType').value;
+        const logP = parseFloat(document.getElementById('logP_dock').value) || 0;
 
         let score = (Math.abs(affinity) * 10); 
         if (admet.mw >= 200 && admet.mw <= 450) score += 30;
@@ -158,6 +160,18 @@
 
         let safetyFailure = false;
         let insights = [];
+
+        // LogP Solubility Logic
+        if (logP >= 1 && logP <= 3.5) {
+            score += 15;
+            insights.push("<div class='insight-item text-green-400'>✅ OPTIMAL LogP: Good balance of solubility and permeability.</div>");
+        } else if (logP > 5) {
+            score -= 25;
+            insights.push("<div class='insight-item text-orange-400'>⚠️ HIGH LogP: Risk of poor water solubility and metabolic instability.</div>");
+        } else if (logP < 0) {
+            score -= 20;
+            insights.push("<div class='insight-item text-blue-300'>⚠️ LOW LogP: Poor membrane permeability. Likely to be excreted fast.</div>");
+        }
 
         // Safety Logic
         if (herg >= 71) {
@@ -170,16 +184,36 @@
             safetyFailure = true;
         }
 
+        // Genotoxicity Logic
         if (genotox === "1") {
-            score = Math.min(score, 30);
-            insights.push("<div class='insight-item text-red-500'>🚨 CRITICAL: Genotoxicity Detected.</div>");
+            if (type === "cancer") {
+                insights.push("<div class='insight-item text-yellow-500 font-bold'>🎗️ ONCOLOGY SPECIAL: Genotoxicity accepted due to high indication priority.</div>");
+            } else {
+                score = Math.min(score, 30);
+                insights.push("<div class='insight-item text-red-500'>🚨 CRITICAL: Genotoxicity Detected.</div>");
+                safetyFailure = true;
+            }
+        }
+
+        // Strict CNS Logic
+        if (type === "cns" && admet.bbb === "No") {
+            score = score * 0.4; 
+            insights.push("<div class='insight-item text-red-500 font-bold'>🚨 CNS FAILURE: Drug cannot cross BBB despite high affinity.</div>");
             safetyFailure = true;
         }
 
+        // Final Score Calculation
         score = Math.max(0, Math.min(100, score)).toFixed(1);
         let rank = score >= 85 ? 'A' : (score >= 65 ? 'B' : 'C');
 
-        // Update UI
+        // Clinical Timeline Logic
+        let clinicalYears = 12; // Base baseline
+        if (score >= 90) clinicalYears -= 3;
+        if (type === "rare") clinicalYears -= 4;
+        if (type === "virus") clinicalYears -= 2; // Fast-track potential
+        if (steps > 6) clinicalYears += 2;
+        if (safetyFailure) clinicalYears = "N/A (Project Halted)";
+
         document.getElementById('globalScore').innerText = score;
         document.getElementById('globalRank').innerText = rank;
         document.getElementById('globalRank').style.color = rank === 'A' ? '#2ea44f' : (rank === 'B' ? '#e3b341' : '#f85149');
@@ -193,7 +227,6 @@
         const cost = (steps * 4500 / (yields/100 || 0.1)).toFixed(0);
         if (targetAdvice) insights.unshift(targetAdvice);
         
-        // Internal Source Guidance (Replaces UI links)
         insights.push("<div class='insight-item text-gray-500 font-bold'>ℹ️ LOGIC SOURCE: Verify parameters via SwissADME & pkCSM for 100% accuracy.</div>");
 
         document.getElementById('synth-report-box').innerHTML = `
@@ -201,7 +234,8 @@
                 <div class="weak-text">Synthesis & Clinical Audit</div>
                 <div class="text-xs mt-2 text-gray-300">
                     • Est. Cost/Gram: <span class="text-yellow-500">₹${cost}</span><br>
-                    • Success Rate: <span class="text-yellow-500">${yields}%</span>
+                    • Success Rate: <span class="text-yellow-500">${yields}%</span><br>
+                    • Est. Time to Market: <span class="text-[#2ea44f] font-bold">${clinicalYears} Years</span>
                 </div>
             </div>
             <div class="suggestion-box">
