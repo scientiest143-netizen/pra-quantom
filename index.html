@@ -18,6 +18,7 @@
         .weak-text { color: #f85149; font-weight: 900; text-transform: uppercase; font-size: 11px; }
         .suggestion-box { background: rgba(46, 164, 79, 0.1); border: 1px dashed #2ea44f; border-radius: 1rem; padding: 0.75rem; margin-top: 1rem; font-size: 11px; color: #8b949e; }
         .insight-item { border-bottom: 1px solid #30363d; padding: 5px 0; }
+        .insight-item:last-child { border: none; }
     </style>
 </head>
 <body class="p-8">
@@ -67,7 +68,7 @@
         <div class="card p-8 flex flex-col">
             <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 3. Final Controls</h2>
             <div class="space-y-3 flex-1 overflow-y-auto" style="max-height: 300px;">
-                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-gray-400 uppercase">hERG Block %</label><input id="herg" type="text" placeholder="0" class="input-field !w-20"></div>
+                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-red-400 uppercase">hERG Block %</label><input id="herg" type="text" placeholder="0" class="input-field !w-20"></div>
                 <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-gray-400 uppercase">Genotoxicity</label><select id="genotox" class="input-field !w-20"><option value="0">NO</option><option value="1">YES</option></select></div>
                 <hr class="border-gray-800">
                 <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-yellow-500 uppercase">Synth Steps</label><input id="sSteps" type="text" placeholder="0" class="input-field !w-20"></div>
@@ -111,15 +112,16 @@
         const advice = {
             'cns': "🧠 <b>CNS:</b> BBB దాటడానికి MW < 450 మరియు PSA < 90 ఉండటం కీలకం.",
             'cancer': "🎗️ <b>ONCOLOGY:</b> Binding Affinity బలంగా ఉండాలి (-8.0 కంటే ఎక్కువ ఐడియల్).",
-            'virus': "🦠 <b>ANTI-INFECTIVE:</b> Flexibilty ఉండాలి.",
-            'heart': "❤️ <b>CARDIO:</b> hERG Block < 5% ఉండాలి.",
-            'metabolic': "🧬 <b>METABOLIC:</b> Bioavailability > 60% ఉండాలి.",
-            'immune': "🛡️ <b>IMMUNOLOGY:</b> Specificity ముఖ్యం.",
-            'rare': "💎 <b>RARE DISEASE:</b> Synthesis Yield ఎక్కువగా ఉండాలి.",
-            'gi': "🧪 <b>GASTRO:</b> LogP నియంత్రణలో ఉండాలి.",
+            'virus': "🦠 <b>ANTI-INFECTIVE:</b> Mutations తట్టుకోవడానికి Flexibilty ఉండాలి.",
+            'heart': "❤️ <b>CARDIO:</b> hERG Block < 5% ఉండాలి. Heart safety అత్యంత ముఖ్యం.",
+            'metabolic': "🧬 <b>METABOLIC:</b> Bioavailability > 60% ఉండాలి (Long term oral use).",
+            'immune': "🛡️ <b>IMMUNOLOGY:</b> Molecular Specificity ముఖ్యం. Side-effects తగ్గించాలి.",
+            'rare': "💎 <b>RARE DISEASE:</b> Orphan drug logic: Synthesis Yield ఎక్కువగా ఉండాలి.",
+            'gi': "🧪 <b>GASTRO:</b> Solubility కీలకం. LogP నియంత్రణలో ఉండాలి.",
             'none': ""
         };
         targetAdvice = advice[type] ? `<div class='insight-item text-blue-400'>${advice[type]}</div>` : "";
+        runAll(); // Auto-update report on target change
     }
 
     function computeDocking() {
@@ -148,55 +150,51 @@
         const steps = parseInt(document.getElementById('sSteps').value) || 0;
         const yields = parseFloat(document.getElementById('sYield').value) || 0;
 
-        // --- IMPROVED SMART SCORING ---
         let score = (Math.abs(affinity) * 10); 
-        
-        // Bonus for optimal MW
         if (admet.mw >= 200 && admet.mw <= 450) score += 30;
-        
-        // Penalty for bad affinity
         if (Math.abs(affinity) < 4) score -= 20;
-
-        // Synthesis Impact
         if (steps > 0 && steps <= 4) score += 15;
         if (yields > 70) score += 10;
 
-        // Safety Hard-Gates
-        if (herg > 15 || genotox === "1") score = Math.min(score, 35);
-        if (yields <= 0) score = Math.min(score, 40); // 0% Success fix
+        let safetyFailure = false;
+        let insights = [];
+
+        // Safety Logic
+        if (herg >= 71) {
+            score = Math.min(score, 20);
+            insights.push("<div class='insight-item text-red-600 font-black'>💀 FATAL: hERG Block is Critical. Sudden Cardiac Death Risk!</div>");
+            safetyFailure = true;
+        } else if (herg >= 31) {
+            score = Math.min(score, 40);
+            insights.push("<div class='insight-item text-red-400'>🚨 WARNING: High Cardiac Risk. Arrhythmia possibility.</div>");
+            safetyFailure = true;
+        }
+
+        if (genotox === "1") {
+            score = Math.min(score, 30);
+            insights.push("<div class='insight-item text-red-500'>🚨 CRITICAL: Genotoxicity Detected.</div>");
+            safetyFailure = true;
+        }
 
         score = Math.max(0, Math.min(100, score)).toFixed(1);
         let rank = score >= 85 ? 'A' : (score >= 65 ? 'B' : 'C');
 
-        // Approval Logic
-        let approval = "REJECTED";
-        let appColor = "#f85149";
-        
-        if (score >= 85 && genotox === "0" && herg <= 10 && yields > 10) {
-            approval = "R&D READY / OPTIMIZED";
-            appColor = "#2ea44f";
-        } else if (score >= 65 && genotox === "0" && yields > 5) {
-            approval = "IND PHASE I READY";
-            appColor = "#e3b341";
-        }
-
-        // UI Updates
+        // Update UI
         document.getElementById('globalScore').innerText = score;
         document.getElementById('globalRank').innerText = rank;
         document.getElementById('globalRank').style.color = rank === 'A' ? '#2ea44f' : (rank === 'B' ? '#e3b341' : '#f85149');
         document.getElementById('scoreResult').innerText = `Score: ${score} | Rank: ${rank}`;
         
+        let approval = (score >= 85 && !safetyFailure) ? "R&D READY" : (score >= 65 && !safetyFailure ? "IND PHASE I" : "REJECTED");
         const appEl = document.getElementById('approvalStatus');
         appEl.innerText = approval;
-        appEl.style.color = appColor;
+        appEl.style.color = (approval === "REJECTED") ? "#f85149" : (approval === "R&D READY" ? "#2ea44f" : "#e3b341");
 
-        // Industrial Report
         const cost = (steps * 4500 / (yields/100 || 0.1)).toFixed(0);
-        let insights = [];
-        if (targetAdvice) insights.push(targetAdvice);
-        if (genotox === "1") insights.push("<div class='insight-item text-red-500'>🚨 <b>CRITICAL:</b> Genotoxicity Detected.</div>");
-        if (yields <= 10) insights.push("<div class='insight-item text-orange-500'>⚠️ <b>LOGIC:</b> Success Rate చాలా తక్కువగా ఉంది.</div>");
-        if (Math.abs(affinity) < 6) insights.push("<div class='insight-item text-yellow-500'>🔼 <b>IMPROVE:</b> Affinity పెంచండి.</div>");
+        if (targetAdvice) insights.unshift(targetAdvice);
+        
+        // Internal Source Guidance (Replaces UI links)
+        insights.push("<div class='insight-item text-gray-500 font-bold'>ℹ️ LOGIC SOURCE: Verify parameters via SwissADME & pkCSM for 100% accuracy.</div>");
 
         document.getElementById('synth-report-box').innerHTML = `
             <div class="opt-card">
