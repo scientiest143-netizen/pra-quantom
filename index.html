@@ -19,6 +19,7 @@
         .suggestion-box { background: rgba(46, 164, 79, 0.1); border: 1px dashed #2ea44f; border-radius: 1rem; padding: 0.75rem; margin-top: 1rem; font-size: 11px; color: #8b949e; }
         .insight-item { border-bottom: 1px solid #30363d; padding: 5px 0; }
         .insight-item:last-child { border: none; }
+        .remedy-box { background: rgba(227, 179, 65, 0.1); border: 1px solid #e3b341; border-radius: 1rem; padding: 0.75rem; margin-top: 1rem; font-size: 11px; color: #e3b341; }
     </style>
 </head>
 <body class="p-8">
@@ -160,6 +161,7 @@
 
         let safetyFailure = false;
         let insights = [];
+        let remedies = [];
 
         // LogP Solubility Logic
         if (logP >= 1 && logP <= 3.5) {
@@ -167,30 +169,35 @@
             insights.push("<div class='insight-item text-green-400'>✅ OPTIMAL LogP: Good balance of solubility and permeability.</div>");
         } else if (logP > 5) {
             score -= 25;
-            insights.push("<div class='insight-item text-orange-400'>⚠️ HIGH LogP: Risk of poor water solubility and metabolic instability.</div>");
+            insights.push("<div class='insight-item text-orange-400'>⚠️ HIGH LogP: Risk of poor water solubility.</div>");
+            remedies.push("• <b>LogP ని తగ్గించండి:</b> మాలిక్యూల్‌కు Hydrophilic గ్రూప్స్ (OH, NH2) యాడ్ చేయండి.");
         } else if (logP < 0) {
             score -= 20;
-            insights.push("<div class='insight-item text-blue-300'>⚠️ LOW LogP: Poor membrane permeability. Likely to be excreted fast.</div>");
+            insights.push("<div class='insight-item text-blue-300'>⚠️ LOW LogP: Poor membrane permeability.</div>");
+            remedies.push("• <b>LogP ని పెంచండి:</b> Carbon chains లేదా Aromatic rings పెంచి Permeability మెరుగుపరచండి.");
         }
 
         // Safety Logic
         if (herg >= 71) {
             score = Math.min(score, 20);
-            insights.push("<div class='insight-item text-red-600 font-black'>💀 FATAL: hERG Block is Critical. Sudden Cardiac Death Risk!</div>");
+            insights.push("<div class='insight-item text-red-600 font-black'>💀 FATAL: hERG Block is Critical.</div>");
+            remedies.push("• <b>hERG Block తగ్గించండి:</b> Basic amines తగ్గించండి లేదా మాలిక్యూల్ Rigid గా ఉండేలా చూడండి.");
             safetyFailure = true;
         } else if (herg >= 31) {
             score = Math.min(score, 40);
-            insights.push("<div class='insight-item text-red-400'>🚨 WARNING: High Cardiac Risk. Arrhythmia possibility.</div>");
+            insights.push("<div class='insight-item text-red-400'>🚨 WARNING: High Cardiac Risk.</div>");
+            remedies.push("• <b>Safety Alert:</b> మాలిక్యూల్ ఫ్లెక్సిబిలిటీ తగ్గించడం ద్వారా hERG బైండింగ్ ఆపవచ్చు.");
             safetyFailure = true;
         }
 
         // Genotoxicity Logic
         if (genotox === "1") {
             if (type === "cancer") {
-                insights.push("<div class='insight-item text-yellow-500 font-bold'>🎗️ ONCOLOGY SPECIAL: Genotoxicity accepted due to high indication priority.</div>");
+                insights.push("<div class='insight-item text-yellow-500 font-bold'>🎗️ ONCOLOGY SPECIAL: Genotoxicity accepted.</div>");
             } else {
                 score = Math.min(score, 30);
                 insights.push("<div class='insight-item text-red-500'>🚨 CRITICAL: Genotoxicity Detected.</div>");
+                remedies.push("• <b>Genotox Error:</b> మాలిక్యూల్ నుండి Reactive functional groups (Nitro, Aliphatic halides) తొలగించండి.");
                 safetyFailure = true;
             }
         }
@@ -198,7 +205,8 @@
         // Strict CNS Logic
         if (type === "cns" && admet.bbb === "No") {
             score = score * 0.4; 
-            insights.push("<div class='insight-item text-red-500 font-bold'>🚨 CNS FAILURE: Drug cannot cross BBB despite high affinity.</div>");
+            insights.push("<div class='insight-item text-red-500 font-bold'>🚨 CNS FAILURE: Cannot cross BBB.</div>");
+            remedies.push("• <b>BBB Pass అవ్వాలంటే:</b> MW < 450 మరియు PSA < 90 ఉండేలా మాలిక్యూల్ చిన్నది చేయండి.");
             safetyFailure = true;
         }
 
@@ -207,10 +215,10 @@
         let rank = score >= 85 ? 'A' : (score >= 65 ? 'B' : 'C');
 
         // Clinical Timeline Logic
-        let clinicalYears = 12; // Base baseline
+        let clinicalYears = 12; 
         if (score >= 90) clinicalYears -= 3;
         if (type === "rare") clinicalYears -= 4;
-        if (type === "virus") clinicalYears -= 2; // Fast-track potential
+        if (type === "virus") clinicalYears -= 2; 
         if (steps > 6) clinicalYears += 2;
         if (safetyFailure) clinicalYears = "N/A (Project Halted)";
 
@@ -227,7 +235,13 @@
         const cost = (steps * 4500 / (yields/100 || 0.1)).toFixed(0);
         if (targetAdvice) insights.unshift(targetAdvice);
         
-        insights.push("<div class='insight-item text-gray-500 font-bold'>ℹ️ LOGIC SOURCE: Verify parameters via SwissADME & pkCSM for 100% accuracy.</div>");
+        insights.push("<div class='insight-item text-gray-500 font-bold'>ℹ️ LOGIC SOURCE: Verify parameters via SwissADME & pkCSM.</div>");
+
+        let remedyHTML = remedies.length > 0 ? `
+            <div class="remedy-box">
+                <span class="font-black uppercase tracking-tighter">🛠️ Auto-Correction Advice:</span><br>
+                <div class="mt-1 leading-tight">${remedies.join("<br>")}</div>
+            </div>` : "";
 
         document.getElementById('synth-report-box').innerHTML = `
             <div class="opt-card">
@@ -238,6 +252,7 @@
                     • Est. Time to Market: <span class="text-[#2ea44f] font-bold">${clinicalYears} Years</span>
                 </div>
             </div>
+            ${remedyHTML}
             <div class="suggestion-box">
                 <span class="text-[#2ea44f] font-bold uppercase">GROW-WIN Improvement Logic:</span><br>
                 <div class="mt-2 text-[10px] leading-relaxed">${insights.join("")}</div>
