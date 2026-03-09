@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW-WIN · DRUG DISCOVERY LOGIC ENGINE v101</title>
+    <title>GROW-WIN · DRUG DISCOVERY LOGIC ENGINE v101.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -31,7 +31,7 @@
 <div class="max-w-7xl mx-auto">
     <div class="text-center mb-10">
         <h1 class="text-5xl font-black tracking-tighter uppercase"> GROW-WIN <span class="text-[#2ea44f]">Pharma Engine</span></h1>
-        <p class="text-sm text-gray-400 mt-2 tracking-widest uppercase">Logic Replaces Supercomputer · Discovery v101</p>
+        <p class="text-sm text-gray-400 mt-2 tracking-widest uppercase">Logic Replaces Supercomputer · Discovery v101.1</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -232,21 +232,30 @@
         document.getElementById('diliAutoStatus').innerText = isMetabolicRisk ? "CRITICAL" : diliStatus;
         document.getElementById('diliAutoStatus').style.color = (diliStatus === "HIGH" || isMetabolicRisk) ? "#f85149" : "#2ea44f";
 
+        // --- NEW SAFETY OVERRIDE LOGIC START ---
         let isRejected = false;
         let rejectReason = "";
-        
+
         if (isMetabolicRisk) { isRejected = true; rejectReason = "METABOLIC DILI"; }
         else if (diliStatus === "HIGH") { isRejected = true; rejectReason = "DILI RISK"; }
         
+        // Catching Cerivastatin Case: High LogP + High Metabolism = Tissue Damage
+        if (admet.logP > 4.0 && metCl === "high") {
+            isRejected = true;
+            rejectReason = "SYSTEMIC TISSUE DAMAGE";
+        }
+
         if (admet.logP > 4.0 && metCl === "low") {
             isRejected = true;
             rejectReason = "BIO-ACCUMULATION RISK";
         }
 
-        if (herg > 50) { isRejected = true; rejectReason = "CARDIOTOX"; }
+        if (herg > 40) { isRejected = true; rejectReason = "CARDIOTOX (hERG)"; }
+        if (cyto < 10) { isRejected = true; rejectReason = "EXTREME CYTOTOXICITY"; }
         if (genotox === "1") { isRejected = true; rejectReason = "GENOTOXIC"; }
+        // --- NEW SAFETY OVERRIDE LOGIC END ---
 
-        if (isRejected) score = score * 0.2;
+        if (isRejected) score = score * 0.1; // Drastic score reduction for safety failure
 
         score = Math.max(0, Math.min(120, score)).toFixed(1);
         document.getElementById('globalScore').innerText = score;
@@ -255,7 +264,7 @@
         if (score > 100) rank = "A+";
         else if (score > 85) rank = "A";
         else if (score > 70) rank = "B";
-        if (isRejected) rank = "F";
+        if (isRejected) rank = "F"; // Safety failure always results in Rank F
         document.getElementById('globalRank').innerText = rank;
 
         const approval = (score > 90 && !isRejected) ? "R&D READY" : (score > 60 && !isRejected ? "IND PHASE I" : "REJECTED");
