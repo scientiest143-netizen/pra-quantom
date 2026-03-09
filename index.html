@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW-WIN · DRUG DISCOVERY LOGIC ENGINE v100</title>
+    <title>GROW-WIN · DRUG DISCOVERY LOGIC ENGINE v101</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body { background: #0a0c10; color: #e6edf3; font-family: 'Inter', sans-serif; font-size: 14px; }
-        .card { background: #161b22; border: 1px solid #30363d; border-radius: 2rem; transition: 0.3s; position: relative; overflow: hidden; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 2rem; transition: 0.3s; position: relative; overflow-y: auto; max-height: 550px; }
         .card:hover { border-color: #2ea44f; transform: translateY(-5px); }
         .input-field { background: #0d1117; border: 1px solid #3b434b; color: #2ea44f; padding: 0.5rem 1rem; border-radius: 1rem; width: 120px; text-align: center; font-weight: bold; outline: none; font-size: 14px; }
         .btn { background: #2ea44f; color: black; font-weight: 800; padding: 0.75rem 1.5rem; border-radius: 2rem; transition: 0.2s; border: none; cursor: pointer; text-transform: uppercase; }
         .btn:hover { background: #3fb950; box-shadow: 0 0 15px #2ea44f; }
+        
         .result { background: #0d1117; padding: 0.75rem 1.5rem; border-radius: 1.5rem; border-left: 4px solid #2ea44f; font-weight: 700; min-height: 50px; display: flex; align-items: center; justify-content: center; }
         .opt-card { background: #0d1117; border-left: 4px solid #e3b341; padding: 1rem; border-radius: 1rem; margin-top: 1rem; }
         .weak-text { color: #f85149; font-weight: 900; text-transform: uppercase; font-size: 11px; }
@@ -20,7 +21,6 @@
         .insight-item { border-bottom: 1px solid #30363d; padding: 5px 0; }
         .insight-item:last-child { border: none; }
         .auto-status { font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; }
-        /* Tooltip style */
         .tooltip { position: relative; display: inline-block; cursor: help; }
         .tooltip .tooltiptext { visibility: hidden; width: 160px; background-color: #30363d; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -80px; opacity: 0; transition: opacity 0.3s; font-size: 10px; font-weight: normal; }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
@@ -31,31 +31,33 @@
 <div class="max-w-7xl mx-auto">
     <div class="text-center mb-10">
         <h1 class="text-5xl font-black tracking-tighter uppercase"> GROW-WIN <span class="text-[#2ea44f]">Pharma Engine</span></h1>
-        <p class="text-sm text-gray-400 mt-2 tracking-widest uppercase">Logic Replaces Supercomputer · Discovery v100</p>
+        <p class="text-sm text-gray-400 mt-2 tracking-widest uppercase">Logic Replaces Supercomputer · Discovery v101</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="card p-8 flex flex-col">
             <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 1. Docking & Simulation</h2>
             <div class="space-y-4 flex-1">
-                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-blue-400 uppercase">Logic Target</label>
-                    <select id="targetType" class="input-field !w-24 text-[10px]" onchange="updateTargetAdvice()">
-                        <option value="none">GENERIC</option>
-                        <option value="cns">CNS (BRAIN)</option>
-                        <option value="cancer">ONCOLOGY</option>
-                        <option value="virus">ANTI-INFECTIVE</option>
-                        <option value="heart">CARDIOVASCULAR</option>
-                        <option value="metabolic">METABOLIC</option>
-                        <option value="immune">IMMUNOLOGY</option>
-                        <option value="rare">RARE DISEASE</option>
-                        <option value="gi">GASTRO (GI)</option>
+                <div class="flex justify-between items-center">
+                    <label class="text-[10px] font-bold text-blue-400 uppercase">Logic Target</label>
+                    <select id="targetType" class="input-field !w-32 text-[9px]" onchange="updateTargetAdvice()">
+                        <option value="none">0. GENERIC</option>
+                        <option value="cns">1. CNS (BRAIN)</option>
+                        <option value="cancer">2. ONCOLOGY</option>
+                        <option value="virus">3. ANTI-INFECTIVE</option>
+                        <option value="heart">4. CARDIOVASCULAR</option>
+                        <option value="immuno">5. IMMUNOLOGY</option>
+                        <option value="metabolic">6. METABOLIC</option>
+                        <option value="rare">7. RARE DISEASE</option>
+                        <option value="resp">8. RESPIRATORY</option>
+                        <option value="tox">9. TOXICOLOGY LOGIC</option>
                     </select>
                 </div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">Pocket Vol (Å³)<span class="tooltiptext">Active site cavity volume.</span></label><input id="pocketVol" type="number" placeholder="0" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">Rotatable Bonds<span class="tooltiptext">Number of single bonds which can rotate freely.</span></label><input id="rotBonds" type="number" placeholder="0" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">LogP (Hydro)<span class="tooltiptext">Lipophilicity; partition coefficient between octanol and water.</span></label><input id="logP_dock" type="number" step="0.1" placeholder="0" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">H-Bond Count<span class="tooltiptext">Sum of H-bond donors and acceptors.</span></label><input id="hBonds" type="number" placeholder="0" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">RMSD (Å)<span class="tooltiptext">Root-mean-square deviation of atomic positions.</span></label><input id="rmsd" type="number" step="0.1" placeholder="0" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">Pocket Vol (Å³)<span class="tooltiptext">Active site cavity volume.</span></label><input id="pocketVol" type="number" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">Rotatable Bonds<span class="tooltiptext">Degrees of freedom.</span></label><input id="rotBonds" type="number" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">LogP (Hydro)<span class="tooltiptext">Lipophilicity.</span></label><input id="logP_dock" type="number" step="0.1" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">H-Bond Count<span class="tooltiptext">Donors + Acceptors.</span></label><input id="hBonds" type="number" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">RMSD (Å)<span class="tooltiptext">Pose precision.</span></label><input id="rmsd" type="number" step="0.1" class="input-field"></div>
                 <button class="btn w-full mt-6" onclick="computeDocking()">Compute Affinity</button>
             </div>
             <div class="result mt-6 text-center" id="dockingResult">-</div>
@@ -64,10 +66,33 @@
         <div class="card p-8 flex flex-col">
             <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 2. ADMET & PK</h2>
             <div class="space-y-4 flex-1">
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Mol Weight</label><input id="molWeight" type="number" placeholder="0" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">PSA (Å²)<span class="tooltiptext">Polar Surface Area; determines cell permeability.</span></label><input id="psa" type="number" placeholder="0" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Bioavail %</label><input id="bioavail" type="number" placeholder="0" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-blue-300 uppercase">PPB % (Protein Binding)</label><input id="ppb" type="number" placeholder="0" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Mol Weight</label><input id="molWeight" type="number" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">PSA (Å²)<span class="tooltiptext">Polar Surface Area.</span></label><input id="psa" type="number" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Bioavail %</label><input id="bioavail" type="number" class="input-field"></div>
+                <div class="flex justify-between items-center">
+                    <label class="text-[10px] font-bold text-blue-300 uppercase">Class Type</label>
+                    <select id="molClass" class="input-field !w-24 text-[10px]">
+                        <option value="small">SMALL MOLECULE</option>
+                        <option value="macro">MACROCYCLE / NP</option>
+                    </select>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-[10px] font-bold text-pink-400 uppercase tooltip">Metabolic Cl<span class="tooltiptext">Rate of drug elimination by liver.</span></label>
+                    <select id="metCl" class="input-field !w-24 text-[10px]">
+                        <option value="low">LOW (STABLE)</option>
+                        <option value="med">MEDIUM</option>
+                        <option value="high">HIGH (FAST)</option>
+                    </select>
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-[10px] font-bold text-green-400 uppercase tooltip">Tissue Target<span class="tooltiptext">Specific organ concentration.</span></label>
+                    <select id="tissueTarget" class="input-field !w-24 text-[10px]">
+                        <option value="blood">BLOOD</option>
+                        <option value="lung">LUNG</option>
+                        <option value="liver">LIVER</option>
+                        <option value="heart">HEART</option>
+                    </select>
+                </div>
                 <button class="btn w-full mt-6" onclick="computeADMET()">Predict ADMET</button>
             </div>
             <div class="result mt-6 text-sm text-center" id="admetResult">-</div>
@@ -75,18 +100,18 @@
 
         <div class="card p-8 flex flex-col">
             <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 3. Final Controls</h2>
-            <div class="space-y-3 flex-1 overflow-y-auto" style="max-height: 400px; scrollbar-width: thin; scrollbar-color: #30363d transparent;">
-                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-red-400 uppercase tooltip">hERG Block %<span class="tooltiptext">Potential for heart rhythm interference (cardiotoxicity).</span></label><input id="herg" type="number" placeholder="0" class="input-field !w-20"></div>
-                
+            <div class="space-y-3 flex-1 overflow-y-auto">
+                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-red-400 uppercase">hERG Block %</label><input id="herg" type="number" class="input-field !w-20"></div>
+                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-orange-400 uppercase">CytoTox (IC50)</label><input id="cytoTox" type="number" class="input-field !w-20"></div>
+
                 <div class="flex justify-between items-center p-2 bg-black/30 rounded-lg">
-                    <label class="text-[10px] font-bold text-red-500 uppercase">DILI Risk (Liver)</label>
+                    <label class="text-[10px] font-bold text-red-500 uppercase">DILI Risk</label>
                     <span id="diliAutoStatus" class="auto-status bg-gray-800 text-gray-400">Wait...</span>
                 </div>
-
                 <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-gray-400 uppercase">Genotoxicity</label><select id="genotox" class="input-field !w-20"><option value="0">NO</option><option value="1">YES</option></select></div>
                 <hr class="border-gray-800">
-                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-yellow-500 uppercase">Synth Steps</label><input id="sSteps" type="number" placeholder="0" class="input-field !w-20"></div>
-                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-yellow-500 uppercase">Avg Yield %</label><input id="sYield" type="number" placeholder="0" class="input-field !w-20"></div>
+                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-yellow-500 uppercase">Synth Steps</label><input id="sSteps" type="number" class="input-field !w-20"></div>
+                <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-yellow-500 uppercase">Avg Yield %</label><input id="sYield" type="number" class="input-field !w-20"></div>
                 <button class="btn w-full mt-4" onclick="runAll()">Calculate All</button>
             </div>
             <div class="result mt-6 text-center" id="scoreResult">-</div>
@@ -95,9 +120,9 @@
 
     <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="card p-8 border-t-4 border-t-yellow-500">
-            <h3 class="text-xs font-black text-yellow-500 tracking-[0.5em] uppercase mb-4">Industrial Intelligence Report</h3>
-            <div id="synth-report-box" class="space-y-2 min-h-[220px] overflow-y-auto pr-2" style="max-height: 250px;">
-                <p class="text-gray-500 italic text-center py-10 uppercase">Awaiting manufacturing data...</p>
+            <h3 class="text-xs font-black text-yellow-500 tracking-[0.5em] uppercase mb-4">Optimization Roadmap</h3>
+            <div id="synth-report-box" class="space-y-2 min-h-[220px] overflow-y-auto pr-2">
+                <p class="text-gray-500 italic text-center py-10 uppercase">Awaiting molecule optimization...</p>
             </div>
         </div>
 
@@ -114,168 +139,144 @@
             <button class="btn w-full py-4 mt-8 text-lg" onclick="runAll()">Execute Full Discovery</button>
         </div>
     </div>
-
-    <div class="mt-10 text-center"><p class="text-[10px] text-gray-600 font-bold tracking-widest uppercase italic">Design & Logic by Udayana Ananth Kumar</p></div>
 </div>
 
 <script>
     let targetAdvice = "";
 
+    function parseInput(id, min = 0, max = 10000, defaultVal = 0) {
+        let val = parseFloat(document.getElementById(id).value);
+        if (isNaN(val)) return defaultVal;
+        return Math.max(min, Math.min(max, val));
+    }
+
     function updateTargetAdvice() {
         const type = document.getElementById('targetType').value;
         const advice = {
-            'cns': "🧠 <b>CNS:</b> BBB దాటడానికి MW < 450 మరియు PSA < 90 ఉండటం కీలకం. H-Bond Donor count తక్కువగా ఉండాలి.",
-            'cancer': "🎗️ <b>ONCOLOGY:</b> Binding Affinity బలంగా ఉండాలి (-8.0 కంటే ఎక్కువ ఐడియల్).",
-            'virus': "🦠 <b>ANTI-INFECTIVE:</b> Mutations తట్టుకోవడానికి Rotatable Bonds (Flexibility) ఎక్కువగా ఉండాలి.",
-            'heart': "❤️ <b>CARDIO:</b> hERG Block < 5% ఉండాలి.",
-            'metabolic': "🧬 <b>METABOLIC:</b> Bioavailability > 60% ఉండాలి.",
-            'immune': "🛡️ <b>IMMUNOLOGY:</b> Molecular Specificity ముఖ్యం.",
-            'rare': "💎 <b>RARE DISEASE:</b> Orphan drug logic: Synthesis Yield ఎక్కువగా ఉండాలి.",
-            'gi': "🧪 <b>GASTRO:</b> Solubility కీలకం. LogP నియంత్రణలో ఉండాలి.",
-            'none': ""
+            'cns': "🧠 <b>CNS:</b> Focus on Blood-Brain Barrier penetration.",
+            'cancer': "🎗️ <b>ONCOLOGY:</b> Prioritizing high binding affinity.",
+            'virus': "🦠 <b>VIRAL:</b> Flexibility (RotBonds) helps fit pockets.",
+            'heart': "❤️ <b>CARDIO:</b> Keep hERG block minimal.",
+            'tox': "🧪 <b>TOX LOGIC:</b> Safety-first mode active."
         };
         targetAdvice = advice[type] ? `<div class='insight-item text-blue-400'>${advice[type]}</div>` : "";
-        runAll();
     }
 
     function computeDocking() {
-        const type = document.getElementById('targetType').value;
-        const vol = parseFloat(document.getElementById('pocketVol').value) || 0;
-        const bonds = parseFloat(document.getElementById('rotBonds').value) || 0;
-        const logp = parseFloat(document.getElementById('logP_dock').value) || 0;
-        const rmsd = parseFloat(document.getElementById('rmsd').value) || 0;
-        const mw = parseFloat(document.getElementById('molWeight').value) || 1; // Used for efficiency calculation
+        const vol = parseInput('pocketVol', 0, 5000, 0);
+        const bonds = parseInput('rotBonds', 0, 50, 0);
+        const logP = parseInput('logP_dock', -5, 15, 0);
+        const rmsd = parseInput('rmsd', 0, 20, 0);
 
-        // Industrial Affinity Logic: Combining binding energy with Ligand Efficiency (LE)
-        // Base affinity driven by pocket fit and lipophilicity
-        let affinityVal = -((vol / 85) + (logp * 0.15));
+        let base = -5.0;
+        let vEff = (vol / 120) * -0.6; 
+        let lEff = logP * -0.7;
+        let bPenalty = bonds * 0.22;
         
-        // Target specific flexibility adjustments
-        if(type === 'virus') {
-            affinityVal -= (bonds * 0.25); // Bonus for flexibility in viral docking
-        } else {
-            affinityVal += (bonds * 0.08); // Penalty for entropy loss in rigid targets
-        }
-
-        // Penalty for high RMSD (Docking uncertainty)
-        if(rmsd > 2.0) {
-            affinityVal += (Math.pow(rmsd, 1.2) * 0.5);
-        } else {
-            affinityVal -= (0.4 - rmsd * 0.1); // Small bonus for high precision poses
-        }
-
-        // Internal Efficiency Check: Affinity normalized by size (Simplified LE)
-        // High affinity with low MW is much better than high affinity with high MW
-        const ligandEfficiency = Math.abs(affinityVal) / (mw / 100);
-        if(ligandEfficiency < 1.0) affinityVal += 0.5; // Slight penalty for poor size-to-binding ratio
-
-        affinityVal = parseFloat(affinityVal.toFixed(2));
+        let affinity = base + vEff + lEff + bPenalty;
         
-        const resEl = document.getElementById('dockingResult');
-        resEl.innerText = affinityVal + ' kcal/mol';
-        resEl.style.color = affinityVal < -7.8 ? '#2ea44f' : (affinityVal < -5.2 ? '#e3b341' : '#f85149');
-        
-        return affinityVal;
+        if (rmsd > 2.0) affinity += (rmsd - 2.0) * 1.5;
+        else affinity -= (2.0 - rmsd) * 0.3;
+
+        const finalAffinity = Math.max(-12.0, Math.min(-2.0, affinity));
+        document.getElementById('dockingResult').innerText = finalAffinity.toFixed(2) + ' kcal/mol';
+        return finalAffinity;
     }
 
     function computeADMET() {
-        const mw = parseFloat(document.getElementById('molWeight').value) || 0;
-        const psa = parseFloat(document.getElementById('psa').value) || 0;
-        const hbonds = parseFloat(document.getElementById('hBonds').value) || 0;
-        const bio = parseFloat(document.getElementById('bioavail').value) || 0;
-        const ppb = parseFloat(document.getElementById('ppb').value) || 0;
+        const mw = parseInput('molWeight', 0, 2000, 0);
+        const psa = parseInput('psa', 0, 500, 0);
+        const bio = parseInput('bioavail', 0, 100, 0);
+        const logP = parseInput('logP_dock', -5, 15, 0);
         
-        const bbb = (psa < 85 && mw < 430 && hbonds < 6) ? 'Yes' : 'No';
-        
-        document.getElementById('admetResult').innerText = `BBB: ${bbb} | PK: ${bio}% | PPB: ${ppb}%`;
-        return { bbb, mw, psa, bio, ppb };
+        const isMacro = document.getElementById('molClass').value === "macro";
+        const bbb = ((psa < 90 && mw < 450 && logP > 1 && logP < 4.5) || (psa < 60 && mw < 250)) ? 'Yes' : 'No';
+        const ro5 = (mw <= 500 && logP <= 5) ? "PASS" : (isMacro ? "bRo5" : "FAIL");
+
+        document.getElementById('admetResult').innerText = `BBB: ${bbb} | PK: ${bio}% | Ro5: ${ro5}`;
+        return { bbb, ro5, bio, logP, mw, psa };
     }
 
     function runAll() {
-        const type = document.getElementById('targetType').value;
         const affinity = computeDocking();
         const admet = computeADMET();
-        const herg = parseFloat(document.getElementById('herg').value) || 0;
+        const herg = parseInput('herg', 0, 100, 0);
+        const cyto = parseInput('cytoTox', 0, 1000, 0);
+        const steps = parseInput('sSteps', 1, 50, 1);
+        const yield = parseInput('sYield', 1, 100, 1);
         const genotox = document.getElementById('genotox').value;
-        const steps = parseInt(document.getElementById('sSteps').value) || 0;
-        const yields = parseFloat(document.getElementById('sYield').value) || 0;
-        const logP = parseFloat(document.getElementById('logP_dock').value) || 0;
-        const hbonds = parseFloat(document.getElementById('hBonds').value) || 0;
-        const rotBonds = parseFloat(document.getElementById('rotBonds').value) || 0;
+        const target = document.getElementById('targetType').value;
+        const metCl = document.getElementById('metCl').value;
+        const tissue = document.getElementById('tissueTarget').value;
 
-        let score = (Math.abs(affinity) * 6.8); 
-        let insights = [];
-        let safetyFailure = false;
+        // LEAD OPTIMIZATION LOGIC
+        let optimizationTips = "";
+        if (admet.logP > 3.0) optimizationTips += "<li>💡 <b>High LogP:</b> Add Polar groups (-OH, -NH2) to improve solubility.</li>";
+        if (herg > 20) optimizationTips += "<li>💡 <b>hERG Risk:</b> Reduce basicity or remove flexible aromatic rings.</li>";
+        if (admet.psa > 140) optimizationTips += "<li>💡 <b>High PSA:</b> Reduce H-bond donors to improve permeability.</li>";
+        if (metCl === 'high') optimizationTips += "<li>💡 <b>Fast Metabolism:</b> Block metabolic sites with Fluorine (-F).</li>";
+        if (affinity > -5.0) optimizationTips += "<li>💡 <b>Weak Binding:</b> Optimize steric fit to active pocket vol.</li>";
 
-        if (type === 'cns') {
-            if (admet.psa < 70) score += 12;
-            if (admet.mw > 450) score -= 18;
-        }
-        if (type === 'heart' && herg > 5) score -= (herg * 2.5);
-
-        if (admet.bio >= 85) score += 22;
-        else if (admet.bio >= 60) score += 12;
-
-        if (logP >= 1 && logP <= 3.2) score += 18;
-        if (admet.mw <= 400) score += 18;
-        if (hbonds >= 2 && hbonds <= 6) score += 10;
-
-        let diliScore = (logP * 0.6) + (admet.mw * 0.006) + (rotBonds * 0.25);
-        let diliStatus = (diliScore > 5.8 && admet.psa < 75) ? "HIGH" : "LOW";
+        // Calculate score
+        let score = (Math.abs(affinity) * 8.2) + (admet.bio * 0.15);
+        if (admet.ro5 === "PASS") score += 15;
+        if (herg < 15) score += 10;
         
-        const diliEl = document.getElementById('diliAutoStatus');
-        diliEl.innerText = diliStatus;
-        diliEl.className = `auto-status ${diliStatus === 'HIGH' ? 'bg-red-900 text-red-200' : 'bg-green-900 text-green-200'}`;
+        if (target === 'cns' && admet.bbb === 'No') score = score * 0.4;
 
-        if (diliStatus === "HIGH") {
-            score -= 38;
-            insights.push("<div class='insight-item text-red-500'>🚨 DILI ALERT: Complex metabolic profile suggests liver risk.</div>");
+        // DILI LOGIC
+        let diliVal = (admet.logP * 0.8) + (admet.mw * 0.004);
+        let diliStatus = (diliVal > 8.5) ? "HIGH" : "LOW";
+        let isMetabolicRisk = (admet.logP > 3.0 && target === 'metabolic');
+
+        document.getElementById('diliAutoStatus').innerText = isMetabolicRisk ? "CRITICAL" : diliStatus;
+        document.getElementById('diliAutoStatus').style.color = (diliStatus === "HIGH" || isMetabolicRisk) ? "#f85149" : "#2ea44f";
+
+        let isRejected = false;
+        let rejectReason = "";
+        
+        if (isMetabolicRisk) { isRejected = true; rejectReason = "METABOLIC DILI"; }
+        else if (diliStatus === "HIGH") { isRejected = true; rejectReason = "DILI RISK"; }
+        
+        if (admet.logP > 4.0 && metCl === "low") {
+            isRejected = true;
+            rejectReason = "BIO-ACCUMULATION RISK";
         }
 
-        if (herg >= 50) { score = 5; safetyFailure = true; insights.push("<div class='insight-item text-red-600 font-black'>💀 CRITICAL: hERG inhibition is cardiotoxic.</div>"); }
-        if (genotox == "1") { score = 3; safetyFailure = true; insights.push("<div class='insight-item text-red-600 font-black'>🚨 GENOTOXIC: Positive mutagenicity detected.</div>"); }
+        if (herg > 50) { isRejected = true; rejectReason = "CARDIOTOX"; }
+        if (genotox === "1") { isRejected = true; rejectReason = "GENOTOXIC"; }
 
-        score = Math.max(0, Math.min(115, score)).toFixed(1);
+        if (isRejected) score = score * 0.2;
+
+        score = Math.max(0, Math.min(120, score)).toFixed(1);
+        document.getElementById('globalScore').innerText = score;
 
         let rank = "C";
-        if (score >= 100) rank = "A++";
-        else if (score >= 90) rank = "A+";
-        else if (score >= 80) rank = "A";
-        else if (score >= 70) rank = "B+";
-        else if (score >= 60) rank = "B";
-
-        document.getElementById('globalScore').innerText = score;
+        if (score > 100) rank = "A+";
+        else if (score > 85) rank = "A";
+        else if (score > 70) rank = "B";
+        if (isRejected) rank = "F";
         document.getElementById('globalRank').innerText = rank;
-        document.getElementById('globalRank').style.color = rank.includes('A') ? '#2ea44f' : (rank.includes('B') ? '#e3b341' : '#f85149');
-        
-        let approval = (score >= 85 && !safetyFailure) ? "R&D READY" : (score >= 65 && !safetyFailure ? "IND PHASE I" : "REJECTED");
-        const appEl = document.getElementById('approvalStatus');
-        appEl.innerText = approval;
-        appEl.style.color = (approval === "REJECTED") ? "#f85149" : (approval === "R&D READY" ? "#2ea44f" : "#e3b341");
 
-        const yieldFactor = yields > 0 ? yields/100 : 0.1;
-        const cost = (steps * 5200 / yieldFactor).toFixed(0);
-        let marketYears = safetyFailure ? "N/A" : (score > 95 ? "5-7" : "10-13");
+        const approval = (score > 90 && !isRejected) ? "R&D READY" : (score > 60 && !isRejected ? "IND PHASE I" : "REJECTED");
+        document.getElementById('approvalStatus').innerText = isRejected ? `REJECTED: ${rejectReason}` : approval;
+        document.getElementById('approvalStatus').style.color = (approval === "REJECTED" || isRejected) ? "#f85149" : "#2ea44f";
 
-        if (steps > 9) insights.push("<div class='insight-item text-yellow-500'>🛠️ SYNTH: Complex route. High production overhead.</div>");
-        if (yields < 35) insights.push("<div class='insight-item text-yellow-500'>🛠️ YIELD: Sub-optimal. Manufacturing cost will be high.</div>");
-
-        if (targetAdvice) insights.unshift(targetAdvice);
-        
+        const cost = (steps * 4800 / (yield / 100)).toFixed(0);
         document.getElementById('synth-report-box').innerHTML = `
-            <div class="opt-card">
-                <div class="weak-text">Industrial Clinical Audit</div>
-                <div class="text-xs mt-2 text-gray-300">• Est. Cost: <span class="text-yellow-500">₹${cost}</span> | Time-to-Market: ${marketYears} Years</div>
-            </div>
-            <div class="opt-card" style="border-left-color: #2ea44f;">
-                <div class="weak-text" style="color: #2ea44f;">Molecular Summary</div>
-                <div class="text-xs mt-2 text-gray-300">• Sub-Rank: ${rank} | Metabolic DILI: ${diliStatus} | BBB Perm: ${admet.bbb}</div>
-            </div>
-            <div class="suggestion-box">
-                <span class="text-[#2ea44f] font-bold uppercase">GROW-WIN Improvement Logic:</span>
-                <div class="mt-2 text-[10px] sm:text-[11px] leading-relaxed">${insights.join("")}</div>
-            </div>
+            <div class="opt-card"><div class="weak-text">Financial Audit</div><div class="text-xs mt-2 text-gray-300">• Est. Mfg Cost: <span class="text-yellow-500">₹${Number(cost).toLocaleString('en-IN')}</span></div></div>
+            <div class="suggestion-box"><span class="text-[#2ea44f] font-bold uppercase">Decision Log:</span><div class="mt-2 text-[10px] space-y-1">
+                <li>• Binding affinity is ${affinity.toFixed(2)}.</li>
+                <li>• Lipophilicity (LogP) is ${admet.logP}.</li>
+                <li>• Metabolic Clearance: <span class="text-pink-400 font-bold">${metCl.toUpperCase()}</span></li>
+                ${isMetabolicRisk ? "<li class='text-red-500 font-bold'>• WARNING: Reactive Metabolite Risk detected.</li>" : ""}
+                ${targetAdvice}
+            </div></div>
+            <div class="suggestion-box border-yellow-500/50"><span class="text-yellow-500 font-bold uppercase">Lead Optimization:</span><div class="mt-2 text-[10px] space-y-1">
+                ${optimizationTips || "<li>✅ Molecule is structurally optimized for this target.</li>"}
+            </div></div>
         `;
+        document.getElementById('scoreResult').innerText = "CALCULATION COMPLETE";
     }
 </script>
 </body>
