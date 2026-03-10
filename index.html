@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW-WIN · DRUG DISCOVERY LOGIC ENGINE v101.2</title>
+    <title>GROW-WIN · DRUG DISCOVERY LOGIC ENGINE v101.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -13,7 +13,6 @@
         .input-field { background: #0d1117; border: 1px solid #3b434b; color: #2ea44f; padding: 0.5rem 1rem; border-radius: 1rem; width: 120px; text-align: center; font-weight: bold; outline: none; font-size: 14px; }
         .btn { background: #2ea44f; color: black; font-weight: 800; padding: 0.75rem 1.5rem; border-radius: 2rem; transition: 0.2s; border: none; cursor: pointer; text-transform: uppercase; }
         .btn:hover { background: #3fb950; box-shadow: 0 0 15px #2ea44f; }
-        
         .result { background: #0d1117; padding: 0.75rem 1.5rem; border-radius: 1.5rem; border-left: 4px solid #2ea44f; font-weight: 700; min-height: 50px; display: flex; align-items: center; justify-content: center; }
         .opt-card { background: #0d1117; border-left: 4px solid #e3b341; padding: 1rem; border-radius: 1rem; margin-top: 1rem; }
         .weak-text { color: #f85149; font-weight: 900; text-transform: uppercase; font-size: 11px; }
@@ -32,7 +31,7 @@
 <div class="max-w-7xl mx-auto">
     <div class="text-center mb-10">
         <h1 class="text-5xl font-black tracking-tighter uppercase"> GROW-WIN <span class="text-[#2ea44f]">Pharma Engine</span></h1>
-        <p class="text-sm text-gray-400 mt-2 tracking-widest uppercase">Logic Replaces Supercomputer · Discovery v101.2 (Fine-Tuned)</p>
+        <p class="text-sm text-gray-400 mt-2 tracking-widest uppercase">Logic Replaces Supercomputer · Discovery v101.3 (Biologically Adapted)</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -96,6 +95,10 @@
                         <option value="lung">LUNG</option>
                         <option value="liver">LIVER</option>
                         <option value="heart">HEART</option>
+                        <option value="brain">BRAIN</option>
+                        <option value="kidney">KIDNEY</option>
+                        <option value="tumor">TUMOR</option>
+                        <option value="stomach">STOMACH</option>
                     </select>
                 </div>
                 <button class="btn w-full mt-6" onclick="computeADMET()">Predict ADMET</button>
@@ -114,6 +117,13 @@
                     <span id="diliAutoStatus" class="auto-status bg-gray-800 text-gray-400">Wait...</span>
                 </div>
                 <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-gray-400 uppercase">Genotoxicity</label><select id="genotox" class="input-field !w-20"><option value="0">NO</option><option value="1">YES</option></select></div>
+                <div class="flex justify-between items-center">
+                    <label class="text-[10px] font-bold text-purple-400 uppercase">Chiral Center Risk</label>
+                    <select id="chiralRisk" class="input-field !w-20">
+                        <option value="0">LOW</option>
+                        <option value="1">HIGH (Racemic)</option>
+                    </select>
+                </div>
                 <hr class="border-gray-800">
                 <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-yellow-500 uppercase">Synth Steps</label><input id="sSteps" type="number" class="input-field !w-20"></div>
                 <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-yellow-500 uppercase">Avg Yield %</label><input id="sYield" type="number" class="input-field !w-20"></div>
@@ -159,6 +169,8 @@
 
     function updateTargetAdvice() {
         const type = document.getElementById('targetType').value;
+        const tissue = document.getElementById('tissueTarget').value;
+        
         const advice = {
             'cns': "🧠 <b>CNS:</b> Focus on Blood-Brain Barrier penetration.",
             'cancer': "🎗️ <b>ONCOLOGY:</b> Prioritizing high binding affinity.",
@@ -167,7 +179,19 @@
             'tox': "🧪 <b>TOX LOGIC:</b> Safety-first mode active.",
             'rare': "🧬 <b>RARE DISEASE:</b> bRo5 parameters applicable."
         };
-        targetAdvice = advice[type] ? `<div class='insight-item text-blue-400'>${advice[type]}</div>` : "";
+
+        const tissueLogic = {
+            'kidney': "⚖️ <b>KIDNEY:</b> Monitoring renal clearance and nephrotoxicity.",
+            'tumor': "🎯 <b>TUMOR:</b> Enhancing localized drug accumulation.",
+            'stomach': "🥣 <b>STOMACH:</b> Assessing acid stability and oral absorption."
+        };
+
+        let combinedAdvice = advice[type] ? `<div class='insight-item text-blue-400'>${advice[type]}</div>` : "";
+        if(tissueLogic[tissue]) {
+            combinedAdvice += `<div class='insight-item text-green-400'>${tissueLogic[tissue]}</div>`;
+        }
+        
+        targetAdvice = combinedAdvice;
     }
 
     function computeDocking() {
@@ -191,7 +215,6 @@
         else affinity -= (rmsdThreshold - rmsd) * 0.3;
 
         const finalAffinity = Math.max(-12.0, Math.min(-2.0, affinity));
-        // Update the input field instead of a div so it remains editable
         document.getElementById('dockingAffinityInput').value = finalAffinity.toFixed(2);
         return finalAffinity;
     }
@@ -214,7 +237,7 @@
     }
 
     function runAll() {
-        // Read affinity from the input field (it might be edited by the user)
+        updateTargetAdvice(); // Sync tissue and target advice
         const affinity = parseFloat(document.getElementById('dockingAffinityInput').value) || 0;
         const admet = computeADMET();
         const herg = parseInput('herg', 0, 100, 0);
@@ -222,54 +245,51 @@
         const steps = parseInput('sSteps', 1, 50, 1);
         const yield = parseInput('sYield', 1, 100, 1);
         const genotox = document.getElementById('genotox').value;
+        const chiralRisk = document.getElementById('chiralRisk').value;
         const target = document.getElementById('targetType').value;
-        const metCl = document.getElementById('metCl').value;
         const tissue = document.getElementById('tissueTarget').value;
-
-        let optimizationTips = "";
-        if (admet.logP > 3.0) optimizationTips += "<li>💡 <b>High LogP:</b> Add Polar groups (-OH, -NH2) to improve solubility.</li>";
-        if (herg > 20) optimizationTips += "<li>💡 <b>hERG Risk:</b> Reduce basicity or remove flexible aromatic rings.</li>";
-        if (admet.psa > 140) optimizationTips += "<li>💡 <b>High PSA:</b> Reduce H-bond donors to improve permeability.</li>";
-        if (metCl === 'high') optimizationTips += "<li>💡 <b>Fast Metabolism:</b> Block metabolic sites with Fluorine (-F).</li>";
-        if (affinity > -5.0) optimizationTips += "<li>💡 <b>Weak Binding:</b> Optimize steric fit to active pocket vol.</li>";
-
-        let score = (Math.abs(affinity) * 8.5) + (admet.bio * 0.2);
-        if (admet.ro5 === "PASS" || admet.ro5 === "bRo5") score += 15;
-        
-        if (target === 'cns' && admet.bbb === 'No') score = score * 0.4;
-        if (target === 'cancer' && admet.bio > 85) score += 10;
-
-        let diliVal = (admet.logP * 0.8) + (admet.mw * 0.004);
-        let diliStatus = (diliVal > 8.5) ? "HIGH" : "LOW";
-        let isMetabolicRisk = (admet.logP > 3.0 && target === 'metabolic');
-
-        let diliCritical = (target === 'rare') ? (isMetabolicRisk && metCl === "high") : isMetabolicRisk;
-
-        document.getElementById('diliAutoStatus').innerText = diliCritical ? "CRITICAL" : diliStatus;
-        document.getElementById('diliAutoStatus').style.color = (diliStatus === "HIGH" || diliCritical) ? "#f85149" : "#2ea44f";
+        const metCl = document.getElementById('metCl').value;
 
         let isRejected = false;
         let rejectReason = "";
 
+        // CORE SCORE CALCULATION
+        let score = (Math.abs(affinity) * 8.5) + (admet.bio * 0.2);
+        if (admet.ro5 === "PASS" || admet.ro5 === "bRo5") score += 15;
+        if (target === 'cns' && admet.bbb === 'No') score = score * 0.4;
+        
+        // TISSUE SPECIFIC LOGIC
+        if (tissue === 'kidney' && admet.mw > 600) score -= 20; // Large molecules struggle in kidney
+        if (tissue === 'tumor' && affinity < -9.0) score += 15; // High affinity is great for tumors
+
+        // BIOLOGICAL ADAPTATION LOGIC
+        if (target === 'cns' && affinity < -8.0 && admet.logP > 3.0) {
+            isRejected = true;
+            rejectReason = "HIGH PROMISCUITY / CNS EDEMA RISK";
+        }
+        
+        if (chiralRisk === "1" && target !== 'cancer') {
+            isRejected = true;
+            rejectReason = "TERATOGENIC RISK (Racemic)";
+        }
+
+        let diliVal = (admet.logP * 0.8) + (admet.mw * 0.004);
+        let diliStatus = (diliVal > 8.5) ? "HIGH" : "LOW";
+        let isMetabolicRisk = (admet.logP > 3.0 && target === 'metabolic');
+        let diliCritical = (target === 'rare') ? (isMetabolicRisk && metCl === "high") : isMetabolicRisk;
+
         if (diliCritical) { isRejected = true; rejectReason = "METABOLIC DILI"; }
         else if (diliStatus === "HIGH" && target !== 'rare') { isRejected = true; rejectReason = "DILI RISK"; }
-        
         if (admet.logP > 4.5 && metCl === "high") { isRejected = true; rejectReason = "SYSTEMIC TISSUE DAMAGE"; }
-        
-        let accumLimit = (target === 'rare') ? 5.5 : 4.0;
-        if (admet.logP > accumLimit && metCl === "low") { isRejected = true; rejectReason = "BIO-ACCUMULATION RISK"; }
-
-        let hergLimit = (target === 'cancer' || target === 'rare') ? 15 : 12;
         if (herg > 40) { isRejected = true; rejectReason = "CARDIOTOX (hERG)"; }
-        else if (herg > hergLimit) { isRejected = true; rejectReason = "BORDERLINE CARDIOTOX"; }
-
         if (cyto < 10) { isRejected = true; rejectReason = "EXTREME CYTOTOXICITY"; }
         if (genotox === "1") { isRejected = true; rejectReason = "GENOTOXIC"; }
 
-        if (isRejected) score = score * 0.1; 
-
         score = Math.max(0, Math.min(140, score)).toFixed(1);
+
         document.getElementById('globalScore').innerText = score;
+        document.getElementById('diliAutoStatus').innerText = diliCritical ? "CRITICAL" : diliStatus;
+        document.getElementById('diliAutoStatus').style.color = (diliStatus === "HIGH" || diliCritical) ? "#f85149" : "#2ea44f";
 
         let rank = "C";
         if (score > 100) rank = "A+";
@@ -284,14 +304,17 @@
 
         let costMultiplier = (steps > 10) ? 5500 : 4800;
         const cost = (steps * costMultiplier / (yield / 100)).toFixed(0);
+        let optimizationTips = "";
+        if (admet.logP > 3.0) optimizationTips += "<li>💡 <b>High LogP:</b> Add Polar groups (-OH, -NH2) to improve solubility.</li>";
+        if (herg > 20) optimizationTips += "<li>💡 <b>hERG Risk:</b> Reduce basicity or remove flexible aromatic rings.</li>";
         
         document.getElementById('synth-report-box').innerHTML = `
             <div class="opt-card"><div class="weak-text">Financial Audit</div><div class="text-xs mt-2 text-gray-300">• Est. Mfg Cost: <span class="text-yellow-500">₹${Number(cost).toLocaleString('en-IN')}</span></div></div>
             <div class="suggestion-box"><span class="text-[#2ea44f] font-bold uppercase">Decision Log:</span><div class="mt-2 text-[10px] space-y-1">
-                <li>• Binding affinity is ${affinity.toFixed(2)}.</li>
-                <li>• Lipophilicity (LogP) is ${admet.logP}.</li>
-                <li>• Metabolic Clearance: <span class="text-pink-400 font-bold">${metCl.toUpperCase()}</span></li>
-                ${diliCritical ? "<li class='text-red-500 font-bold'>• WARNING: Reactive Metabolite Risk detected.</li>" : ""}
+                <li>• Binding affinity: ${affinity.toFixed(2)}.</li>
+                <li>• Lipophilicity (LogP): ${admet.logP}.</li>
+                <li>• Tissue Target: <span class="text-green-400 uppercase">${tissue}</span></li>
+                <li>• Biological Adaptation: <span class="text-purple-400 font-bold">${isRejected ? 'Safety Override Active' : 'Normal'}</span></li>
                 ${targetAdvice}
             </div></div>
             <div class="suggestion-box border-yellow-500/50"><span class="text-yellow-500 font-bold uppercase">Lead Optimization:</span><div class="mt-2 text-[10px] space-y-1">
