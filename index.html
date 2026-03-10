@@ -50,7 +50,7 @@
                         <option value="immuno">5. IMMUNOLOGY</option>
                         <option value="metabolic">6. METABOLIC</option>
                         <option value="rare">7. RARE DISEASE</option>
-                        <option value="resp">8. RESPIRATORY</option>
+                        <option value="rare">8. RESPIRATORY</option>
                         <option value="tox">9. TOXICOLOGY LOGIC</option>
                     </select>
                 </div>
@@ -61,7 +61,11 @@
                 <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">RMSD (Å)<span class="tooltiptext">Pose precision.</span></label><input id="rmsd" type="number" step="0.1" class="input-field"></div>
                 <button class="btn w-full mt-6" onclick="computeDocking()">Compute Affinity</button>
             </div>
-            <div class="result mt-6 text-center" id="dockingResult">-</div>
+            <div class="mt-6 flex flex-col items-center">
+                <span class="text-[10px] font-bold text-gray-500 uppercase mb-2">Result (Editable)</span>
+                <input id="dockingAffinityInput" type="number" step="0.01" class="result w-full text-center outline-none border-none" value="0.00">
+                <span class="text-[10px] text-gray-600 mt-1">kcal/mol</span>
+            </div>
         </div>
 
         <div class="card p-8 flex flex-col">
@@ -177,19 +181,18 @@
         let vEff = (vol / 120) * -0.6; 
         let lEff = logP * -0.7;
         
-        // FINE-TUNING: Rotatable Bonds for Oncology
         let bondLimit = (target === 'cancer') ? 10 : 8;
         let bPenalty = (bonds > bondLimit) ? (bonds - bondLimit) * 0.4 : bonds * 0.15;
         
         let affinity = base + vEff + lEff + bPenalty;
         
-        // FINE-TUNING: RMSD Tolerance
         let rmsdThreshold = 2.0;
         if (rmsd > rmsdThreshold) affinity += (rmsd - rmsdThreshold) * 1.2; 
         else affinity -= (rmsdThreshold - rmsd) * 0.3;
 
         const finalAffinity = Math.max(-12.0, Math.min(-2.0, affinity));
-        document.getElementById('dockingResult').innerText = finalAffinity.toFixed(2) + ' kcal/mol';
+        // Update the input field instead of a div so it remains editable
+        document.getElementById('dockingAffinityInput').value = finalAffinity.toFixed(2);
         return finalAffinity;
     }
 
@@ -203,7 +206,6 @@
         const isMacro = document.getElementById('molClass').value === "macro";
         const bbb = ((psa < 90 && mw < 450 && logP > 1 && logP < 4.5) || (psa < 60 && mw < 250)) ? 'Yes' : 'No';
         
-        // FINE-TUNING: LogP for Rare Disease
         let logPThreshold = (target === 'rare') ? 5.5 : 5.0;
         const ro5 = (mw <= 500 && logP <= logPThreshold) ? "PASS" : (isMacro ? "bRo5" : "FAIL");
 
@@ -212,7 +214,8 @@
     }
 
     function runAll() {
-        const affinity = computeDocking();
+        // Read affinity from the input field (it might be edited by the user)
+        const affinity = parseFloat(document.getElementById('dockingAffinityInput').value) || 0;
         const admet = computeADMET();
         const herg = parseInput('herg', 0, 100, 0);
         const cyto = parseInput('cytoTox', 0, 1000, 0);
@@ -223,7 +226,6 @@
         const metCl = document.getElementById('metCl').value;
         const tissue = document.getElementById('tissueTarget').value;
 
-        // LEAD OPTIMIZATION LOGIC
         let optimizationTips = "";
         if (admet.logP > 3.0) optimizationTips += "<li>💡 <b>High LogP:</b> Add Polar groups (-OH, -NH2) to improve solubility.</li>";
         if (herg > 20) optimizationTips += "<li>💡 <b>hERG Risk:</b> Reduce basicity or remove flexible aromatic rings.</li>";
@@ -231,26 +233,21 @@
         if (metCl === 'high') optimizationTips += "<li>💡 <b>Fast Metabolism:</b> Block metabolic sites with Fluorine (-F).</li>";
         if (affinity > -5.0) optimizationTips += "<li>💡 <b>Weak Binding:</b> Optimize steric fit to active pocket vol.</li>";
 
-        // Calculate score
         let score = (Math.abs(affinity) * 8.5) + (admet.bio * 0.2);
         if (admet.ro5 === "PASS" || admet.ro5 === "bRo5") score += 15;
         
-        // FINE-TUNING: CNS BBB Scoring
         if (target === 'cns' && admet.bbb === 'No') score = score * 0.4;
         if (target === 'cancer' && admet.bio > 85) score += 10;
 
-        // DILI LOGIC
         let diliVal = (admet.logP * 0.8) + (admet.mw * 0.004);
         let diliStatus = (diliVal > 8.5) ? "HIGH" : "LOW";
         let isMetabolicRisk = (admet.logP > 3.0 && target === 'metabolic');
 
-        // FINE-TUNING: Rare Disease Risk Tolerance
         let diliCritical = (target === 'rare') ? (isMetabolicRisk && metCl === "high") : isMetabolicRisk;
 
         document.getElementById('diliAutoStatus').innerText = diliCritical ? "CRITICAL" : diliStatus;
         document.getElementById('diliAutoStatus').style.color = (diliStatus === "HIGH" || diliCritical) ? "#f85149" : "#2ea44f";
 
-        // SAFETY OVERRIDE
         let isRejected = false;
         let rejectReason = "";
 
@@ -259,11 +256,9 @@
         
         if (admet.logP > 4.5 && metCl === "high") { isRejected = true; rejectReason = "SYSTEMIC TISSUE DAMAGE"; }
         
-        // FINE-TUNING: Bio-accumulation Risk for Rare Disease
         let accumLimit = (target === 'rare') ? 5.5 : 4.0;
         if (admet.logP > accumLimit && metCl === "low") { isRejected = true; rejectReason = "BIO-ACCUMULATION RISK"; }
 
-        // FINE-TUNING: hERG Thresholds
         let hergLimit = (target === 'cancer' || target === 'rare') ? 15 : 12;
         if (herg > 40) { isRejected = true; rejectReason = "CARDIOTOX (hERG)"; }
         else if (herg > hergLimit) { isRejected = true; rejectReason = "BORDERLINE CARDIOTOX"; }
@@ -287,7 +282,6 @@
         document.getElementById('approvalStatus').innerText = isRejected ? `REJECTED: ${rejectReason}` : approval;
         document.getElementById('approvalStatus').style.color = (approval === "REJECTED" || isRejected) ? "#f85149" : "#2ea44f";
 
-        // Cost Calculation (SyntSteps Penalty for 10+)
         let costMultiplier = (steps > 10) ? 5500 : 4800;
         const cost = (steps * costMultiplier / (yield / 100)).toFixed(0);
         
