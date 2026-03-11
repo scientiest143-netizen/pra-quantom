@@ -24,6 +24,8 @@
         .tooltip .tooltiptext { visibility: hidden; width: 160px; background-color: #30363d; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -80px; opacity: 0; transition: opacity 0.3s; font-size: 10px; font-weight: normal; }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
         .watermark { text-align: center; margin-top: 3rem; font-size: 10px; color: #30363d; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; }
+        /* New Style for Critical Suggestions */
+        .fix-logic { color: #ffab70; font-weight: bold; display: block; margin-top: 4px; border-left: 2px solid #ffab70; padding-left: 8px; }
     </style>
 </head>
 <body class="p-8">
@@ -217,14 +219,17 @@
         const logP = parseInput('logP_dock', -5, 15, 0);
         const rmsd = parseInput('rmsd', 0, 20, 0);
         const target = document.getElementById('targetType').value;
+        
         let base = -5.0;
         let vEff = (vol / 120) * -0.6; 
         let lEff = logP * -0.7;
         let bondLimit = (target === 'cancer') ? 10 : 8;
         let bPenalty = (bonds > bondLimit) ? (bonds - bondLimit) * 0.4 : bonds * 0.15;
+        
         let affinity = base + vEff + lEff + bPenalty;
         let rmsdThreshold = 2.0;
         affinity += (rmsd > rmsdThreshold) ? (rmsd - rmsdThreshold) * 1.2 : (rmsdThreshold - rmsd) * -0.3;
+        
         const finalAffinity = Math.max(-12.0, Math.min(-2.0, affinity));
         document.getElementById('dockingAffinityInput').value = finalAffinity.toFixed(2);
         return finalAffinity;
@@ -237,8 +242,10 @@
         const logP = parseInput('logP_dock', -5, 15, 0);
         const target = document.getElementById('targetType').value;
         const isMacro = document.getElementById('molClass').value === "macro";
+        
         const bbb = ((psa < 90 && mw < 450 && logP > 1 && logP < 4.5) || (psa < 60 && mw < 250)) ? 'Yes' : 'No';
         let ro5 = (mw <= 500 && logP <= 5.0) ? "PASS" : (isMacro || target === 'rare' ? "bRo5" : "FAIL");
+        
         document.getElementById('admetResult').innerText = `BBB: ${bbb} | PK: ${bio}% | Ro5: ${ro5}`;
         return { bbb, ro5, bio, logP, mw, psa };
     }
@@ -250,46 +257,75 @@
         const herg = parseInput('herg', 0, 100, 0);
         const cyto = parseInput('cytoTox', 0, 1000, 0);
         const steps = parseInput('sSteps', 1, 50, 1);
-        const yield = parseInput('sYield', 1, 100, 1);
+        const yieldVal = parseInput('sYield', 1, 100, 1);
         const target = document.getElementById('targetType').value;
+        const tissue = document.getElementById('tissueTarget').value;
         const metCl = document.getElementById('metCl').value;
+        const isGenotox = document.getElementById('genotox').value === "1";
 
-        // V102 NEW METRICS CALCULATION
         const absAffinity = Math.abs(affinity);
         const tsi = (absAffinity - 4.0).toFixed(2);
         const otr = (admet.logP * 1.2 + (10 - absAffinity)).toFixed(2);
         const clFactor = (metCl === 'high') ? 2.5 : (metCl === 'med' ? 1.2 : 0.5);
         const rmr = (clFactor * admet.logP).toFixed(2);
 
-        let isRejected = false;
-        let rejectReason = "";
-
-        // Core Score
         let score = (absAffinity * 8.5) + (admet.bio * 0.2);
         if (admet.ro5 !== "FAIL") score += 15;
         if (target === 'cns' && admet.bbb === 'No') score *= 0.4;
 
-        // Rejection Logic
-        if (herg > 40) { isRejected = true; rejectReason = "CARDIOTOX (hERG)"; }
-        if (cyto < 10) { isRejected = true; rejectReason = "CYTOTOXICITY"; }
-        if (document.getElementById('genotox').value === "1") { isRejected = true; rejectReason = "GENOTOXIC"; }
-        if (admet.logP > 4.5 && metCl === "high") { isRejected = true; rejectReason = "HEPATIC CLEARANCE FAIL"; }
-
-        score = Math.max(0, Math.min(140, score)).toFixed(1);
-        document.getElementById('globalScore').innerText = score;
-
         const diliStatus = (admet.logP > 3 && metCl === 'high') ? "CRITICAL" : (admet.logP > 3 ? "HIGH" : "LOW");
+        
+        let isRejected = false;
+        let rejectReason = "";
+        let logicSuggestions = [];
+
+        // --- DYNAMIC LOGIC SUGGESTIONS START ---
+        if (diliStatus !== "LOW") {
+            isRejected = true; rejectReason = `DILI RISK (${diliStatus})`;
+            logicSuggestions.push(`<span class='fix-logic'>Reduce LogP to < 3.0 or optimize Metabolic Stability to 'LOW'.</span>`);
+        }
+        if (herg > 40) {
+            isRejected = true; rejectReason = "CARDIOTOX (hERG)";
+            logicSuggestions.push(`<span class='fix-logic'>Cardiac Risk: Minimize basic amines or increase rigidity.</span>`);
+        }
+        if (cyto < 10 && cyto > 0) {
+            isRejected = true; rejectReason = "CYTOTOXICITY";
+            logicSuggestions.push(`<span class='fix-logic'>High Cytotoxicity: Improve structural biocompatibility.</span>`);
+        }
+        if (isGenotox) {
+            isRejected = true; rejectReason = "GENOTOXIC";
+            logicSuggestions.push(`<span class='fix-logic'>DNA Damage: Remove reactive electrophilic alerts.</span>`);
+        }
+
+        // Suggestions for Rank B/C optimization
+        if (!isRejected && score < 90) {
+            if (absAffinity < 7) logicSuggestions.push(`<span class='fix-logic' style='color:#e3b341'>Improve Affinity: Add H-bond donors/acceptors to fill Pocket Vol.</span>`);
+            if (admet.bio < 40) logicSuggestions.push(`<span class='fix-logic' style='color:#e3b341'>Low Bioavailability: Optimize PSA or reduce MW.</span>`);
+            if (target === 'cns' && admet.bbb === 'No') logicSuggestions.push(`<span class='fix-logic' style='color:#e3b341'>CNS Barrier: PSA must be < 90 and LogP > 2.0.</span>`);
+            if (tissue === 'liver' && metCl === 'high') logicSuggestions.push(`<span class='fix-logic' style='color:#e3b341'>Hepatic Cl: Fast metabolism detected. Protect labile groups.</span>`);
+        }
+        // --- DYNAMIC LOGIC SUGGESTIONS END ---
+
+        if (isRejected) {
+            score = 0;
+            document.getElementById('globalRank').innerText = "F";
+            document.getElementById('globalRank').style.color = "#f85149";
+            document.getElementById('approvalStatus').innerText = `REJECTED: ${rejectReason}`;
+            document.getElementById('approvalStatus').style.color = "#f85149";
+        } else {
+            let finalScore = Math.max(0, Math.min(140, score)).toFixed(1);
+            let rank = (finalScore > 100) ? "A+" : (finalScore > 85 ? "A" : (finalScore > 70 ? "B" : "C"));
+            document.getElementById('globalRank').innerText = rank;
+            document.getElementById('globalRank').style.color = "#2ea44f";
+            document.getElementById('approvalStatus').innerText = (finalScore > 90) ? "R&D READY" : "IND PHASE I";
+            document.getElementById('approvalStatus').style.color = "#2ea44f";
+        }
+
+        document.getElementById('globalScore').innerText = isRejected ? "0.0" : score.toFixed(1);
         document.getElementById('diliAutoStatus').innerText = diliStatus;
         document.getElementById('diliAutoStatus').style.color = (diliStatus !== "LOW") ? "#f85149" : "#2ea44f";
 
-        let rank = isRejected ? "F" : (score > 100 ? "A+" : (score > 85 ? "A" : (score > 70 ? "B" : "C")));
-        document.getElementById('globalRank').innerText = rank;
-
-        const approval = (score > 90 && !isRejected) ? "R&D READY" : (score > 60 && !isRejected ? "IND PHASE I" : "REJECTED");
-        document.getElementById('approvalStatus').innerText = isRejected ? `REJECTED: ${rejectReason}` : approval;
-        document.getElementById('approvalStatus').style.color = isRejected ? "#f85149" : "#2ea44f";
-
-        const cost = (steps * 5000 / (yield / 100)).toFixed(0);
+        const cost = (steps * 5000 / (yieldVal / 100)).toFixed(0);
 
         document.getElementById('synth-report-box').innerHTML = `
             <div class="opt-card">
@@ -300,12 +336,20 @@
                     <div class="bg-black/40 p-1 rounded">RMR: <span class="text-red-400">${rmr}</span></div>
                 </div>
             </div>
-            <div class="opt-card"><div class="weak-text">Financial Audit</div><div class="text-xs mt-2 text-gray-300">• Est. Mfg Cost: <span class="text-yellow-500">₹${Number(cost).toLocaleString('en-IN')}</span></div></div>
-            <div class="suggestion-box"><span class="text-[#2ea44f] font-bold uppercase">Decision Log:</span><div class="mt-2 text-[10px] space-y-1">
-                ${targetAdvice}
-                <li>• Stability: ${metCl.toUpperCase()}</li>
-                <li>• Discovery Logic: Integrated Pathway active.</li>
-            </div></div>
+            <div class="opt-card">
+                <div class="weak-text">Financial Audit</div>
+                <div class="text-xs mt-2 text-gray-300">• Est. Mfg Cost: <span class="text-yellow-500">₹${Number(cost).toLocaleString('en-IN')}</span></div>
+            </div>
+            <div class="suggestion-box">
+                <span class="text-[#2ea44f] font-bold uppercase">Decision Log & Strategy:</span>
+                <div class="mt-2 text-[10px] space-y-1">
+                    ${targetAdvice}
+                    ${logicSuggestions.join('')}
+                    <hr class="border-gray-700 my-1">
+                    <li>• Stability: ${metCl.toUpperCase()}</li>
+                    <li>• Safety: ${isRejected ? 'CRITICAL RISK DETECTED' : 'PARAMETERS WITHIN LOGIC LIMITS'}</li>
+                </div>
+            </div>
         `;
         document.getElementById('scoreResult').innerText = "CALCULATION COMPLETE";
     }
