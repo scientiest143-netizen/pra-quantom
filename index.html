@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW-WIN · DRUG DISCOVERY LOGIC ENGINE v101.3</title>
+    <title>GROW-WIN · DRUG DISCOVERY LOGIC ENGINE v102.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -20,9 +20,6 @@
         .insight-item { border-bottom: 1px solid #30363d; padding: 5px 0; }
         .insight-item:last-child { border: none; }
         .auto-status { font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; }
-        .tooltip { position: relative; display: inline-block; cursor: help; }
-        .tooltip .tooltiptext { visibility: hidden; width: 160px; background-color: #30363d; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -80px; opacity: 0; transition: opacity 0.3s; font-size: 10px; font-weight: normal; }
-        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
         .watermark { text-align: center; margin-top: 3rem; font-size: 10px; color: #30363d; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; }
     </style>
 </head>
@@ -31,7 +28,7 @@
 <div class="max-w-7xl mx-auto">
     <div class="text-center mb-10">
         <h1 class="text-5xl font-black tracking-tighter uppercase"> GROW-WIN <span class="text-[#2ea44f]">Pharma Engine</span></h1>
-        <p class="text-sm text-gray-400 mt-2 tracking-widest uppercase">Logic Replaces Supercomputer · Discovery v101.3 (Biologically Adapted)</p>
+        <p class="text-sm text-gray-400 mt-2 tracking-widest uppercase">Logic Replaces Supercomputer · Discovery v102.0 (Pathway Integrated)</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -42,22 +39,33 @@
                     <label class="text-[10px] font-bold text-blue-400 uppercase">Logic Target</label>
                     <select id="targetType" class="input-field !w-32 text-[9px]" onchange="updateTargetAdvice()">
                         <option value="none">0. GENERIC</option>
-                        <option value="cns">1. CNS (BRAIN)</option>
-                        <option value="cancer">2. ONCOLOGY</option>
-                        <option value="virus">3. ANTI-INFECTIVE</option>
-                        <option value="heart">4. CARDIOVASCULAR</option>
+                        <option value="cns">1. CNS</option>
+                        <option value="oncology">2. ONCOLOGY</option>
+                        <option value="anti_infective">3. ANTI-INFECTIVE</option>
+                        <option value="cardio">4. CARDIOVASCULAR</option>
                         <option value="immuno">5. IMMUNOLOGY</option>
-                        <option value="metabolic">6. METABOLIC</option>
-                        <option value="rare">7. RARE DISEASE</option>
-                        <option value="rare">8. RESPIRATORY</option>
-                        <option value="tox">9. TOXICOLOGY LOGIC</option>
+                        <option value="metabolic">6. METABOLIC / ENDO</option>
+                        <option value="resp">7. RESPIRATORY</option>
+                        <option value="gi">8. GASTROINTESTINAL</option>
+                        <option value="derma">9. DERMATOLOGY</option>
+                        <option value="musculo">10. MUSCULOSKELETAL</option>
+                        <option value="rare">11. RARE DISEASE</option>
+                        <option value="vaccine">12. VACCINES</option>
+                        <option value="tox_logic">13. TOXICOLOGY / SAFETY</option>
+                        <option value="hema">14. HEMATOLOGY</option>
+                        <option value="opthal">15. OPHTHALMOLOGY</option>
+                        <option value="nephro">16. NEPHROLOGY</option>
+                        <option value="uro">17. UROLOGY</option>
+                        <option value="repro">18. REPRODUCTIVE HEALTH</option>
+                        <option value="pain">19. PAIN / INFLAMMATION</option>
+                        <option value="genetic">20. GENETIC THERAPY</option>
                     </select>
                 </div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">Pocket Vol (Å³)<span class="tooltiptext">Active site cavity volume.</span></label><input id="pocketVol" type="number" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">Rotatable Bonds<span class="tooltiptext">Degrees of freedom.</span></label><input id="rotBonds" type="number" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">LogP (Hydro)<span class="tooltiptext">Lipophilicity.</span></label><input id="logP_dock" type="number" step="0.1" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">H-Bond Count<span class="tooltiptext">Donors + Acceptors.</span></label><input id="hBonds" type="number" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">RMSD (Å)<span class="tooltiptext">Pose precision.</span></label><input id="rmsd" type="number" step="0.1" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Pocket Vol (Å³)</label><input id="pocketVol" type="number" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Rotatable Bonds</label><input id="rotBonds" type="number" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">LogP (Hydro)</label><input id="logP_dock" type="number" step="0.1" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">H-Bond Count</label><input id="hBonds" type="number" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">RMSD (Å)</label><input id="rmsd" type="number" step="0.1" class="input-field"></div>
                 <button class="btn w-full mt-6" onclick="computeDocking()">Compute Affinity</button>
             </div>
             <div class="mt-6 flex flex-col items-center">
@@ -71,7 +79,7 @@
             <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 2. ADMET & PK</h2>
             <div class="space-y-4 flex-1">
                 <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Mol Weight</label><input id="molWeight" type="number" class="input-field"></div>
-                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase tooltip">PSA (Å²)<span class="tooltiptext">Polar Surface Area.</span></label><input id="psa" type="number" class="input-field"></div>
+                <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">PSA (Å²)</label><input id="psa" type="number" class="input-field"></div>
                 <div class="flex justify-between items-center"><label class="text-xs font-bold text-gray-400 uppercase">Bioavail %</label><input id="bioavail" type="number" class="input-field"></div>
                 <div class="flex justify-between items-center">
                     <label class="text-[10px] font-bold text-blue-300 uppercase">Class Type</label>
@@ -81,7 +89,7 @@
                     </select>
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-[10px] font-bold text-pink-400 uppercase tooltip">Metabolic Cl<span class="tooltiptext">Rate of drug elimination by liver.</span></label>
+                    <label class="text-[10px] font-bold text-pink-400 uppercase">Metabolic Cl</label>
                     <select id="metCl" class="input-field !w-24 text-[10px]">
                         <option value="low">LOW (STABLE)</option>
                         <option value="med">MEDIUM</option>
@@ -89,16 +97,23 @@
                     </select>
                 </div>
                 <div class="flex justify-between items-center">
-                    <label class="text-[10px] font-bold text-green-400 uppercase tooltip">Tissue Target<span class="tooltiptext">Specific organ concentration.</span></label>
-                    <select id="tissueTarget" class="input-field !w-24 text-[10px]">
-                        <option value="blood">BLOOD</option>
-                        <option value="lung">LUNG</option>
-                        <option value="liver">LIVER</option>
-                        <option value="heart">HEART</option>
-                        <option value="brain">BRAIN</option>
-                        <option value="kidney">KIDNEY</option>
-                        <option value="tumor">TUMOR</option>
-                        <option value="stomach">STOMACH</option>
+                    <label class="text-[10px] font-bold text-green-400 uppercase">Tissue Target</label>
+                    <select id="tissueTarget" class="input-field !w-32 text-[9px]" onchange="updateTargetAdvice()">
+                        <option value="brain">BRAIN (CNS)</option>
+                        <option value="heart">HEART (CARDIO)</option>
+                        <option value="liver">LIVER (HEPATIC)</option>
+                        <option value="kidney">KIDNEY (RENAL)</option>
+                        <option value="lung">LUNG (RESPIRATORY)</option>
+                        <option value="blood">BLOOD (HEMATOLOGIC)</option>
+                        <option value="stomach">STOMACH (GASTRIC)</option>
+                        <option value="intestine">INTESTINE (GI TRACT)</option>
+                        <option value="pancreas">PANCREAS (METABOLIC)</option>
+                        <option value="bone">BONE (SKELETAL)</option>
+                        <option value="skin">SKIN (DERMAL)</option>
+                        <option value="tumor">TUMOR (ONCOLOGY)</option>
+                        <option value="immune">IMMUNE SYSTEM</option>
+                        <option value="eye">EYE (OPHTHALMIC)</option>
+                        <option value="urology">URO-TRACT</option>
                     </select>
                 </div>
                 <button class="btn w-full mt-6" onclick="computeADMET()">Predict ADMET</button>
@@ -109,6 +124,14 @@
         <div class="card p-8 flex flex-col">
             <h2 class="text-xl font-black text-[#2ea44f] mb-6 uppercase"> 3. Final Controls</h2>
             <div class="space-y-3 flex-1">
+                <div class="flex flex-col space-y-1 p-2 bg-blue-900/20 rounded-lg border border-blue-500/30">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[10px] font-black text-blue-400 uppercase">Exposure Duration</label>
+                        <span id="durationLabel" class="text-[10px] font-bold text-white uppercase text-blue-300">Acute (24h)</span>
+                    </div>
+                    <input id="exposureSlider" type="range" min="1" max="3" value="1" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500" oninput="updateDurationLabel()">
+                </div>
+
                 <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-red-400 uppercase">hERG Block %</label><input id="herg" type="number" class="input-field !w-20"></div>
                 <div class="flex justify-between items-center"><label class="text-[10px] font-bold text-orange-400 uppercase">CytoTox (IC50)</label><input id="cytoTox" type="number" class="input-field !w-20"></div>
 
@@ -167,30 +190,93 @@
         return Math.max(min, Math.min(max, val));
     }
 
+    function updateDurationLabel() {
+        const val = document.getElementById('exposureSlider').value;
+        const label = document.getElementById('durationLabel');
+        if (val == 1) label.innerText = "Acute (24h)";
+        if (val == 2) label.innerText = "Sub-Chronic (30d)";
+        if (val == 3) label.innerText = "Chronic (6mo+)";
+    }
+
+    function updateDiliStatus() {
+        const tissue = document.getElementById('tissueTarget').value;
+        const metCl = document.getElementById('metCl').value;
+        const logP = parseInput('logP_dock', -5, 15, 0);
+        const statusEl = document.getElementById('diliAutoStatus');
+        
+        let riskLevel = "LOW";
+        let color = "bg-green-900 text-green-400";
+
+        if (tissue === 'liver' || metCl === 'high' || logP > 3) {
+            riskLevel = "MODERATE";
+            color = "bg-yellow-900 text-yellow-400";
+        }
+        if ((tissue === 'liver' && metCl === 'high') || (metCl === 'high' && logP > 4.5)) {
+            riskLevel = "CRITICAL";
+            color = "bg-red-900 text-red-100";
+        }
+
+        statusEl.innerText = riskLevel;
+        statusEl.className = `auto-status ${color}`;
+        return riskLevel;
+    }
+
+    function systemsAudit(target, affinity) {
+        let systemicRisk = 0;
+        let imbalanceReport = "";
+        if (target === 'pain' || target === 'immuno' || target === 'metabolic') {
+            systemicRisk += 25; 
+            imbalanceReport += "<li>⚠️ <b>SYSTEMIC RISK:</b> High potential for 'Cross-talk' in non-target tissues.</li>";
+        }
+        if (Math.abs(affinity) > 10.0) {
+            systemicRisk += 15;
+            imbalanceReport += "<li>⚖️ <b>PATHWAY IMBALANCE:</b> Risk of receptor down-regulation.</li>";
+        }
+        return { systemicRisk, imbalanceReport };
+    }
+
     function updateTargetAdvice() {
         const type = document.getElementById('targetType').value;
         const tissue = document.getElementById('tissueTarget').value;
         
         const advice = {
-            'cns': "🧠 <b>CNS:</b> Focus on Blood-Brain Barrier penetration.",
-            'cancer': "🎗️ <b>ONCOLOGY:</b> Prioritizing high binding affinity.",
-            'virus': "🦠 <b>VIRAL:</b> Flexibility (RotBonds) helps fit pockets.",
-            'heart': "❤️ <b>CARDIO:</b> Keep hERG block minimal.",
-            'tox': "🧪 <b>TOX LOGIC:</b> Safety-first mode active.",
-            'rare': "🧬 <b>RARE DISEASE:</b> bRo5 parameters applicable."
+            'cns': "🧠 <b>CNS:</b> Cross BBB; monitor neurotoxicity & neurotransmitter balance.",
+            'oncology': "🎗️ <b>ONCOLOGY:</b> High binding affinity; focus on apoptosis pathways.",
+            'anti_infective': "🦠 <b>ANTI-INFECTIVE:</b> Broad spectrum vs target specificity logic.",
+            'cardio': "❤️ <b>CARDIOVASCULAR:</b> Monitor hERG & BP regulation pathways.",
+            'immuno': "🛡️ <b>IMMUNOLOGY:</b> Cytokine modulation; avoid systemic over-activation.",
+            'metabolic': "💉 <b>METABOLIC/ENDO:</b> Insulin sensitivity & hormonal axis stability.",
+            'resp': "🫁 <b>RESPIRATORY:</b> Pulmonary surfactant compatibility check.",
+            'gi': "🌀 <b>GASTROINTESTINAL:</b> pH stability (1.5 - 8.0) & microbiome impact.",
+            'derma': "🧴 <b>DERMATOLOGY:</b> Stratum corneum penetration & skin sensitization.",
+            'musculo': "🦴 <b>MUSCULOSKELETAL:</b> Bone mineral density (BMD) impact analysis.",
+            'rare': "🧬 <b>RARE DISEASE:</b> Orphan drug logic; bRo5 parameters allowed.",
+            'vaccine': "💉 <b>VACCINES:</b> Antigenic stability & adjuvant synergy logic.",
+            'tox_logic': "🧪 <b>TOX/SAFETY:</b> Safety-first; maximum tolerated dose (MTD) logic.",
+            'hema': "🩸 <b>HEMATOLOGY:</b> Plasma protein binding (PPB) & coagulation risk.",
+            'opthal': "👁️ <b>OPHTHALMOLOGY:</b> Intraocular pressure & retinal toxicity check.",
+            'nephro': "⚖️ <b>NEPHROLOGY:</b> Glomerular filtration rate (GFR) compatibility.",
+            'uro': "🚽 <b>UROLOGY:</b> Urinary excretion rate & bladder wall permeability.",
+            'repro': "👶 <b>REPRODUCTIVE:</b> Teratogenicity & placental barrier risk.",
+            'pain': "⚡ <b>PAIN/INFLAM:</b> COX-2 selectivity vs non-selective logic pathway analysis active.",
+            'genetic': "🧬 <b>GENETIC THERAPY:</b> Viral vector load vs CRISPR/Cas selectivity."
         };
 
         const tissueLogic = {
-            'kidney': "⚖️ <b>KIDNEY:</b> Monitoring renal clearance and nephrotoxicity.",
-            'tumor': "🎯 <b>TUMOR:</b> Enhancing localized drug accumulation.",
-            'stomach': "🥣 <b>STOMACH:</b> Assessing acid stability and oral absorption."
+            'brain': "🧠 <b>BRAIN:</b> Monitoring p-Glycoprotein efflux risk.",
+            'heart': "🫀 <b>HEART:</b> Ion channel selectivity is paramount.",
+            'liver': "🧪 <b>HEPATIC:</b> High risk of Phase I/II metabolism.",
+            'kidney': "⚖️ <b>RENAL:</b> Monitoring renal clearance & nephrotoxicity.",
+            'lung': "🌬️ <b>LUNG:</b> Analyzing pulmonary permeability.",
+            'blood': "🩸 <b>BLOOD:</b> Plasma protein binding analysis active.",
+            'stomach': "🥣 <b>GASTRIC:</b> Acid stability (pH 1.5) is critical.",
+            'tumor': "🎯 <b>TUMOR:</b> EPR effect & selectivity check."
         };
 
         let combinedAdvice = advice[type] ? `<div class='insight-item text-blue-400'>${advice[type]}</div>` : "";
         if(tissueLogic[tissue]) {
             combinedAdvice += `<div class='insight-item text-green-400'>${tissueLogic[tissue]}</div>`;
         }
-        
         targetAdvice = combinedAdvice;
     }
 
@@ -200,20 +286,14 @@
         const logP = parseInput('logP_dock', -5, 15, 0);
         const rmsd = parseInput('rmsd', 0, 20, 0);
         const target = document.getElementById('targetType').value;
-
         let base = -5.0;
         let vEff = (vol / 120) * -0.6; 
         let lEff = logP * -0.7;
-        
-        let bondLimit = (target === 'cancer') ? 10 : 8;
+        let bondLimit = (target === 'oncology') ? 12 : 8;
         let bPenalty = (bonds > bondLimit) ? (bonds - bondLimit) * 0.4 : bonds * 0.15;
-        
         let affinity = base + vEff + lEff + bPenalty;
-        
         let rmsdThreshold = 2.0;
-        if (rmsd > rmsdThreshold) affinity += (rmsd - rmsdThreshold) * 1.2; 
-        else affinity -= (rmsdThreshold - rmsd) * 0.3;
-
+        affinity += (rmsd > rmsdThreshold) ? (rmsd - rmsdThreshold) * 1.2 : (rmsdThreshold - rmsd) * -0.3;
         const finalAffinity = Math.max(-12.0, Math.min(-2.0, affinity));
         document.getElementById('dockingAffinityInput').value = finalAffinity.toFixed(2);
         return finalAffinity;
@@ -225,100 +305,88 @@
         const bio = parseInput('bioavail', 0, 100, 0);
         const logP = parseInput('logP_dock', -5, 15, 0);
         const target = document.getElementById('targetType').value;
-        
         const isMacro = document.getElementById('molClass').value === "macro";
         const bbb = ((psa < 90 && mw < 450 && logP > 1 && logP < 4.5) || (psa < 60 && mw < 250)) ? 'Yes' : 'No';
-        
-        let logPThreshold = (target === 'rare') ? 5.5 : 5.0;
-        const ro5 = (mw <= 500 && logP <= logPThreshold) ? "PASS" : (isMacro ? "bRo5" : "FAIL");
-
+        let ro5 = (mw <= 500 && logP <= 5.0) ? "PASS" : (isMacro || target === 'rare' ? "bRo5" : "FAIL");
         document.getElementById('admetResult').innerText = `BBB: ${bbb} | PK: ${bio}% | Ro5: ${ro5}`;
         return { bbb, ro5, bio, logP, mw, psa };
     }
 
     function runAll() {
-        updateTargetAdvice(); // Sync tissue and target advice
+        updateTargetAdvice();
+        const diliRisk = updateDiliStatus();
         const affinity = parseFloat(document.getElementById('dockingAffinityInput').value) || 0;
+        const exposure = parseInt(document.getElementById('exposureSlider').value);
         const admet = computeADMET();
         const herg = parseInput('herg', 0, 100, 0);
         const cyto = parseInput('cytoTox', 0, 1000, 0);
         const steps = parseInput('sSteps', 1, 50, 1);
         const yield = parseInput('sYield', 1, 100, 1);
-        const genotox = document.getElementById('genotox').value;
-        const chiralRisk = document.getElementById('chiralRisk').value;
         const target = document.getElementById('targetType').value;
         const tissue = document.getElementById('tissueTarget').value;
-        const metCl = document.getElementById('metCl').value;
+        const audit = systemsAudit(target, affinity);
 
         let isRejected = false;
         let rejectReason = "";
+        let pathwayAlert = audit.imbalanceReport;
+        let chronicPenalty = 0;
 
-        // CORE SCORE CALCULATION
-        let score = (Math.abs(affinity) * 8.5) + (admet.bio * 0.2);
-        if (admet.ro5 === "PASS" || admet.ro5 === "bRo5") score += 15;
-        if (target === 'cns' && admet.bbb === 'No') score = score * 0.4;
-        
-        // TISSUE SPECIFIC LOGIC
-        if (tissue === 'kidney' && admet.mw > 600) score -= 20; // Large molecules struggle in kidney
-        if (tissue === 'tumor' && affinity < -9.0) score += 15; // High affinity is great for tumors
-
-        // BIOLOGICAL ADAPTATION LOGIC
-        if (target === 'cns' && affinity < -8.0 && admet.logP > 3.0) {
-            isRejected = true;
-            rejectReason = "HIGH PROMISCUITY / CNS EDEMA RISK";
-        }
-        
-        if (chiralRisk === "1" && target !== 'cancer') {
-            isRejected = true;
-            rejectReason = "TERATOGENIC RISK (Racemic)";
+        if (exposure > 1) {
+            if (Math.abs(affinity) > 9.0) {
+                chronicPenalty = (exposure - 1) * 15;
+                pathwayAlert += `<li>⚖️ <b>PATHWAY DRIFT:</b> High affinity leads to ${exposure == 3 ? 'Permanent' : 'Severe'} Receptor Down-regulation.</li>`;
+            }
+            if (target === 'pain' || target === 'cardio') {
+                chronicPenalty += 10;
+                pathwayAlert += "<li>🩸 <b>VASCULAR IMBALANCE:</b> Long-term TXA2/PGI2 drift risk detected.</li>";
+            }
         }
 
-        let diliVal = (admet.logP * 0.8) + (admet.mw * 0.004);
-        let diliStatus = (diliVal > 8.5) ? "HIGH" : "LOW";
-        let isMetabolicRisk = (admet.logP > 3.0 && target === 'metabolic');
-        let diliCritical = (target === 'rare') ? (isMetabolicRisk && metCl === "high") : isMetabolicRisk;
+        let score = (Math.abs(affinity) * 8.5) + (admet.bio * 0.2) - chronicPenalty;
+        if (admet.ro5 !== "FAIL") score += 15;
+        
+        if (target === 'pain' && affinity < -8.5) {
+            pathwayAlert += "<li>⚠️ <b>COX-2 ALERT:</b> Risk of PGI2 suppression (Cardiovascular Event).</li>";
+            isRejected = true;
+            rejectReason = "VASCULAR IMBALANCE";
+        }
 
-        if (diliCritical) { isRejected = true; rejectReason = "METABOLIC DILI"; }
-        else if (diliStatus === "HIGH" && target !== 'rare') { isRejected = true; rejectReason = "DILI RISK"; }
-        if (admet.logP > 4.5 && metCl === "high") { isRejected = true; rejectReason = "SYSTEMIC TISSUE DAMAGE"; }
+        if (diliRisk === "CRITICAL") {
+            isRejected = true;
+            rejectReason = "HEPATOTOXICITY (DILI)";
+        }
+
+        if ((target === 'cns' || tissue === 'brain') && admet.bbb === 'No') { score *= 0.5; }
         if (herg > 40) { isRejected = true; rejectReason = "CARDIOTOX (hERG)"; }
-        if (cyto < 10) { isRejected = true; rejectReason = "EXTREME CYTOTOXICITY"; }
-        if (genotox === "1") { isRejected = true; rejectReason = "GENOTOXIC"; }
+        if (cyto < 10) { isRejected = true; rejectReason = "CYTOTOXICITY"; }
+        if (document.getElementById('genotox').value === "1") { isRejected = true; rejectReason = "GENOTOXIC"; }
 
         score = Math.max(0, Math.min(140, score)).toFixed(1);
-
         document.getElementById('globalScore').innerText = score;
-        document.getElementById('diliAutoStatus').innerText = diliCritical ? "CRITICAL" : diliStatus;
-        document.getElementById('diliAutoStatus').style.color = (diliStatus === "HIGH" || diliCritical) ? "#f85149" : "#2ea44f";
-
-        let rank = "C";
-        if (score > 100) rank = "A+";
-        else if (score > 85) rank = "A";
-        else if (score > 70) rank = "B";
-        if (isRejected) rank = "F"; 
+        let rank = isRejected ? "F" : (score > 100 ? "A+" : (score > 85 ? "A" : (score > 70 ? "B" : "C")));
         document.getElementById('globalRank').innerText = rank;
 
         const approval = (score > 90 && !isRejected) ? "R&D READY" : (score > 60 && !isRejected ? "IND PHASE I" : "REJECTED");
         document.getElementById('approvalStatus').innerText = isRejected ? `REJECTED: ${rejectReason}` : approval;
-        document.getElementById('approvalStatus').style.color = (approval === "REJECTED" || isRejected) ? "#f85149" : "#2ea44f";
+        document.getElementById('approvalStatus').style.color = isRejected ? "#f85149" : "#2ea44f";
 
-        let costMultiplier = (steps > 10) ? 5500 : 4800;
-        const cost = (steps * costMultiplier / (yield / 100)).toFixed(0);
-        let optimizationTips = "";
-        if (admet.logP > 3.0) optimizationTips += "<li>💡 <b>High LogP:</b> Add Polar groups (-OH, -NH2) to improve solubility.</li>";
-        if (herg > 20) optimizationTips += "<li>💡 <b>hERG Risk:</b> Reduce basicity or remove flexible aromatic rings.</li>";
-        
+        let leadOpt = admet.logP > 3 ? "<li>💡 High LogP: Add polar groups.</li>" : "<li>✅ Molecule structurally stable.</li>";
+        if (rejectReason.includes("VASCULAR") || (exposure == 3 && score < 60)) {
+            leadOpt = "<li>🧪 <b>NO-DONOR PATCH:</b> Attach Nitrooxybutyl linker to restore endothelial balance.</li><li>💡 <b>CHRONIC BUFFER:</b> Reduce affinity to -7.5 to avoid feedback loops.</li>";
+        }
+        if (diliRisk === "CRITICAL") {
+            leadOpt += "<li>🧪 <b>HEPATIC BYPASS:</b> Consider prodrug strategy to reduce first-pass metabolic load.</li>";
+        }
+
         document.getElementById('synth-report-box').innerHTML = `
-            <div class="opt-card"><div class="weak-text">Financial Audit</div><div class="text-xs mt-2 text-gray-300">• Est. Mfg Cost: <span class="text-yellow-500">₹${Number(cost).toLocaleString('en-IN')}</span></div></div>
+            <div class="opt-card"><div class="weak-text">Financial Audit</div><div class="text-xs mt-2 text-gray-300">• Est. Mfg Cost: <span class="text-yellow-500">₹${(steps * 5000 / (yield/100)).toLocaleString('en-IN')}</span></div></div>
             <div class="suggestion-box"><span class="text-[#2ea44f] font-bold uppercase">Decision Log:</span><div class="mt-2 text-[10px] space-y-1">
-                <li>• Binding affinity: ${affinity.toFixed(2)}.</li>
-                <li>• Lipophilicity (LogP): ${admet.logP}.</li>
-                <li>• Tissue Target: <span class="text-green-400 uppercase">${tissue}</span></li>
-                <li>• Biological Adaptation: <span class="text-purple-400 font-bold">${isRejected ? 'Safety Override Active' : 'Normal'}</span></li>
+                <li>• Stability Mode: ${exposure > 1 ? 'Dynamic Equilibrium' : 'Static Binding'}</li>
                 ${targetAdvice}
+                ${pathwayAlert}
             </div></div>
             <div class="suggestion-box border-yellow-500/50"><span class="text-yellow-500 font-bold uppercase">Lead Optimization:</span><div class="mt-2 text-[10px] space-y-1">
-                ${optimizationTips || "<li>✅ Molecule is structurally optimized for this target.</li>"}
+                ${leadOpt}
             </div></div>
         `;
         document.getElementById('scoreResult').innerText = "CALCULATION COMPLETE";
