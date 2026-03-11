@@ -326,11 +326,65 @@
         const tissue = document.getElementById('tissueTarget').value;
         const audit = systemsAudit(target, affinity);
 
+        const absAffinity = Math.abs(affinity);
+        const tsi = (absAffinity - 4.0).toFixed(2);
+        const otr = (admet.logP * 1.5 + (10 - absAffinity)).toFixed(2);
+        const clVal = document.getElementById('metCl').value === 'high' ? 3 : (document.getElementById('metCl').value === 'med' ? 1.5 : 0.5);
+        const rmr = (clVal * admet.logP).toFixed(2);
+
         let isRejected = false;
         let rejectReason = "";
+        let failureLog = ""; // New: Detailed failure tracking
         let pathwayAlert = audit.imbalanceReport;
         let chronicPenalty = 0;
 
+        // 1. Biological/Tox Rejections
+        if (target === 'pain' && affinity < -8.5) {
+            pathwayAlert += "<li>⚠️ <b>COX-2 ALERT:</b> Risk of PGI2 suppression (Cardiovascular Event).</li>";
+            isRejected = true;
+            rejectReason = "VASCULAR IMBALANCE";
+            failureLog += "<li>❌ <b>BIOLOGICAL FAIL:</b> Molecule induces dangerous thrombotic events in long-term models.</li>";
+        }
+        if (diliRisk === "CRITICAL") {
+            isRejected = true;
+            rejectReason = "HEPATOTOXICITY (DILI)";
+            failureLog += "<li>❌ <b>PHASE I FAIL:</b> Elevated ALT/AST enzymes detected; high liver failure risk.</li>";
+        }
+        if (herg > 40) { 
+            isRejected = true; 
+            rejectReason = "CARDIOTOX (hERG)"; 
+            failureLog += "<li>❌ <b>TORSADES RISK:</b> Molecule blocks hERG potassium channels; leads to sudden cardiac arrest.</li>";
+        }
+        if (cyto < 10) { 
+            isRejected = true; 
+            rejectReason = "CYTOTOXICITY"; 
+            failureLog += "<li>❌ <b>CELL DEATH:</b> IC50 too low; molecule kills healthy cells alongside target.</li>";
+        }
+        if (document.getElementById('genotox').value === "1") { 
+            isRejected = true; 
+            rejectReason = "GENOTOXIC"; 
+            failureLog += "<li>❌ <b>MUTAGENICITY:</b> Positive Ames test; drug induces DNA damage/cancer.</li>";
+        }
+
+        // 2. Industrial/Commercial/Trial Rejections (The "Real" Failure Logic)
+        const estCost = steps * 5000 / (yield/100);
+        if (estCost > 1000000 && target !== 'rare') {
+            isRejected = true;
+            rejectReason = "COMMERCIAL UNVIABILITY";
+            failureLog += "<li>❌ <b>INDUSTRIAL FAIL:</b> Cost of goods (COGS) exceeds market reimbursement limits.</li>";
+        }
+        if (steps > 15 && yield < 10) {
+            isRejected = true;
+            rejectReason = "SYNTHETIC BLOCK";
+            failureLog += "<li>❌ <b>MFG FAIL:</b> Synthesis too complex for large-scale GMP manufacturing.</li>";
+        }
+        if (admet.ro5 === "FAIL" && target !== 'rare' && target !== 'oncology') {
+            isRejected = true;
+            rejectReason = "POOR DRUGGABILITY";
+            failureLog += "<li>❌ <b>ADME FAIL:</b> Molecule lacks 'drug-like' properties; will not survive human digestion.</li>";
+        }
+
+        // Chronic logic
         if (exposure > 1) {
             if (Math.abs(affinity) > 9.0) {
                 chronicPenalty = (exposure - 1) * 15;
@@ -342,24 +396,9 @@
             }
         }
 
-        let score = (Math.abs(affinity) * 8.5) + (admet.bio * 0.2) - chronicPenalty;
+        let score = (absAffinity * 8.5) + (admet.bio * 0.2) - chronicPenalty;
         if (admet.ro5 !== "FAIL") score += 15;
-        
-        if (target === 'pain' && affinity < -8.5) {
-            pathwayAlert += "<li>⚠️ <b>COX-2 ALERT:</b> Risk of PGI2 suppression (Cardiovascular Event).</li>";
-            isRejected = true;
-            rejectReason = "VASCULAR IMBALANCE";
-        }
-
-        if (diliRisk === "CRITICAL") {
-            isRejected = true;
-            rejectReason = "HEPATOTOXICITY (DILI)";
-        }
-
         if ((target === 'cns' || tissue === 'brain') && admet.bbb === 'No') { score *= 0.5; }
-        if (herg > 40) { isRejected = true; rejectReason = "CARDIOTOX (hERG)"; }
-        if (cyto < 10) { isRejected = true; rejectReason = "CYTOTOXICITY"; }
-        if (document.getElementById('genotox').value === "1") { isRejected = true; rejectReason = "GENOTOXIC"; }
 
         score = Math.max(0, Math.min(140, score)).toFixed(1);
         document.getElementById('globalScore').innerText = score;
@@ -379,7 +418,21 @@
         }
 
         document.getElementById('synth-report-box').innerHTML = `
-            <div class="opt-card"><div class="weak-text">Financial Audit</div><div class="text-xs mt-2 text-gray-300">• Est. Mfg Cost: <span class="text-yellow-500">₹${(steps * 5000 / (yield/100)).toLocaleString('en-IN')}</span></div></div>
+            <div class="opt-card">
+                <div class="weak-text">Automated Bio-Logic Metrics</div>
+                <div class="grid grid-cols-3 gap-2 mt-2 text-[10px] text-center">
+                    <div class="bg-black/40 p-1 rounded">TSI: <span class="text-blue-400">${tsi}</span></div>
+                    <div class="bg-black/40 p-1 rounded">OTR: <span class="text-orange-400">${otr}</span></div>
+                    <div class="bg-black/40 p-1 rounded">RMR: <span class="text-red-400">${rmr}</span></div>
+                </div>
+            </div>
+            ${isRejected ? `<div class="opt-card border-t-red-600">
+                <div class="weak-text text-red-500">Root Cause of Failure</div>
+                <div class="text-[10px] mt-2 space-y-1 text-red-200">
+                    ${failureLog}
+                </div>
+            </div>` : ''}
+            <div class="opt-card"><div class="weak-text">Financial Audit</div><div class="text-xs mt-2 text-gray-300">• Est. Mfg Cost: <span class="text-yellow-500">₹${estCost.toLocaleString('en-IN')}</span></div></div>
             <div class="suggestion-box"><span class="text-[#2ea44f] font-bold uppercase">Decision Log:</span><div class="mt-2 text-[10px] space-y-1">
                 <li>• Stability Mode: ${exposure > 1 ? 'Dynamic Equilibrium' : 'Static Binding'}</li>
                 ${targetAdvice}
