@@ -22,9 +22,9 @@
         .auto-status { font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 5px; text-transform: uppercase; }
         .tooltip { position: relative; display: inline-block; cursor: help; }
         .tooltip .tooltiptext { visibility: hidden; width: 160px; background-color: #30363d; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -80px; opacity: 0; transition: opacity 0.3s; font-size: 10px; font-weight: normal; }
+        .tooltip:hover { visibility: visible; }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
         .watermark { text-align: center; margin-top: 3rem; font-size: 10px; color: #30363d; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; }
-        /* New Style for Critical Suggestions */
         .fix-logic { color: #ffab70; font-weight: bold; display: block; margin-top: 4px; border-left: 2px solid #ffab70; padding-left: 8px; }
     </style>
 </head>
@@ -259,72 +259,88 @@
         const steps = parseInput('sSteps', 1, 50, 1);
         const yieldVal = parseInput('sYield', 1, 100, 1);
         const target = document.getElementById('targetType').value;
-        const tissue = document.getElementById('tissueTarget').value;
         const metCl = document.getElementById('metCl').value;
         const isGenotox = document.getElementById('genotox').value === "1";
-
         const absAffinity = Math.abs(affinity);
-        const tsi = (absAffinity - 4.0).toFixed(2);
-        const otr = (admet.logP * 1.2 + (10 - absAffinity)).toFixed(2);
-        const clFactor = (metCl === 'high') ? 2.5 : (metCl === 'med' ? 1.2 : 0.5);
-        const rmr = (clFactor * admet.logP).toFixed(2);
 
-        let score = (absAffinity * 8.5) + (admet.bio * 0.2);
-        if (admet.ro5 !== "FAIL") score += 15;
-        if (target === 'cns' && admet.bbb === 'No') score *= 0.4;
+        // --- ENHANCED LOGP LOGIC PER CATEGORY ---
+        const categoryLogPMap = {
+            'cns': { min: 1.5, max: 2.5, fail: 3.5 },
+            'cancer': { min: 2.0, max: 4.0, fail: 5.5 },
+            'virus': { min: 0.5, max: 3.0, fail: 4.5 },
+            'heart': { min: 1.0, max: 3.0, fail: 4.0 },
+            'tox': { min: -1.0, max: 2.0, fail: 3.0 },
+            'derma': { min: 3.0, max: 5.0, fail: 6.5 },
+            'none': { min: 1.0, max: 3.0, fail: 5.0 }
+        };
 
-        const diliStatus = (admet.logP > 3 && metCl === 'high') ? "CRITICAL" : (admet.logP > 3 ? "HIGH" : "LOW");
+        const config = categoryLogPMap[target] || categoryLogPMap['none'];
         
+        let isLifeSaving = (target === 'cancer' || target === 'rare' || target === 'virus');
+        let isHighStakes = (target === 'heart' || target === 'cns' || target === 'metabolic');
+
+        // Logic Check: DILI Status based on dynamic thresholds
+        const rawDiliStatus = (admet.logP >= config.fail && metCl === 'high') ? "CRITICAL" : 
+                            (admet.logP >= config.fail ? "HIGH" : 
+                            (admet.logP > config.max ? "MODERATE" : "LOW"));
+        
+        let diliStatus = rawDiliStatus;
         let isRejected = false;
         let rejectReason = "";
         let logicSuggestions = [];
 
-        // --- DYNAMIC LOGIC SUGGESTIONS START ---
-        if (diliStatus !== "LOW") {
-            isRejected = true; rejectReason = `DILI RISK (${diliStatus})`;
-            logicSuggestions.push(`<span class='fix-logic'>Reduce LogP to < 3.0 or optimize Metabolic Stability to 'LOW'.</span>`);
-        }
-        if (herg > 40) {
-            isRejected = true; rejectReason = "CARDIOTOX (hERG)";
-            logicSuggestions.push(`<span class='fix-logic'>Cardiac Risk: Minimize basic amines or increase rigidity.</span>`);
-        }
-        if (cyto < 10 && cyto > 0) {
-            isRejected = true; rejectReason = "CYTOTOXICITY";
-            logicSuggestions.push(`<span class='fix-logic'>High Cytotoxicity: Improve structural biocompatibility.</span>`);
-        }
-        if (isGenotox) {
-            isRejected = true; rejectReason = "GENOTOXIC";
-            logicSuggestions.push(`<span class='fix-logic'>DNA Damage: Remove reactive electrophilic alerts.</span>`);
+        if (diliStatus === "CRITICAL" || (diliStatus === "HIGH" && !isLifeSaving)) { 
+            isRejected = true; 
+            rejectReason = "DILI RISK (HEPATIC)"; 
+            logicSuggestions.push(`<span class='fix-logic'>Safety Failure: High DILI risk for ${target.toUpperCase()}. Adjust LogP to ${config.min}-${config.max}.</span>`);
         }
 
-        // Suggestions for Rank B/C optimization
-        if (!isRejected && score < 90) {
-            if (absAffinity < 7) logicSuggestions.push(`<span class='fix-logic' style='color:#e3b341'>Improve Affinity: Add H-bond donors/acceptors to fill Pocket Vol.</span>`);
-            if (admet.bio < 40) logicSuggestions.push(`<span class='fix-logic' style='color:#e3b341'>Low Bioavailability: Optimize PSA or reduce MW.</span>`);
-            if (target === 'cns' && admet.bbb === 'No') logicSuggestions.push(`<span class='fix-logic' style='color:#e3b341'>CNS Barrier: PSA must be < 90 and LogP > 2.0.</span>`);
-            if (tissue === 'liver' && metCl === 'high') logicSuggestions.push(`<span class='fix-logic' style='color:#e3b341'>Hepatic Cl: Fast metabolism detected. Protect labile groups.</span>`);
+        let hergLimit = isHighStakes ? 15 : 40; 
+        if (herg > hergLimit) { isRejected = true; rejectReason = "CARDIOTOX RISK"; logicSuggestions.push(`<span class='fix-logic'>Cardiac Risk: Target Limit: ${hergLimit}%.</span>`); }
+        if (isGenotox && !isLifeSaving) { isRejected = true; rejectReason = "GENOTOXIC"; } 
+        if (cyto < 10 && cyto > 0) { isRejected = true; rejectReason = "CYTOTOXICITY"; }
+
+        if (!isRejected) {
+            if (diliStatus === "MODERATE") {
+                logicSuggestions.push(`<span class='fix-logic' style='color:#e3b341'>Caution: LogP is slightly high for this target. Monitor hepatic markers.</span>`);
+            }
+            if (absAffinity < 7) {
+                logicSuggestions.push(`<span class='fix-logic' style='color:#e3b341'>Improve Affinity: Add H-bond donors/acceptors.</span>`);
+            }
         }
-        // --- DYNAMIC LOGIC SUGGESTIONS END ---
+
+        let baseScore = (absAffinity * 10) + (admet.bio * 0.2);
+        
+        // Bonus for being in the "Sweet Spot" LogP for the specific category
+        if (admet.logP >= config.min && admet.logP <= config.max) baseScore += 10;
+        
+        if (isLifeSaving) baseScore *= 1.2; 
+        if (admet.ro5 !== "FAIL") baseScore += 15;
+        if (target === 'cns' && admet.bbb === 'No') baseScore *= 0.4;
 
         if (isRejected) {
-            score = 0;
+            document.getElementById('globalScore').innerText = "0.0";
             document.getElementById('globalRank').innerText = "F";
             document.getElementById('globalRank').style.color = "#f85149";
             document.getElementById('approvalStatus').innerText = `REJECTED: ${rejectReason}`;
             document.getElementById('approvalStatus').style.color = "#f85149";
         } else {
-            let finalScore = Math.max(0, Math.min(140, score)).toFixed(1);
-            let rank = (finalScore > 100) ? "A+" : (finalScore > 85 ? "A" : (finalScore > 70 ? "B" : "C"));
+            let finalScoreValue = Math.max(0, Math.min(140, baseScore));
+            document.getElementById('globalScore').innerText = finalScoreValue.toFixed(1);
+            let rank = (finalScoreValue > 100) ? "A+" : (finalScoreValue > 85 ? "A" : (finalScoreValue > 70 ? "B" : "C"));
             document.getElementById('globalRank').innerText = rank;
             document.getElementById('globalRank').style.color = "#2ea44f";
-            document.getElementById('approvalStatus').innerText = (finalScore > 90) ? "R&D READY" : "IND PHASE I";
+            document.getElementById('approvalStatus').innerText = (finalScoreValue > 90) ? "R&D READY" : "IND PHASE I";
             document.getElementById('approvalStatus').style.color = "#2ea44f";
         }
 
-        document.getElementById('globalScore').innerText = isRejected ? "0.0" : score.toFixed(1);
         document.getElementById('diliAutoStatus').innerText = diliStatus;
-        document.getElementById('diliAutoStatus').style.color = (diliStatus !== "LOW") ? "#f85149" : "#2ea44f";
+        document.getElementById('diliAutoStatus').style.color = (diliStatus === "CRITICAL" || diliStatus === "HIGH") ? "#f85149" : (diliStatus === "MODERATE" ? "#e3b341" : "#2ea44f");
 
+        const tsi = (absAffinity - 4.0).toFixed(2);
+        const otr = (admet.logP * 1.2 + (10 - absAffinity)).toFixed(2);
+        const clFactor = (metCl === 'high') ? 2.5 : (metCl === 'med' ? 1.2 : 0.5);
+        const rmr = (clFactor * admet.logP).toFixed(2);
         const cost = (steps * 5000 / (yieldVal / 100)).toFixed(0);
 
         document.getElementById('synth-report-box').innerHTML = `
@@ -345,9 +361,10 @@
                 <div class="mt-2 text-[10px] space-y-1">
                     ${targetAdvice}
                     ${logicSuggestions.join('')}
-                    <hr class="border-gray-700 my-1">
+                    <hr class="border-gray-800 my-1">
                     <li>• Stability: ${metCl.toUpperCase()}</li>
-                    <li>• Safety: ${isRejected ? 'CRITICAL RISK DETECTED' : 'PARAMETERS WITHIN LOGIC LIMITS'}</li>
+                    <li>• Safety Context: ${isLifeSaving ? 'LIFE-SAVING PROTOCOL' : 'STANDARD PROTOCOL'}</li>
+                    <li>• Result: ${isRejected ? 'CRITICAL RISK' : 'LOGIC LIMITS MET'}</li>
                 </div>
             </div>
         `;
