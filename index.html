@@ -18,6 +18,7 @@
         .label-text { font-size: 10px; font-weight: 700; color: #8b949e; text-transform: uppercase; }
         .watermark { text-align: center; margin-top: 2rem; font-size: 10px; color: #30363d; letter-spacing: 2px; font-weight: bold; }
         .insight-item { border-bottom: 1px solid #21262d; padding: 4px 0; }
+        .opt-suggest { color: #f2cc60; margin-top: 8px; font-weight: 700; border-top: 1px dashed #3b434b; padding-top: 8px; }
     </style>
 </head>
 <body class="p-6">
@@ -110,6 +111,7 @@
         <div class="result-box flex-col items-start p-6 text-xs" id="logOutput">
             <span class="text-gray-500 uppercase font-black mb-2">45-Gate Industrial Sieve:</span>
             <div id="logic-log" class="w-full">Awaiting industrial parameters...</div>
+            <div id="opt-log" class="w-full mt-2"></div>
         </div>
         <div class="result-box flex-col p-6 text-center">
             <div id="multiplierLabel" class="text-[10px] text-gray-500 uppercase mb-1">Risk Multiplier: 1.0x</div>
@@ -130,20 +132,13 @@
         return isNaN(val) ? def : val;
     }
 
-    // --- NEW: TARGET-BASED THRESHOLD SYSTEM ---
     function getTargetRules(target) {
         let rules = { affinity: -7.0, logP_min: -1.0, logP_max: 5.0, psa_max: 140 };
-
         const t = target.toUpperCase();
-        if (t === "METABOLIC") {
-            rules = { affinity: -6.0, logP_min: -2.5, logP_max: 3.5, psa_max: 150 };
-        } else if (t === "ONCOLOGY") {
-            rules = { affinity: -7.5, logP_min: -1.0, logP_max: 5.5, psa_max: 160 };
-        } else if (t === "CNS") {
-            rules = { affinity: -7.0, logP_min: 1.0, logP_max: 4.5, psa_max: 70 };
-        } else if (t === "ANTI-INFECTIVE" || t === "ANTIVIRAL" || t === "ANTIBACTERIAL") {
-            rules = { affinity: -7.0, logP_min: -1.5, logP_max: 4.5, psa_max: 130 };
-        }
+        if (t === "METABOLIC") rules = { affinity: -6.0, logP_min: -2.5, logP_max: 3.5, psa_max: 150 };
+        else if (t === "ONCOLOGY") rules = { affinity: -7.5, logP_min: -1.0, logP_max: 5.5, psa_max: 160 };
+        else if (t === "CNS") rules = { affinity: -7.0, logP_min: 1.0, logP_max: 4.5, psa_max: 70 };
+        else if (t.includes("ANTI-") || t.includes("ANTI")) rules = { affinity: -7.0, logP_min: -1.5, logP_max: 4.5, psa_max: 130 };
         return rules;
     }
 
@@ -171,87 +166,95 @@
         let criticalFailures = 0;
         let riskMultiplier = 1.0;
         let log = [];
+        let optSuggest = [];
 
-        // --- GATE EVALUATION WITH TARGET-SPECIFIC RULES ---
-        
-        // 1. Docking Affinity (Soft Penalty Logic)
+        // 1. Docking Affinity
         if (affinity > rules.affinity) { 
             gateFailures++; 
             riskMultiplier *= 0.8; 
-            log.push(`Gate 1: Weak Affinity for ${targetType} (> ${rules.affinity})`); 
+            log.push(`Gate 1: Weak Affinity (> ${rules.affinity})`); 
+            optSuggest.push(`Increase Affinity to at least ${rules.affinity} kcal/mol`);
         }
 
-        if (rmsd > 2.0) { gateFailures++; log.push("Gate 2: Pose Instability (High RMSD)"); }
+        if (rmsd > 2.0) { 
+            gateFailures++; 
+            log.push("Gate 2: Pose Instability (RMSD > 2.0)"); 
+            optSuggest.push("Minimize RMSD below 2.0 Å for better binding stability");
+        }
         
-        // 2. ADMET & Lipophilicity (Corrected Ranges)
-        if (bio < 30) { gateFailures++; log.push("Gate 11: Poor Bioavailability (< 30%)"); }
+        // 2. ADMET & LogP
+        if (bio < 30) { 
+            gateFailures++; 
+            log.push("Gate 11: Poor Bioavailability (< 30%)"); 
+            optSuggest.push("Improve Bioavailability above 30% for systemic efficacy");
+        }
         
         if (logP < rules.logP_min || logP > rules.logP_max) { 
             gateFailures++; 
-            log.push(`Gate 6: Lipophilicity Risk (Range: ${rules.logP_min} to ${rules.logP_max})`); 
+            log.push(`Gate 6: LogP Lipophilicity Out of Range`); 
+            optSuggest.push(`Optimize LogP to fall between ${rules.logP_min} and ${rules.logP_max}`);
         }
 
         if (psa > rules.psa_max) { 
             gateFailures++; 
-            log.push(`Gate 7: High PSA for ${targetType} (> ${rules.psa_max})`); 
+            log.push(`Gate 7: High PSA (> ${rules.psa_max})`); 
+            optSuggest.push(`Reduce Polar Surface Area (PSA) below ${rules.psa_max} Å²`);
         }
 
-        if (stability < 25) { gateFailures++; log.push("Gate 45: Critical Metabolic Instability"); }
-        if (cyp > 50) { gateFailures++; log.push("Gate 42: High CYP450 Inhibition"); }
-
         // 3. TOXICOLOGY (CRITICAL)
-        if (herg > 10) { criticalFailures++; log.push("Gate 21: CRITICAL hERG Block"); }
-        if (cyto < 50 && cyto > 0) { criticalFailures++; log.push("Gate 22: CRITICAL Cytotoxicity"); }
-        if (diliStatus === "CRITICAL" || diliStatus === "HIGH") { criticalFailures++; log.push("Gate 23: CRITICAL Hepatic Risk (DILI)"); }
-        if (genotox === "1" || ames === "pos") { criticalFailures++; log.push("Gate 24/41: CRITICAL DNA Mutation Risk"); }
-        if (mech === "thrombotic") { criticalFailures++; log.push("Gate 32: CRITICAL Thrombosis Risk"); }
-        if (pains === "1") { gateFailures++; log.push("Gate 43: PAINS Structural Alert"); }
-        if (aggRisk > 70) { gateFailures++; log.push("Gate 44: High Aggregation"); }
+        if (herg > 10) { 
+            criticalFailures++; log.push("Gate 21: CRITICAL hERG Block"); 
+            optSuggest.push("CRITICAL: Reduce hERG inhibition below 10% to avoid arrhythmia");
+        }
+        if (diliStatus !== "LOW") { 
+            criticalFailures++; log.push("Gate 23: Hepatic Risk detected"); 
+            optSuggest.push("CRITICAL: Address DILI risk; change status to LOW");
+        }
+        if (genotox === "1" || ames === "pos") { 
+            criticalFailures++; log.push("Gate 24: Mutagenicity detected"); 
+            optSuggest.push("CRITICAL: Remove mutagenic structural features (Ames/Genotox)");
+        }
 
-        // Multi-Gate Kill Switch
-        if (gateFailures >= 3) { criticalFailures++; log.push("🚨 SYSTEM REJECTION: 3+ Multi-Gate Failures"); }
-
-        // Final Multiplier Determination
+        // Global Multiplier & Score
         if (criticalFailures > 0) riskMultiplier = 0.0;
         else if (gateFailures === 2 && riskMultiplier > 0.5) riskMultiplier = 0.5;
         else if (gateFailures === 1 && riskMultiplier > 0.8) riskMultiplier = 0.8;
 
-        // --- SCORING ---
         let dockingScore = Math.min(Math.max(Math.abs(affinity) * 3.5, 0), 35);
-        let psaScore = Math.max(0, 120 - Math.abs(psa - 90));
-        let admetScore = (bio * 0.15) + (psaScore * 0.15) + (stability * 0.1);
+        let admetScore = (bio * 0.15) + (stability * 0.1);
         let safetyScore = Math.max(0, (40 - gateFailures) * 1.5);
-        
         let finalScore = (dockingScore + admetScore + safetyScore) * riskMultiplier;
 
-        // --- UI UPDATE ---
         let rank = "F";
         if (riskMultiplier > 0) {
             if (finalScore >= 130) rank = "A+";
             else if (finalScore >= 110) rank = "A";
             else if (finalScore >= 90) rank = "B";
             else if (finalScore >= 70) rank = "C";
-            else if (finalScore >= 40) rank = "D";
+            else rank = "D";
         }
 
+        // Optimization Engine Trigger
+        if (rank !== "A" && rank !== "A+" && optSuggest.length === 0) {
+            if (dockingScore < 25) optSuggest.push("Boost binding affinity to reach A-Rank status");
+            if (bio < 60) optSuggest.push("Higher Bioavailability will significantly raise the global score");
+        }
+
+        // UI UPDATE
         document.getElementById('globalScore').innerText = finalScore.toFixed(1);
         document.getElementById('globalRank').innerText = rank;
         document.getElementById('multiplierLabel').innerText = `Risk Multiplier: ${riskMultiplier.toFixed(2)}x`;
         
         const statusObj = document.getElementById('approvalStatus');
-        if (riskMultiplier === 0) {
-            statusObj.innerText = "REJECTED (CRITICAL)";
-            statusObj.style.color = "#f85149";
-            document.getElementById('globalRank').style.color = "#f85149";
-        } else {
-            statusObj.innerText = (finalScore > 105) ? "R&D READY" : "OPTIMIZATION REQ";
-            statusObj.style.color = "#2ea44f";
-            document.getElementById('globalRank').style.color = "#2ea44f";
-        }
+        statusObj.innerText = (riskMultiplier === 0) ? "REJECTED (CRITICAL)" : (finalScore > 105 ? "R&D READY" : "OPTIMIZATION REQ");
+        statusObj.style.color = (riskMultiplier === 0) ? "#f85149" : "#2ea44f";
 
         document.getElementById('logic-log').innerHTML = log.length > 0 ? 
             log.map(l => `<div class='insight-item text-red-400'>${l}</div>`).join('') : 
-            "<div class='text-green-500'>✔ ALL TARGET-SPECIFIC INDUSTRIAL GATES PASSED</div>";
+            "<div class='text-green-500'>✔ ALL INDUSTRIAL GATES PASSED</div>";
+
+        document.getElementById('opt-log').innerHTML = optSuggest.length > 0 ? 
+            `<div class='opt-suggest'>PATHWAY TO A-RANK:<br>${optSuggest.map(s => `• ${s}`).join('<br>')}</div>` : "";
     }
 </script>
 </body>
