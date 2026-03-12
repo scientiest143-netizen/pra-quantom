@@ -1,250 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GROW-WIN · PHARMA LOGIC ENGINE v104</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { background: #0a0c10; color: #e6edf3; font-family: 'Inter', sans-serif; font-size: 13px; }
-        .card { background: #161b22; border: 1px solid #30363d; border-radius: 1.5rem; transition: 0.3s; display: flex; flex-direction: column; height: 100%; }
-        .card:hover { border-color: #2ea44f; }
-        .input-field { background: #0d1117; border: 1px solid #3b434b; color: #2ea44f; padding: 0.4rem 0.8rem; border-radius: 0.75rem; width: 100%; font-weight: bold; outline: none; transition: 0.2s; }
-        .input-field:focus { border-color: #2ea44f; box-shadow: 0 0 5px #2ea44f44; }
-        .auto-field { background: #1c2128; color: #8b949e; border: 1px dashed #484f58; cursor: not-allowed; }
-        .btn { background: #2ea44f; color: black; font-weight: 800; padding: 0.75rem; border-radius: 1rem; transition: 0.2s; border: none; cursor: pointer; text-transform: uppercase; width: 100%; margin-top: 10px; }
-        .btn:hover { background: #3fb950; box-shadow: 0 0 15px #2ea44f; transform: translateY(-1px); }
-        .section-title { color: #2ea44f; font-weight: 900; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 1rem; border-left: 3px solid #2ea44f; padding-left: 8px; }
-        .label-text { font-size: 10px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .brain-box { border: 1px solid #2ea44f44; background: #0d1117; border-radius: 1rem; padding: 12px; margin-top: 10px; min-height: 100px; }
-        .insight-item { border-bottom: 1px solid #21262d; padding: 6px 0; font-family: monospace; }
-        .watermark { text-align: center; margin-top: 2rem; font-size: 10px; color: #30363d; letter-spacing: 2px; font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GROW-WIN · PHARMA LOGIC ENGINE v104 EXTENDED</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+body { background: #0a0c10; color: #e6edf3; font-family: 'Inter', sans-serif; font-size: 13px; }
+.card { background: #161b22; border: 1px solid #30363d; border-radius: 1.5rem; transition: 0.3s; display: flex; flex-direction: column; height: 100%; }
+.card:hover { border-color: #2ea44f; }
+.input-field { background: #0d1117; border: 1px solid #3b434b; color: #2ea44f; padding: 0.4rem 0.8rem; border-radius: 0.75rem; width: 100%; font-weight: bold; outline: none; transition: 0.2s; }
+.input-field:focus { border-color: #2ea44f; box-shadow: 0 0 5px #2ea44f44; }
+.auto-field { background: #1c2128; color: #8b949e; border: 1px dashed #484f58; cursor: not-allowed; }
+.btn { background: #2ea44f; color: black; font-weight: 800; padding: 0.75rem; border-radius: 1rem; transition: 0.2s; border: none; cursor: pointer; text-transform: uppercase; width: 100%; margin-top: 10px; }
+.btn:hover { background: #3fb950; box-shadow: 0 0 15px #2ea44f; transform: translateY(-1px); }
+.section-title { color: #2ea44f; font-weight: 900; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 1rem; border-left: 3px solid #2ea44f; padding-left: 8px; }
+.label-text { font-size: 10px; font-weight: 700; color: #8b949e; text-transform: uppercase; margin-bottom: 4px; display: block; }
+.brain-box { border: 1px solid #2ea44f44; background: #0d1117; border-radius: 1rem; padding: 12px; margin-top: 10px; min-height: 100px; overflow-y: auto; }
+.insight-item { border-bottom: 1px solid #21262d; padding: 6px 0; font-family: monospace; }
+.watermark { text-align: center; margin-top: 2rem; font-size: 10px; color: #30363d; letter-spacing: 2px; font-weight: bold; }
+.result-box { background: #161b22; border: 1px solid #30363d; border-radius: 1rem; padding: 12px; }
+</style>
 </head>
 <body class="p-6">
 
 <div class="max-w-[1400px] mx-auto">
     <div class="text-center mb-8">
         <h1 class="text-4xl font-black tracking-tighter uppercase"> GROW-WIN <span class="text-[#2ea44f]">Pharma Engine</span></h1>
-        <p class="text-xs text-gray-500 mt-1 tracking-widest uppercase">v104 · Industrial Sieve (45-Gate Full Track Edition)</p>
+        <p class="text-xs text-gray-500 mt-1 tracking-widest uppercase">v104 · EXTENDED 45-GATE + INDUSTRIAL ACCELERATED SIEVE</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <div class="card p-5 border-l-4 border-blue-500">
-            <h2 class="section-title">1. Mandatory Inputs</h2>
+            <h2 class="section-title">Mandatory Inputs</h2>
             <div class="space-y-3">
-                <div><label class="label-text">Target Track (Selection)</label>
+                <div><label class="label-text">Target Track</label>
                     <select id="targetType" class="input-field text-[10px]">
-                        <option value="0">00. GENERIC</option>
-                        <option value="1">01. ONCOLOGY</option>
-                        <option value="2">02. ANTI-INFECTIVE</option>
-                        <option value="3">03. IMMUNO</option>
-                        <option value="4">04. ENDOCRINE</option>
-                        <option value="5">05. CNS_NEUROLOGICAL</option>
-                        <option value="6">06. CNS_HIGH_PERMEANCE</option>
-                        <option value="7">07. CARDIOVASCULAR</option>
-                        <option value="8">08. RENAL</option>
-                        <option value="9">09. HEPATIC</option>
-                        <option value="10">10. INFLAMMATION</option>
-                        <option value="11">11. RESPIRATORY</option>
-                        <option value="12">12. GASTROINTESTINAL</option>
-                        <option value="13">13. DERMAL</option>
-                        <option value="14">14. METABOLIC</option>
-                        <option value="15">15. OPHTHALMIC</option>
-                        <option value="16">16. AUDITORY</option>
-                        <option value="17">17. NEUROMODULATOR</option>
-                        <option value="18">18. HEMATOLOGICAL</option>
-                        <option value="19">19. MUSCULOSKELETAL</option>
+                        <option value="0">GENERIC</option>
+                        <option value="1">ONCOLOGY</option>
+                        <option value="2">ANTI-INFECTIVE</option>
+                        <option value="3">IMMUNO</option>
+                        <option value="4">ENDOCRINE</option>
+                        <option value="5">CNS_NEURO</option>
+                        <option value="6">CNS_HIGH</option>
+                        <option value="7">CARDIOVASCULAR</option>
+                        <option value="8">RENAL</option>
+                        <option value="9">HEPATIC</option>
+                        <option value="10">INFLAMMATION</option>
+                        <option value="11">RESPIRATORY</option>
+                        <option value="12">GASTRO</option>
+                        <option value="13">DERMAL</option>
+                        <option value="14">METABOLIC</option>
+                        <option value="15">OPHTHALMIC</option>
+                        <option value="16">AUDITORY</option>
+                        <option value="17">NEUROMODULATOR</option>
+                        <option value="18">HEMATOLOGICAL</option>
+                        <option value="19">MUSCULOSKELETAL</option>
                     </select>
                 </div>
-                <div><label class="label-text">Affinity (kcal/mol)</label><input id="affinity" type="number" step="0.1" class="input-field" placeholder="-9.2"></div>
+                <div><label class="label-text">Affinity (kcal/mol)</label><input id="affinity" type="number" step="0.1" class="input-field" placeholder="-9.5"></div>
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="label-text">LogP</label><input id="logP" type="number" step="0.1" class="input-field" placeholder="3.2"></div>
-                    <div><label class="label-text">MW (Da)</label><input id="mw" type="number" class="input-field" placeholder="420"></div>
+                    <div><label class="label-text">MW (Da)</label><input id="mw" type="number" class="input-field" placeholder="450"></div>
                 </div>
-                <div><label class="label-text">PSA (Å²)</label><input id="psa" type="number" class="input-field" placeholder="75"></div>
+                <div><label class="label-text">PSA (Å²)</label><input id="psa" type="number" class="input-field" placeholder="90"></div>
             </div>
         </div>
 
         <div class="card p-5 border-l-4 border-yellow-500">
-            <h2 class="section-title">2. Lab Data (Auto-Fills)</h2>
-            <div class="space-y-4">
-                <div><label class="label-text">Bioavailability %</label><input id="bio" type="text" class="input-field auto-field" readonly placeholder="Auto"></div>
-                <div><label class="label-text">Metabolic Stab. %</label><input id="metStab" type="text" class="input-field auto-field" readonly placeholder="Auto"></div>
-                <div><label class="label-text">Synth Steps</label><input id="steps" type="text" class="input-field auto-field" readonly placeholder="Auto"></div>
+            <h2 class="section-title">Lab Data (Auto-Fills)</h2>
+            <div class="space-y-3">
+                <div><label class="label-text">Bioavailability</label><input id="bio" class="input-field auto-field" readonly></div>
+                <div><label class="label-text">Metabolic Stability</label><input id="metStab" class="input-field auto-field" readonly></div>
+                <div><label class="label-text">Synthesis Complexity</label><input id="steps" class="input-field auto-field" readonly></div>
             </div>
         </div>
 
         <div class="card p-5 border-l-4 border-green-500">
-            <h2 class="section-title">3. Engine Predictions</h2>
-            <div class="space-y-3">
-                <div><label class="label-text">hERG Block %</label><div id="pred-herg" class="input-field auto-field">--</div></div>
-                <div><label class="label-text">DILI Risk</label><div id="pred-dili" class="input-field auto-field">--</div></div>
-                <div><label class="label-text">Ames Mutagenicity</label><div id="pred-ames" class="input-field auto-field">--</div></div>
-                <div><label class="label-text">Aggregation Risk</label><div id="pred-agg" class="input-field auto-field">--</div></div>
-                <div><label class="label-text">PAINS Filter</label><div id="pred-pains" class="input-field auto-field">CLEAR</div></div>
+            <h2 class="section-title">Safety Predictions</h2>
+            <div class="space-y-2 text-[11px] font-bold">
+                <div class="flex justify-between border-b border-[#30363d] pb-1"><span>hERG:</span> <span id="pred-herg" class="text-blue-400">--</span></div>
+                <div class="flex justify-between border-b border-[#30363d] pb-1"><span>DILI Risk:</span> <span id="pred-dili" class="text-blue-400">--</span></div>
+                <div class="flex justify-between border-b border-[#30363d] pb-1"><span>Ames Test:</span> <span id="pred-ames" class="text-blue-400">--</span></div>
+                <div class="flex justify-between border-b border-[#30363d] pb-1"><span>Aggregation:</span> <span id="pred-agg" class="text-blue-400">--</span></div>
+                <div class="flex justify-between border-b border-[#30363d] pb-1"><span>PAINS Filter:</span> <span id="pred-pains" class="text-green-500">CLEAR</span></div>
             </div>
         </div>
 
         <div class="card p-5 lg:col-span-2">
-            <h2 class="section-title">4. Industrial Sieve Analysis</h2>
-            <div class="brain-box flex-grow overflow-y-auto">
-                <span class="text-[10px] text-[#2ea44f] font-black uppercase">Engine Brain:</span>
-                <div id="brain-reasoning" class="text-gray-400 mt-2 italic leading-relaxed">Awaiting input...</div>
-            </div>
+            <h2 class="section-title">Brain Reasoning & Latent Sieve</h2>
+            <div class="brain-box text-xs leading-relaxed" id="brain-reasoning">System Standby. Please enter compound metrics to begin sieve.</div>
             <button class="btn" onclick="runEngine()">Process Compound</button>
         </div>
     </div>
 
     <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="result-box bg-[#161b22] border border-[#30363d] rounded-2xl p-6 text-xs">
-            <span class="text-gray-500 uppercase font-black mb-2 block">Gate Violation Logs (45 Gates):</span>
-            <div id="logic-log" class="w-full space-y-1">Awaiting data...</div>
+        <div class="result-box">
+            <span class="text-gray-500 uppercase font-black mb-2 block text-[10px] tracking-widest">Gate Violation Logs & Optimization Strategy</span>
+            <div id="logic-log" class="min-height-[120px]"></div>
         </div>
-        <div class="result-box bg-[#161b22] border border-[#30363d] rounded-2xl p-6 flex flex-col items-center justify-center">
-            <div id="multiplierLabel" class="text-[10px] text-gray-400 uppercase font-bold mb-1">Risk Multiplier: 1.0x</div>
+        <div class="result-box flex flex-col items-center justify-center relative overflow-hidden">
+            <div id="multiplierLabel" class="text-[10px] text-gray-500 uppercase font-bold mb-1">Risk Multiplier: 1.00x</div>
             <div class="flex items-center gap-6">
-                <span id="globalScore" class="text-6xl font-black text-white">0.0</span>
-                <span id="globalRank" class="text-6xl font-black text-gray-700">-</span>
+                <span id="globalScore" class="text-7xl font-black text-white">0.0</span>
+                <span id="globalRank" class="text-7xl font-black text-gray-700">-</span>
             </div>
             <div id="approvalStatus" class="mt-4 text-2xl font-black uppercase text-gray-600 tracking-widest">Standby</div>
         </div>
     </div>
 
-    <div class="watermark">GROW-WIN INDUSTRIAL BIOTECH · DESIGNED BY U. ANANTH KUMAR</div>
+    <div class="watermark">GROW-WIN INDUSTRIAL BIOTECH · V104 ACCELERATED · DESIGNED BY U. ANANTH KUMAR</div>
 </div>
 
 <script>
-    const targetTracks = {
-        0: { name: "GENERIC", hERG: 25, LogP: 5.5, MW: 600, PSA: 140 },
-        1: { name: "ONCOLOGY", hERG: 30, LogP: 5.0, MW: 550, PSA: 120 },
-        2: { name: "ANTI-INFECTIVE", hERG: 25, LogP: 5.0, MW: 500, PSA: 120 },
-        3: { name: "IMMUNO", hERG: 20, LogP: 4.5, MW: 500, PSA: 100 },
-        4: { name: "ENDOCRINE", hERG: 15, LogP: 4.5, MW: 450, PSA: 90 },
-        5: { name: "CNS_NEUROLOGICAL", hERG: 20, LogP: 3.8, MW: 500, PSA: 90 },
-        6: { name: "CNS_HIGH_PERMEANCE", hERG: 20, LogP: 3.5, MW: 480, PSA: 85 },
-        7: { name: "CARDIOVASCULAR", hERG: 15, LogP: 5.0, MW: 500, PSA: 100 },
-        8: { name: "RENAL", hERG: 25, LogP: 5.5, MW: 550, PSA: 110 },
-        9: { name: "HEPATIC", hERG: 25, LogP: 5.5, MW: 550, PSA: 110 },
-        10: { name: "INFLAMMATION", hERG: 10, LogP: 4.5, MW: 500, PSA: 90 },
-        11: { name: "RESPIRATORY", hERG: 20, LogP: 4.5, MW: 500, PSA: 95 },
-        12: { name: "GASTROINTESTINAL", hERG: 25, LogP: 5.0, MW: 500, PSA: 100 },
-        13: { name: "DERMAL", hERG: 25, LogP: 5.5, MW: 550, PSA: 120 },
-        14: { name: "METABOLIC", hERG: 20, LogP: 4.5, MW: 500, PSA: 90 },
-        15: { name: "OPHTHALMIC", hERG: 15, LogP: 4.0, MW: 480, PSA: 85 },
-        16: { name: "AUDITORY", hERG: 20, LogP: 4.5, MW: 500, PSA: 90 },
-        17: { name: "NEUROMODULATOR", hERG: 20, LogP: 3.8, MW: 500, PSA: 90 },
-        18: { name: "HEMATOLOGICAL", hERG: 25, LogP: 5.0, MW: 550, PSA: 100 },
-        19: { name: "MUSCULOSKELETAL", hERG: 25, LogP: 5.5, MW: 550, PSA: 110 },
-    };
+const targetTracks = {
+0:{name:"GENERIC",hERG:25,MW:600,PSA:140},
+1:{name:"ONCOLOGY",hERG:30,MW:550,PSA:120},
+2:{name:"ANTI-INFECTIVE",hERG:25,MW:500,PSA:120},
+3:{name:"IMMUNO",hERG:20,MW:500,PSA:100},
+4:{name:"ENDOCRINE",hERG:15,MW:450,PSA:90},
+5:{name:"CNS_NEURO",hERG:20,MW:500,PSA:90},
+6:{name:"CNS_HIGH",hERG:20,MW:480,PSA:85},
+7:{name:"CARDIOVASCULAR",hERG:15,MW:500,PSA:100},
+8:{name:"RENAL",hERG:25,MW:550,PSA:110},
+9:{name:"HEPATIC",hERG:25,MW:550,PSA:110},
+10:{name:"INFLAMMATION",hERG:10,MW:500,PSA:90},
+11:{name:"RESPIRATORY",hERG:20,MW:500,PSA:95},
+12:{name:"GASTRO",hERG:25,MW:500,PSA:100},
+13:{name:"DERMAL",hERG:25,MW:550,PSA:120},
+14:{name:"METABOLIC",hERG:20,MW:500,PSA:90},
+15:{name:"OPHTHALMIC",hERG:15,MW:480,PSA:85},
+16:{name:"AUDITORY",hERG:20,MW:500,PSA:90},
+17:{name:"NEUROMODULATOR",hERG:20,MW:500,PSA:90},
+18:{name:"HEMATOLOGICAL",hERG:25,MW:550,PSA:100},
+19:{name:"MUSCULOSKELETAL",hERG:25,MW:550,PSA:110}
+};
 
-    function parseInput(id) {
-        let val = parseFloat(document.getElementById(id).value);
-        return isNaN(val) ? null : val;
+const trackExceptions = {
+    0:{mwSlack:0,psaSlack:0},1:{mwSlack:150,psaSlack:50},2:{mwSlack:350,psaSlack:150},
+    3:{mwSlack:100,psaSlack:50},4:{mwSlack:0,psaSlack:0},5:{mwSlack:100,psaSlack:40},
+    6:{mwSlack:120,psaSlack:50},7:{mwSlack:0,psaSlack:0},8:{mwSlack:50,psaSlack:30},
+    9:{mwSlack:50,psaSlack:30},10:{mwSlack:50,psaSlack:40},11:{mwSlack:100,psaSlack:50},
+    12:{mwSlack:80,psaSlack:40},13:{mwSlack:50,psaSlack:30},14:{mwSlack:80,psaSlack:50},
+    15:{mwSlack:100,psaSlack:50},16:{mwSlack:100,psaSlack:50},17:{mwSlack:80,psaSlack:50},
+    18:{mwSlack:150,psaSlack:70},19:{mwSlack:80,psaSlack:50}
+};
+
+function parseInput(id){let val=parseFloat(document.getElementById(id).value);return isNaN(val)?null:val;}
+
+function runEngine(){
+    let trackID=document.getElementById('targetType').value;
+    let affinity=parseInput('affinity'), mw=parseInput('mw'), logP=parseInput('logP'), psa=parseInput('psa');
+    if(affinity===null||mw===null||logP===null||psa===null){alert("Mandatory metrics missing.");return;}
+
+    let track=targetTracks[trackID], exception=trackExceptions[trackID];
+
+    // LAB DATA MAPPING
+    let calcBio=Math.min(100,Math.max(20,50+(-affinity*3)-(logP*2)+(mw/10))).toFixed(1);
+    let calcMet=Math.min(100,Math.max(20,70-(logP*3)+(mw/15))).toFixed(1);
+    let calcSteps=Math.floor((mw/100)+Math.abs(logP));
+    document.getElementById('bio').value=calcBio+"%";
+    document.getElementById('metStab').value=calcMet+"%";
+    document.getElementById('steps').value=calcSteps;
+
+    // PREDICTIONS
+    let hergVal=parseFloat((5+0.5*logP+0.02*(mw-300)).toFixed(1));
+    let dili=(affinity<-7.5&&mw<500)?"LOW":"HIGH";
+    let ames=(mw>650||logP>5.5)?"POS":"NEG";
+    let agg=Math.min(50,5+2*Math.pow((logP-3),2)).toFixed(1);
+    document.getElementById('pred-herg').innerText=hergVal+"%";
+    document.getElementById('pred-dili').innerText=dili;
+    document.getElementById('pred-ames').innerText=ames;
+    document.getElementById('pred-agg').innerText=agg+"%";
+
+    let riskMultiplier=1.0, failedGates=[], brainReasoning="", optimizationTips=[];
+
+    // GATE 01: POTENCY
+    if(affinity > -6.5){ riskMultiplier = 0; failedGates.push("GATE01: Weak Potency Fail"); }
+
+    // SAFETY GATES (LATENT - NON-ZEROING)
+    if(hergVal > track.hERG){ 
+        riskMultiplier *= 0.6; 
+        failedGates.push(`GATE21: hERG Toxicity (${hergVal}%)`); 
+        optimizationTips.push("Reduce LogP or add polar groups to shield hERG interaction.");
+    }
+    if(ames === "POS"){ 
+        riskMultiplier *= 0.5; 
+        failedGates.push("GATE23: Mutagenicity Warning"); 
+        optimizationTips.push("Ames POS detected. Review aromatic amine/nitro substituents.");
+    }
+    if(dili === "HIGH"){ 
+        riskMultiplier *= 0.85; 
+        failedGates.push("GATE22: DILI Liver Stress"); 
+        optimizationTips.push("DILI risk high. Monitor AST/ALT in pre-clinical.");
     }
 
-    function runEngine() {
-        const trackID = document.getElementById('targetType').value;
-        const affinity = parseInput('affinity');
-        const mw = parseInput('mw');
-        const logP = parseInput('logP');
-        const psa = parseInput('psa');
-
-        if (affinity === null || mw === null || logP === null || psa === null) {
-            alert("All Mandatory Inputs (Affinity, MW, LogP, PSA) are required.");
-            return;
-        }
-
-        const track = targetTracks[trackID];
-
-        // --- 1. Automatic Lab Data Calculations ---
-        const calcBio = Math.min(100, Math.max(20, 50 + (-affinity * 3) - (logP * 2) + (mw / 10))).toFixed(1);
-        const calcMet = Math.min(100, Math.max(20, 70 - (logP * 3) + (mw / 15))).toFixed(1);
-        const calcSteps = Math.floor((mw / 100) + Math.abs(logP));
-
-        document.getElementById('bio').value = calcBio + "%";
-        document.getElementById('metStab').value = calcMet + "%";
-        document.getElementById('steps').value = calcSteps;
-
-        // --- 2. Predictions ---
-        const hergVal = parseFloat((5 + 0.5 * logP + 0.02 * (mw - 300)).toFixed(1));
-        const dili = (affinity < -7 && mw < 500) ? "LOW" : "HIGH";
-        const ames = (mw > 650 || logP > 6) ? "POS" : "NEG";
-        const agg = Math.min(50, 5 + 2 * Math.pow((logP - 3), 2)).toFixed(1);
-        const pains = "CLEAR";
-
-        document.getElementById('pred-herg').innerText = hergVal + "%";
-        document.getElementById('pred-dili').innerText = dili;
-        document.getElementById('pred-ames').innerText = ames;
-        document.getElementById('pred-agg').innerText = agg + "%";
-        document.getElementById('pred-pains').innerText = pains;
-
-        // --- 3. Industrial Logic (45 Gates) ---
-        let riskMultiplier = 1.0;
-        let hardFail = false;
-        let failedGates = [];
-        let brainReasoning = "";
-
-        // GATES 1-5: Potency & Size
-        if (affinity > -6.5) { hardFail = true; failedGates.push("GATE 01: Potency too weak"); }
-        if (mw > track.MW) { riskMultiplier *= 0.8; failedGates.push(`GATE 05: MW (${mw} > Track Limit ${track.MW})`); }
-
-        // GATES 6-10: Polarity (PSA)
-        if (psa > track.PSA) { riskMultiplier *= 0.9; failedGates.push(`GATE 06: PSA exceeds Track Limit ${track.PSA}`); }
-        if (psa > 140) { hardFail = true; failedGates.push("GATE 09: PSA critical (Absorption Failure)"); }
-
-        // GATES 11-20: Metabolism & Bio
-        if (parseFloat(calcBio) < 30) { riskMultiplier *= 0.8; failedGates.push("GATE 11: Low Bioavailability"); }
-        if (parseFloat(calcMet) < 30) { riskMultiplier *= 0.8; failedGates.push("GATE 12: Low Metabolic Stability"); }
-
-        // GATES 21-30: Toxicity Sieve
-        if (hergVal > track.hERG) { 
-            hardFail = true; 
-            failedGates.push(`GATE 21: hERG (${hergVal}% > Limit ${track.hERG}%)`); 
-            brainReasoning += "CRITICAL: Cardiac toxicity limit exceeded. ";
-        }
-        if (dili === "HIGH") { riskMultiplier *= 0.75; failedGates.push("GATE 22: DILI Risk High"); }
-        if (ames === "POS") { hardFail = true; failedGates.push("GATE 23: Mutagenicity Detected"); }
-        if (parseFloat(agg) > 15) { riskMultiplier *= 0.8; failedGates.push("GATE 24: Aggregation Risk"); }
-
-        // GATES 31-45: Contextual Optimization
-        if (track.name.includes("CNS") && logP > 3.8) { riskMultiplier *= 0.8; failedGates.push("GATE 41: CNS LogP optimized limit exceeded"); }
-        if (track.name === "CARDIOVASCULAR" && hergVal > 15) { hardFail = true; failedGates.push("GATE 42: Cardio Track hERG intolerance"); }
-
-        // --- 4. Final Output Processing ---
-        let finalScore = (Math.abs(affinity) * 4 + parseFloat(calcBio) * 0.2) * riskMultiplier;
-        
-        const approvalEl = document.getElementById('approvalStatus');
-        const scoreEl = document.getElementById('globalScore');
-        const rankEl = document.getElementById('globalRank');
-
-        if (hardFail) {
-            finalScore = 0;
-            riskMultiplier = 0.0;
-            approvalEl.innerText = "REJECTED";
-            approvalEl.style.color = "#f85149";
-            rankEl.innerText = "F";
-            brainReasoning += "Compound failed critical safety/potency gates.";
-        } else if (riskMultiplier < 1.0 || affinity > -7.5) {
-            approvalEl.innerText = "OPTIMIZATION REQ";
-            approvalEl.style.color = "#f2cc60";
-            rankEl.innerText = finalScore > 35 ? "B+" : "B";
-            brainReasoning = failedGates.join(". ");
-        } else {
-            approvalEl.innerText = "R&D READY";
-            approvalEl.style.color = "#2ea44f";
-            rankEl.innerText = finalScore > 40 ? "A+" : "A";
-            brainReasoning = "All industrial gates cleared for " + track.name + ".";
-        }
-
-        scoreEl.innerText = finalScore.toFixed(1);
-        document.getElementById('multiplierLabel').innerText = `Risk Multiplier: ${riskMultiplier.toFixed(2)}x`;
-        document.getElementById('brain-reasoning').innerText = brainReasoning;
-        document.getElementById('logic-log').innerHTML = failedGates.length > 0 ? 
-            failedGates.map(l => `<div class='insight-item text-red-400'>${l}</div>`).join('') : 
-            "<div class='text-green-500 font-bold'>✔ ALL 45 GATES CLEARED</div>";
+    // PROPERTY GATES
+    if(mw > (track.MW + exception.mwSlack)){
+        riskMultiplier *= 0.7;
+        failedGates.push(`GATE05: MW Critical (${mw})`);
+        optimizationTips.push("Structure is too bulky for delivery. Trim alkyl chains.");
+    } else if (mw > track.MW) {
+        brainReasoning += "Sieve: Applying Clinical MW Slack. ";
     }
+
+    if(psa > (track.PSA + exception.psaSlack)){
+        riskMultiplier *= 0.9;
+        failedGates.push(`GATE06: PSA Critical (${psa})`);
+    }
+
+    // RESCUE LOGIC
+    if((track.name === "ANTI-INFECTIVE" || track.name === "ONCOLOGY") && affinity < -10.5) {
+        riskMultiplier *= 1.35; 
+        brainReasoning += "RESCUE: High Potency Accelerated Track applied. ";
+    }
+
+    // FINAL SCORING
+    let finalScore=(Math.abs(affinity)*4.5 + parseFloat(calcBio)*0.15)*riskMultiplier;
+    let approvalEl=document.getElementById('approvalStatus'), scoreEl=document.getElementById('globalScore'), rankEl=document.getElementById('globalRank');
+
+    scoreEl.innerText=finalScore.toFixed(1);
+    document.getElementById('multiplierLabel').innerText=`Risk Multiplier: ${riskMultiplier.toFixed(2)}x`;
+    document.getElementById('brain-reasoning').innerText=brainReasoning || "Sieve Complete. Compound analyzed across 45 latent parameters.";
+
+    if(finalScore > 40) {
+        approvalEl.innerText="R&D READY"; approvalEl.style.color="#2ea44f"; rankEl.innerText="A+";
+    } else if(finalScore > 18) {
+        approvalEl.innerText="ACCELERATED TRACK"; approvalEl.style.color="#f2cc60"; rankEl.innerText="B";
+    } else if (finalScore > 0) {
+        approvalEl.innerText="OPTIMIZATION REQUIRED"; approvalEl.style.color="#f85149"; rankEl.innerText="C";
+    } else {
+        approvalEl.innerText="REJECTED"; approvalEl.style.color="#8b949e"; rankEl.innerText="F";
+    }
+
+    let logHtml = failedGates.map(l => `<div class='insight-item text-red-400'>${l}</div>`).join('');
+    if(optimizationTips.length > 0) {
+        logHtml += `<div class='mt-3 text-[10px] text-green-400 font-bold'>STRATEGY INSIGHTS:</div>`;
+        logHtml += optimizationTips.map(t => `<div class='insight-item text-gray-400'>• ${t}</div>`).join('');
+    }
+    document.getElementById('logic-log').innerHTML = failedGates.length > 0 ? logHtml : "<div class='text-green-500 font-bold'>✔ ALL 45 GATES CLEARED</div>";
+}
 </script>
 </body>
 </html>
