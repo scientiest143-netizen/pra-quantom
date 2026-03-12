@@ -19,6 +19,7 @@
         .watermark { text-align: center; margin-top: 2rem; font-size: 10px; color: #30363d; letter-spacing: 2px; font-weight: bold; }
         .insight-item { border-bottom: 1px solid #21262d; padding: 4px 0; }
         .opt-suggest { color: #f2cc60; margin-top: 8px; font-weight: 700; border-top: 1px dashed #3b434b; padding-top: 8px; }
+        .brain-box { border: 1px solid #2ea44f44; background: #0d1117; border-radius: 1rem; padding: 12px; margin-top: 10px; }
     </style>
 </head>
 <body class="p-6">
@@ -35,26 +36,26 @@
             <div class="space-y-3">
                 <div class="flex flex-col"><label class="label-text">Target Type</label>
                     <select id="targetType" class="input-field !w-full text-[10px]">
-                        <option value="generic">0. GENERIC</option>
-                        <option value="oncology">1. ONCOLOGY</option>
-                        <option value="anti-infective">2. ANTI-INFECTIVE</option>
-                        <option value="antiviral">3. ANTIVIRAL</option>
-                        <option value="antibacterial">4. ANTIBACTERIAL</option>
-                        <option value="antifungal">5. ANTIFUNGAL</option>
-                        <option value="cns">6. CNS (NEURO)</option>
-                        <option value="cardio">7. CARDIOVASCULAR</option>
-                        <option value="metabolic">8. METABOLIC</option>
-                        <option value="immuno">9. IMMUNOLOGY</option>
-                        <option value="inflam">10. INFLAMMATION</option>
-                        <option value="resp">11. RESPIRATORY</option>
-                        <option value="gi">12. GASTROINTESTINAL</option>
-                        <option value="derma">13. DERMATOLOGY</option>
-                        <option value="hormonal">14. HORMONAL</option>
-                        <option value="autoimmune">15. AUTOIMMUNE</option>
-                        <option value="neurodeg">16. NEURODEGENERATIVE</option>
-                        <option value="pain">17. PAIN/ANALGESIC</option>
-                        <option value="parasitic">18. ANTIPARASITIC</option>
-                        <option value="vaccine">19. VACCINE</option>
+                        <option value="GENERIC">0. GENERIC</option>
+                        <option value="ONCOLOGY">1. ONCOLOGY</option>
+                        <option value="ANTI-INFECTIVE">2. ANTI-INFECTIVE</option>
+                        <option value="ANTIVIRAL">3. ANTIVIRAL</option>
+                        <option value="ANTIBACTERIAL">4. ANTIBACTERIAL</option>
+                        <option value="ANTIFUNGAL">5. ANTIFUNGAL</option>
+                        <option value="CNS">6. CNS (NEURO)</option>
+                        <option value="CARDIO">7. CARDIOVASCULAR</option>
+                        <option value="METABOLIC">8. METABOLIC</option>
+                        <option value="IMMUNO">9. IMMUNOLOGY</option>
+                        <option value="INFLAMMATION">10. INFLAMMATION</option>
+                        <option value="RESP">11. RESPIRATORY</option>
+                        <option value="GI">12. GASTROINTESTINAL</option>
+                        <option value="DERMA">13. DERMATOLOGY</option>
+                        <option value="HORMONAL">14. HORMONAL</option>
+                        <option value="AUTOIMMUNE">15. AUTOIMMUNE</option>
+                        <option value="NEURODEG">16. NEURODEGENERATIVE</option>
+                        <option value="PAIN">17. PAIN/ANALGESIC</option>
+                        <option value="PARASITIC">18. ANTIPARASITIC</option>
+                        <option value="VACCINE">19. VACCINE</option>
                     </select>
                 </div>
                 <div class="flex justify-between items-center"><label class="label-text">Affinity (kcal/mol)</label><input id="affinity" type="number" step="0.1" class="input-field" placeholder="0.0"></div>
@@ -111,7 +112,10 @@
         <div class="result-box flex-col items-start p-6 text-xs" id="logOutput">
             <span class="text-gray-500 uppercase font-black mb-2">45-Gate Industrial Sieve:</span>
             <div id="logic-log" class="w-full">Awaiting industrial parameters...</div>
-            <div id="opt-log" class="w-full mt-2"></div>
+            <div class="brain-box w-full">
+                <span class="text-[10px] text-[#2ea44f] font-black uppercase">Engine Brain (Scientific Reasoning):</span>
+                <div id="brain-reasoning" class="text-gray-400 mt-1 italic">No data processed yet.</div>
+            </div>
         </div>
         <div class="result-box flex-col p-6 text-center">
             <div id="multiplierLabel" class="text-[10px] text-gray-500 uppercase mb-1">Risk Multiplier: 1.0x</div>
@@ -119,7 +123,7 @@
                 <span id="globalScore" class="text-5xl font-black text-white">0.0</span>
                 <span id="globalRank" class="text-5xl font-black text-gray-700">-</span>
             </div>
-            <div id="approvalStatus" class="mt-2 text-xs font-bold uppercase text-gray-500 italic">Standby</div>
+            <div id="approvalStatus" class="mt-4 text-xl font-black uppercase text-gray-500">Standby</div>
         </div>
     </div>
 
@@ -132,129 +136,118 @@
         return isNaN(val) ? def : val;
     }
 
-    function getTargetRules(target) {
-        let rules = { affinity: -7.0, logP_min: -1.0, logP_max: 5.0, psa_max: 140 };
-        const t = target.toUpperCase();
-        if (t === "METABOLIC") rules = { affinity: -6.0, logP_min: -2.5, logP_max: 3.5, psa_max: 150 };
-        else if (t === "ONCOLOGY") rules = { affinity: -7.5, logP_min: -1.0, logP_max: 5.5, psa_max: 160 };
-        else if (t === "CNS") rules = { affinity: -7.0, logP_min: 1.0, logP_max: 4.5, psa_max: 70 };
-        else if (t.includes("ANTI-") || t.includes("ANTI")) rules = { affinity: -7.0, logP_min: -1.5, logP_max: 4.5, psa_max: 130 };
-        return rules;
-    }
-
     function runAll() {
         const targetType = document.getElementById('targetType').value;
-        const rules = getTargetRules(targetType);
-
         const affinity = parseInput('affinity', -20, 0, 0);
-        const rmsd = parseInput('rmsd', 0, 10, 0);
+        const herg = parseInput('herg', 0, 100, 0);
+        const diliStatus = document.getElementById('dili').value.toUpperCase();
+        const ames = document.getElementById('ames').value;
         const bio = parseInput('bio', 0, 100, 0);
         const logP = parseInput('logP', -5, 15, 0);
         const psa = parseInput('psa', 0, 300, 0);
         const stability = parseInput('metStab', 0, 100, 0);
-        const cyp = parseInput('cyp', 0, 100, 0);
-        const herg = parseInput('herg', 0, 100, 0);
-        const cyto = parseInput('cyto', 0, 1000, 0);
-        const diliStatus = document.getElementById('dili').value.toUpperCase();
-        const ames = document.getElementById('ames').value;
-        const genotox = document.getElementById('genotox').value;
-        const mech = document.getElementById('mechRisk').value;
-        const pains = document.getElementById('pains').value;
-        const aggRisk = parseInput('agg', 0, 100, 0);
 
-        let gateFailures = 0;
-        let criticalFailures = 0;
         let riskMultiplier = 1.0;
         let log = [];
-        let optSuggest = [];
+        let brainReason = "";
+        let gateFailures = 0;
 
-        // 1. Docking Affinity
-        if (affinity > rules.affinity) { 
-            gateFailures++; 
+        // INDUSTRIAL hERG LIMITS
+        const hERG_limits = {
+            CARDIO: 15,
+            CNS: 20,
+            ONCOLOGY: 30,
+            INFLAMMATION: 35,
+            GENERIC: 25
+        };
+
+        // 1. HARD REJECT LOGIC
+        let hardFail = false;
+
+        // Apply Gate 21
+        const limit = hERG_limits[targetType] || hERG_limits.GENERIC;
+        if(herg > limit){
+            gateFailures++;
+            hardFail = true;
+            log.push("Gate 21: CRITICAL hERG Block");
+            brainReason += `• hERG (${herg}%) > Limit (${limit}%) for ${targetType}. `;
+        }
+
+        if (targetType !== "ONCOLOGY") {
+            if (diliStatus === "CRITICAL" || ames === "pos") { 
+                hardFail = true; 
+                brainReason += "• Critical Toxicology (DILI/Ames) in safe-track mode. "; 
+            }
+        }
+
+        // 2. SOFT DEVIATIONS (Optimization Path)
+        let needsOpt = false;
+        
+        // Logical Suggestions for Engine Brain
+        if (affinity > -7.0) { 
             riskMultiplier *= 0.8; 
-            log.push(`Gate 1: Weak Affinity (> ${rules.affinity})`); 
-            optSuggest.push(`Increase Affinity to at least ${rules.affinity} kcal/mol`);
+            needsOpt = true; 
+            log.push("Sub-optimal Affinity"); 
+            brainReason += "• Weak binding; consider core scaffold modification. ";
         }
-
-        if (rmsd > 2.0) { 
-            gateFailures++; 
-            log.push("Gate 2: Pose Instability (RMSD > 2.0)"); 
-            optSuggest.push("Minimize RMSD below 2.0 Å for better binding stability");
+        if (psa > 140) { 
+            riskMultiplier *= 0.9; 
+            needsOpt = true; 
+            log.push("High PSA"); 
+            brainReason += "• Reduce polar groups to improve permeability. ";
         }
-        
-        // 2. ADMET & LogP
+        if (logP > 5.0) {
+            riskMultiplier *= 0.85;
+            needsOpt = true;
+            log.push("Lipophilicity Warning");
+            brainReason += "• LogP too high; risk of non-specific binding. ";
+        }
         if (bio < 30) { 
-            gateFailures++; 
-            log.push("Gate 11: Poor Bioavailability (< 30%)"); 
-            optSuggest.push("Improve Bioavailability above 30% for systemic efficacy");
-        }
-        
-        if (logP < rules.logP_min || logP > rules.logP_max) { 
-            gateFailures++; 
-            log.push(`Gate 6: LogP Lipophilicity Out of Range`); 
-            optSuggest.push(`Optimize LogP to fall between ${rules.logP_min} and ${rules.logP_max}`);
+            riskMultiplier *= 0.85; 
+            needsOpt = true; 
+            log.push("Low Bioavailability"); 
+            brainReason += "• Poor absorption; check solubility or metabolic path. ";
         }
 
-        if (psa > rules.psa_max) { 
-            gateFailures++; 
-            log.push(`Gate 7: High PSA (> ${rules.psa_max})`); 
-            optSuggest.push(`Reduce Polar Surface Area (PSA) below ${rules.psa_max} Å²`);
+        // 3. FINAL DECISION GATES
+        const statusObj = document.getElementById('approvalStatus');
+        if (hardFail) {
+            riskMultiplier = 0.0;
+            statusObj.innerText = "REJECTED (CRITICAL)";
+            statusObj.style.color = "#f85149";
+            if (!brainReason) brainReason = "Molecule failed critical industrial safety gates.";
+        } else if (needsOpt || riskMultiplier < 1.0) {
+            statusObj.innerText = "OPTIMIZATION REQ";
+            statusObj.style.color = "#f2cc60";
+            if (!brainReason) brainReason = "Molecule is viable but requires structural optimization.";
+        } else {
+            statusObj.innerText = "R&D READY";
+            statusObj.style.color = "#2ea44f";
+            brainReason = "Molecule meets all context-dependent thresholds for preclinical entry.";
         }
 
-        // 3. TOXICOLOGY (CRITICAL)
-        if (herg > 10) { 
-            criticalFailures++; log.push("Gate 21: CRITICAL hERG Block"); 
-            optSuggest.push("CRITICAL: Reduce hERG inhibition below 10% to avoid arrhythmia");
-        }
-        if (diliStatus !== "LOW") { 
-            criticalFailures++; log.push("Gate 23: Hepatic Risk detected"); 
-            optSuggest.push("CRITICAL: Address DILI risk; change status to LOW");
-        }
-        if (genotox === "1" || ames === "pos") { 
-            criticalFailures++; log.push("Gate 24: Mutagenicity detected"); 
-            optSuggest.push("CRITICAL: Remove mutagenic structural features (Ames/Genotox)");
-        }
-
-        // Global Multiplier & Score
-        if (criticalFailures > 0) riskMultiplier = 0.0;
-        else if (gateFailures === 2 && riskMultiplier > 0.5) riskMultiplier = 0.5;
-        else if (gateFailures === 1 && riskMultiplier > 0.8) riskMultiplier = 0.8;
-
+        // 4. SCORING ENGINE
         let dockingScore = Math.min(Math.max(Math.abs(affinity) * 3.5, 0), 35);
         let admetScore = (bio * 0.15) + (stability * 0.1);
-        let safetyScore = Math.max(0, (40 - gateFailures) * 1.5);
+        let safetyScore = Math.max(0, 40 - (herg * 0.2));
         let finalScore = (dockingScore + admetScore + safetyScore) * riskMultiplier;
 
+        // UI UPDATES
+        document.getElementById('globalScore').innerText = finalScore.toFixed(1);
+        document.getElementById('multiplierLabel').innerText = `Risk Multiplier: ${riskMultiplier.toFixed(2)}x`;
+        document.getElementById('brain-reasoning').innerText = brainReason;
+        document.getElementById('logic-log').innerHTML = log.length > 0 ? 
+            log.map(l => `<div class='insight-item ${l.includes("Gate") ? "text-red-500" : "text-yellow-400"}'>${l}</div>`).join('') : 
+            "<div class='text-green-500'>✔ ALL GATES CLEAR</div>";
+        
         let rank = "F";
         if (riskMultiplier > 0) {
-            if (finalScore >= 130) rank = "A+";
-            else if (finalScore >= 110) rank = "A";
-            else if (finalScore >= 90) rank = "B";
-            else if (finalScore >= 70) rank = "C";
-            else rank = "D";
+            if (finalScore >= 120) rank = "A+";
+            else if (finalScore >= 100) rank = "A";
+            else if (finalScore >= 80) rank = "B";
+            else rank = "C";
         }
-
-        // Optimization Engine Trigger
-        if (rank !== "A" && rank !== "A+" && optSuggest.length === 0) {
-            if (dockingScore < 25) optSuggest.push("Boost binding affinity to reach A-Rank status");
-            if (bio < 60) optSuggest.push("Higher Bioavailability will significantly raise the global score");
-        }
-
-        // UI UPDATE
-        document.getElementById('globalScore').innerText = finalScore.toFixed(1);
         document.getElementById('globalRank').innerText = rank;
-        document.getElementById('multiplierLabel').innerText = `Risk Multiplier: ${riskMultiplier.toFixed(2)}x`;
-        
-        const statusObj = document.getElementById('approvalStatus');
-        statusObj.innerText = (riskMultiplier === 0) ? "REJECTED (CRITICAL)" : (finalScore > 105 ? "R&D READY" : "OPTIMIZATION REQ");
-        statusObj.style.color = (riskMultiplier === 0) ? "#f85149" : "#2ea44f";
-
-        document.getElementById('logic-log').innerHTML = log.length > 0 ? 
-            log.map(l => `<div class='insight-item text-red-400'>${l}</div>`).join('') : 
-            "<div class='text-green-500'>✔ ALL INDUSTRIAL GATES PASSED</div>";
-
-        document.getElementById('opt-log').innerHTML = optSuggest.length > 0 ? 
-            `<div class='opt-suggest'>PATHWAY TO A-RANK:<br>${optSuggest.map(s => `• ${s}`).join('<br>')}</div>` : "";
     }
 </script>
 </body>
